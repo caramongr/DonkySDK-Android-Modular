@@ -1,4 +1,4 @@
-package net.donky.core.test;
+package net.donky.core;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;
@@ -25,7 +25,7 @@ public class IntegrationAnonymousTest extends ApplicationTestCase<Application> {
         /*
         MockDonkyListener listener = new MockDonkyListener();
 
-        DonkyCore.initialiseDonkySDK(getApplication(), "vMBC8SHsILtV1g+UVnozZ0QmMKM4mcpNbNLfwUQnKq8P2z1XPMhhuHThwszJorUv32epCXMSjq3kwq0KM35w", listener);
+        DonkyCore.initialiseDonkySDK(getApplication(), DONKY_API_KEY, listener);
 
         synchronized (listener) {
             listener.wait(2000);

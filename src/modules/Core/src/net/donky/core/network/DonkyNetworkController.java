@@ -348,8 +348,15 @@ public class DonkyNetworkController {
 
                                             synchronise(listener);
 
+                                        } else {
+
+                                            if (listener != null) {
+                                                listener.success();
+                                            }
+
                                         }
                                     }
+
                                 }, 3000);
 
                                 synchronized (sharedLock) {
@@ -397,6 +404,13 @@ public class DonkyNetworkController {
                         sharedLock.notifyAll();
                     }
 
+                    DonkyException donkyException = new DonkyException("Error processing notification sync.");
+                    donkyException.initCause(e);
+
+                    if (listener != null) {
+                        listener.error(donkyException, null);
+                    }
+
                     log.error("Error performing sync", e);
                 }
             }
@@ -421,12 +435,25 @@ public class DonkyNetworkController {
 
                 @Override
                 public void error(DonkyException donkyException, Map<String, String> validationErrors) {
+
                     log.warning("User suspended. Re-authentication failed.");
+
+                    if (listener != null) {
+                        listener.error(donkyException, validationErrors);
+                    }
+
                 }
             });
 
         } else {
             log.warning("Cancel synchronisation. User not registered.");
+
+            DonkyException donkyException = new DonkyException("Cancel synchronisation. User not registered.");
+
+            if (listener != null) {
+                listener.error(donkyException, null);
+            }
+
         }
     }
 

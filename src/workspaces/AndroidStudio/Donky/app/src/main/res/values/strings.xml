@@ -8,8 +8,6 @@
     <string name="DebugLogsEnabled">true</string>
     <string name="SensitiveLogsEnabled">true</string>
 
-    <string name="ServiceURL">https://dev-client-api.mobiledonky.com</string>
-
     <integer name="minimalTimeBetweenSubmittingLogsSeconds">30</integer>
 
     <string name="app_name">DonkyTest</string>

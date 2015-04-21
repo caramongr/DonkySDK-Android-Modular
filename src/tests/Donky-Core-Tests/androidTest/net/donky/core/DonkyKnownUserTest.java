@@ -63,7 +63,7 @@ public class DonkyKnownUserTest extends ApplicationTestCase<Application> {
 
     private static int TIME_OUT = 30000;
 
-    private static String apiKey = "vMBC8SHsILtV1g+UVnozZ0QmMKM4mcpNbNLfwUQnKq8P2z1XPMhhuHThwszJorUv32epCXMSjq3kwq0KM35w";
+    private static String apiKey = DONKY_API_KEY;
 
     private static String initialUserId = "test_"+new Integer(Math.abs(new Random().nextInt(Integer.MAX_VALUE)));
 
