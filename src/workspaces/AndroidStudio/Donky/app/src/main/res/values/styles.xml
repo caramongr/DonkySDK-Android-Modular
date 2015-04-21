@@ -1,0 +1,16 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Customize your theme here. -->
+    </style>
+
+    <style name="Theme.Donky.Messaging.Light.CustomDonkyActivity" parent="Theme.Donky.Messaging.Light.DonkyActivity">
+
+        <item name="colorPrimary">@color/donkyColorPrimary</item>
+        <item name="colorPrimaryDark">@color/donkyColorPrimaryDark</item>
+        <item name="android:textColorPrimary">@color/donkyTextColorPrimary</item>
+
+    </style>
+
+</resources>

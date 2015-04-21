@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <color name="donky_notification_led">@android:color/white</color>
+    <color name="donky_notification_icon_background_rich">@android:color/holo_purple</color>
+
+</resources>

@@ -1,0 +1,12 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="net.donky.core.messaging.rich.ui">
+
+    <application android:allowBackup="true">
+
+        <activity
+            android:name="net.donky.core.messaging.rich.ui.components.RichMessagePopUpActivity"
+            android:theme="@style/Theme.Donky.Messaging.Light.DonkyActivity"></activity>
+
+    </application>
+
+</manifest>

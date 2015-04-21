@@ -1,0 +1,12 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="net.donky.core.messaging.push.logic">
+
+    <application android:allowBackup="true">
+
+        <service
+            android:name="net.donky.core.messaging.push.logic.PushLogicIntentService"
+            android:exported="true" />
+
+    </application>
+
+</manifest>

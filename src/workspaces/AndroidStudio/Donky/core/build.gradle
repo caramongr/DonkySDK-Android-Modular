@@ -1,0 +1,37 @@
+apply plugin: 'com.android.library'
+
+android {
+    compileSdkVersion 21
+    buildToolsVersion "21.1.2"
+
+    defaultConfig {
+        minSdkVersion 14
+        targetSdkVersion 21
+        versionCode 1
+        versionName "1.0"
+    }
+
+    sourceSets {
+        main.manifest.srcFile '../../../../modules/Core/AndroidManifest.xml'
+        main.java.srcDirs = ['../../../../modules/Core/src']
+        main.res.srcDirs = ['../../../../modules/Core/res']
+
+        androidTest.java.srcDirs = ['../../../../tests/Donky-Core-Tests/androidTest']
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile 'com.android.support:appcompat-v7:22.0.0'
+    compile 'com.google.android.gms:play-services-gcm:7.0.0'
+    compile 'com.squareup.retrofit:retrofit:1.9.0'
+    compile 'com.squareup.okhttp:okhttp:2.3.0'
+    compile 'junit:junit:4.12'
+}

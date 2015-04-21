@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Theme.Donky.Messaging.Light.DonkyActivity" parent="Theme.AppCompat.Light.NoActionBar">
+    </style>
+
+    <style name="Theme.Donky.Messaging.DonkyActivity" parent="Theme.AppCompat.NoActionBar">
+    </style>
+
+</resources>

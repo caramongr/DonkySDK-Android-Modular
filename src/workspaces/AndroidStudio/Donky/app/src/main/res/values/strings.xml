@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="LoggingEnabled">true</string>
+    <string name="ErrorLogsEnabled">true</string>
+    <string name="WarningLogsEnabled">true</string>
+    <string name="InfoLogsEnabled">true</string>
+    <string name="DebugLogsEnabled">true</string>
+    <string name="SensitiveLogsEnabled">true</string>
+
+    <string name="ServiceURL">https://dev-client-api.mobiledonky.com</string>
+
+    <integer name="minimalTimeBetweenSubmittingLogsSeconds">30</integer>
+
+    <string name="app_name">DonkyTest</string>
+
+</resources>
