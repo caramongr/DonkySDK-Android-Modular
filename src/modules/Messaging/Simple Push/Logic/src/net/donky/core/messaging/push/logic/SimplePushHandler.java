@@ -4,8 +4,6 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
 import net.donky.core.DonkyCore;
-import net.donky.core.DonkyException;
-import net.donky.core.DonkyListener;
 import net.donky.core.helpers.DateAndTimeHelper;
 import net.donky.core.logging.DLog;
 import net.donky.core.messaging.logic.MessageReceivedDetails;
@@ -15,7 +13,6 @@ import net.donky.core.network.AcknowledgementDetail;
 import net.donky.core.network.ServerNotification;
 
 import java.util.Date;
-import java.util.Map;
 
 /**
  * Class responsible for translating Server notification with Simple/Interactive notification into Local Event.
@@ -62,7 +59,7 @@ public class SimplePushHandler {
             messageReceivedDetails.setMessageScope(MessageReceivedDetails.MessageScope.A2P.toString());
             messageReceivedDetails.setContextItems(simplePushData.getContextItems());
             messageReceivedDetails.setSenderInternalUserId(simplePushData.getSenderInternalUserId());
-            messageReceivedDetails.setSenderMessageId(simplePushData.getMessageId());
+            messageReceivedDetails.setSenderMessageId(simplePushData.getSenderMessageId());
             messageReceivedDetails.setSentTimestamp(simplePushData.getSentTimestamp());
 
             Date expiredTime = DateAndTimeHelper.parseUtcDate(simplePushData.getExpiryTimeStamp());
