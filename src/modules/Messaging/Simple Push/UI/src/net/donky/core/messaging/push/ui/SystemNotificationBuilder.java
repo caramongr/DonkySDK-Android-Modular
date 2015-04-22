@@ -4,6 +4,7 @@ import android.app.Notification;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.os.Build;
 import android.support.v4.app.NotificationCompat;
 import android.text.Html;
 import android.text.TextUtils;
@@ -80,38 +81,53 @@ public class SystemNotificationBuilder {
 
             if (buttonSetToUse != null) {
 
-                if (buttonSetToUse.getButtonSetActions() != null) {
 
-                    if (buttonSetToUse.getButtonSetActions().length == 2) {
 
-                        for (int i = 0; i < buttonSetToUse.getButtonSetActions().length; i++) {
+                    if (buttonSetToUse.getButtonSetActions() != null) {
 
-                            PendingIntent pendingIntent = PushLogicController.getInstance().createPendingIntent(buttonSetToUse.getButtonSetActions()[i], simplePushData, notificationId);
+                        if (buttonSetToUse.getButtonSetActions().length == 2) {
 
-                            builder.addAction(
-                                    simplePushUIConfiguration.getActionButtonIconIds()[i],
-                                    buttonSetToUse.getButtonSetActions()[i].getLabel(),
-                                    pendingIntent
-                            );
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+
+                                for (int i = 0; i < buttonSetToUse.getButtonSetActions().length; i++) {
+
+                                    PendingIntent pendingIntent = PushLogicController.getInstance().createPendingIntent(buttonSetToUse.getButtonSetActions()[i], simplePushData, notificationId);
+
+                                    builder.addAction(
+                                            simplePushUIConfiguration.getActionButtonIconIds()[i],
+                                            buttonSetToUse.getButtonSetActions()[i].getLabel(),
+                                            pendingIntent
+                                    );
+
+                                }
+
+                                builder.setAutoCancel(false);
+
+                            } else {
+
+                                PendingIntent pendingIntent = PushLogicController.getInstance().createPendingIntent(buttonSetToUse.getButtonSetActions()[1], simplePushData, notificationId);
+
+                                builder.setContentIntent(pendingIntent);
+
+                                builder.setAutoCancel(true);
+
+                            }
+                        } else if (buttonSetToUse.getButtonSetActions().length == 1) {
+
+                            PendingIntent pendingIntent = PushLogicController.getInstance().createPendingIntent(buttonSetToUse.getButtonSetActions()[0], simplePushData, notificationId);
+
+                            builder.setContentIntent(pendingIntent);
+
+                            builder.setAutoCancel(true);
 
                         }
-
-                        builder.setAutoCancel(false);
-
-                    } else if (buttonSetToUse.getButtonSetActions().length == 1) {
-
-                        PendingIntent pendingIntent = PushLogicController.getInstance().createPendingIntent(buttonSetToUse.getButtonSetActions()[0], simplePushData, notificationId);
-
-                        builder.setContentIntent(pendingIntent);
-
-                        builder.setAutoCancel(true);
-
                     }
-                }
 
             } else {
+
                 builder.setContentIntent(PushLogicController.getInstance().createPendingIntent(null, null, notificationId));
                 builder.setAutoCancel(true);
+
             }
 
         } else {
