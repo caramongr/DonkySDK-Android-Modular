@@ -1,9 +1,11 @@
 package net.donky.core.messaging.ui.components.rich;
 
+import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.media.RingtoneManager;
 import android.net.Uri;
+import android.os.Build;
 
 import net.donky.core.messaging.ui.R;
 
@@ -38,11 +40,14 @@ public class RichMessagePushUIConfiguration {
 
     private int smallIconId;
 
+    @SuppressLint("NewApi")
     public RichMessagePushUIConfiguration() {
 
-        this.category = Notification.CATEGORY_MESSAGE;
-        this.priority = Notification.PRIORITY_HIGH;
-        this.visibility = Notification.VISIBILITY_PUBLIC;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            this.category = Notification.CATEGORY_MESSAGE;
+            this.priority = Notification.PRIORITY_HIGH;
+            this.visibility = Notification.VISIBILITY_PUBLIC;
+        }
         this.vibratePattern = new long[] { 0l, 100l };
         this.soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         this.iconBackgroundColor = R.color.donky_notification_icon_background_rich;

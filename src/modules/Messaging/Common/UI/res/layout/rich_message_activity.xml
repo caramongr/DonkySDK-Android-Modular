@@ -10,7 +10,7 @@
         android:id="@+id/toolbar"
         layout="@layout/toolbar"></include>
 
-    <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+    <fragment
         android:id="@+id/rich_message_fragment"
         android:layout_below="@id/toolbar"
         android:name="net.donky.core.messaging.ui.components.rich.RichMessageFragment"
