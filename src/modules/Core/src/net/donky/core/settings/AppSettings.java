@@ -18,7 +18,7 @@ public class AppSettings {
     // 2 - Minor version number, increment when adding new functionality.
     // 3 - Major bug fix number, increment every 100 bugs.
     // 4 - Minor bug fix number, increment every bug fix, roll back when reaching 99.
-    private static final String CLIENT_VERSION = "2.0.0.1";
+    private static final String CLIENT_VERSION = "2.0.0.2";
 
     private static final String DEFAULT_SERVICE_URL = "https://client-api.mobiledonky.com";
 

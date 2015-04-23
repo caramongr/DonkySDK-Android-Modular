@@ -563,11 +563,7 @@ public class DonkyAccountController {
      */
     private void saveRegistrationData(final String apiKey, final UserDetails userDetails, final DeviceDetails deviceDetails, String appVersion, boolean isUserAnonymous) {
 
-        if (TextUtils.isEmpty(DonkyDataController.getInstance().getConfigurationDAO().getDonkyNetworkApiKey())) {
-
-            DonkyDataController.getInstance().getConfigurationDAO().setDonkyNetworkApiKey(apiKey);
-
-        }
+        DonkyDataController.getInstance().getConfigurationDAO().setDonkyNetworkApiKey(apiKey);
 
         UserDetails user = DonkyDataController.getInstance().getUserDAO().getUserDetails();
 
@@ -614,7 +610,7 @@ public class DonkyAccountController {
 
         if (DonkyCore.isInitialised() && !TextUtils.isEmpty(apiKey) && context != null) {
 
-            boolean isAllowedToRegister = TextUtils.isEmpty(DonkyDataController.getInstance().getUserDAO().getUserNetworkId());
+            boolean isAllowedToRegister = TextUtils.isEmpty(DonkyDataController.getInstance().getUserDAO().getUserNetworkId()) || !apiKey.equals(DonkyDataController.getInstance().getConfigurationDAO().getDonkyNetworkApiKey());
 
             if (isAllowedToRegister) {
 
@@ -655,6 +651,8 @@ public class DonkyAccountController {
                     DonkyCore.publishLocalEvent(new RegistrationChangedEvent(userDetails, deviceDetails));
 
                     DonkyNetworkController.getInstance().synchronise();
+
+                    DonkyDataController.getInstance().getConfigurationDAO().setGcmRegistrationId(null);
 
                 } else {
 
@@ -773,6 +771,58 @@ public class DonkyAccountController {
                     }
                 }
             }.execute(null, null, null);
+        }
+    }
+
+    /**
+     * Recover in case the registration was deleted on the server. This method is for Donky Core internal use only.
+     */
+    public void reRegisterWithSameUserDetailsSynchronously() throws DonkyException {
+
+        // Do not re-register if this is called in response to initial registration failure.
+        if (!TextUtils.isEmpty(DonkyDataController.getInstance().getConfigurationDAO().getAuthorisationToken()) && isRegistered.get()) {
+
+            synchronized (sharedLock) {
+                isRegistered.set(false);
+                sharedLock.notifyAll();
+            }
+
+            UserDetails userDetails = DonkyAccountController.getInstance().getCurrentDeviceUser();
+
+            // Necessary when upgrading from anonymous user.
+            if (userDetails != null && userDetails.getUserDisplayName() == null) {
+                userDetails.setUserDisplayName(userDetails.getUserId());
+            }
+
+            DeviceDetails deviceDetails = DonkyAccountController.getInstance().getDeviceDetails();
+
+            Register registerRequest = new Register(
+                    DonkyDataController.getInstance().getConfigurationDAO().getDonkyNetworkApiKey(),
+                    userDetails,
+                    deviceDetails,
+                    DonkyDataController.getInstance().getConfigurationDAO().getAppVersion());
+
+            log.sensitive(registerRequest.toString());
+
+            RegisterResponse response = DonkyNetworkController.getInstance().registerToNetwork(registerRequest);
+
+            if (processRegistrationResponse(response)) {
+
+                log.sensitive(response.toString());
+
+                synchronized (sharedLock) {
+                    isRegistered.set(true);
+                    setSuspended(false);
+                    sharedLock.notifyAll();
+                }
+
+                DonkyCore.publishLocalEvent(new RegistrationChangedEvent(userDetails, deviceDetails));
+
+            } else {
+
+                throw new DonkyException("Error re-registering with the same data. Invalid registration response.");
+
+            }
         }
     }
 

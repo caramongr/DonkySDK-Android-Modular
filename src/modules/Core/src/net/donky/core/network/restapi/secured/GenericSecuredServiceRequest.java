@@ -121,11 +121,9 @@ public abstract class GenericSecuredServiceRequest<T> extends OnConnectionListen
 
                     } else if (statusCode == 401) {
 
-                        DonkyAccountController.getInstance().reRegisterWithSameUserDetails(null);
+                        DonkyAccountController.getInstance().authenticate();
 
-                        DonkyException donkyException = new DonkyException("Error performing network call. User don't exist. Re-registering.");
-                        donkyException.initCause(error);
-                        throw donkyException;
+                        return performSynchronous();
 
                     } else if (statusCode == 403) {
 
@@ -218,7 +216,8 @@ public abstract class GenericSecuredServiceRequest<T> extends OnConnectionListen
 
                                     } else if (statusCode == 401) {
 
-                                        DonkyAccountController.getInstance().reRegisterWithSameUserDetails(new DonkyListener() {
+                                        DonkyAccountController.getInstance().authenticate(new DonkyListener() {
+
                                             @Override
                                             public void success() {
 
@@ -233,6 +232,7 @@ public abstract class GenericSecuredServiceRequest<T> extends OnConnectionListen
                                                     listener.error(donkyException, null);
                                                 }
                                             }
+
                                         });
 
                                     } else if (statusCode == 403) {

@@ -5,7 +5,6 @@ import net.donky.core.DonkyListener;
 import net.donky.core.DonkyResultListener;
 import net.donky.core.account.DonkyAccountController;
 import net.donky.core.logging.DLog;
-import net.donky.core.model.DonkyDataController;
 import net.donky.core.network.NetworkResultListener;
 import net.donky.core.network.OnConnectionListener;
 import net.donky.core.network.RetryPolicy;
@@ -107,11 +106,29 @@ public abstract class GenericAuthenticationServiceRequest<T> extends OnConnectio
 
                     } else if (statusCode == 401) {
 
-                        DonkyAccountController.getInstance().reRegisterWithSameUserDetails(null);
+                        if (this instanceof Login) {
 
-                        DonkyException donkyException = new DonkyException("Error performing network call. User don't exist. Re-registering if user was registered.");
-                        donkyException.initCause(error);
-                        throw donkyException;
+                            try {
+
+                                DonkyAccountController.getInstance().reRegisterWithSameUserDetailsSynchronously();
+
+                                return performSynchronous(apiKey);
+
+                            } catch (DonkyException exception) {
+
+                                DonkyException donkyException = new DonkyException("Error performing network call. User don't exist. Re-registering failed.");
+                                donkyException.initCause(error);
+                                throw donkyException;
+
+                            }
+
+                        } else {
+
+                            DonkyException donkyException = new DonkyException("Error performing network call. Probably wrong API or AppSpace deleted.");
+                            donkyException.initCause(error);
+                            throw donkyException;
+
+                        }
 
                     } else if (statusCode == 403) {
 
@@ -197,23 +214,33 @@ public abstract class GenericAuthenticationServiceRequest<T> extends OnConnectio
 
                         } else if (statusCode == 401) {
 
-                            DonkyAccountController.getInstance().reRegisterWithSameUserDetails(new DonkyListener() {
+                            if (GenericAuthenticationServiceRequest.this instanceof Login) {
 
-                                @Override
-                                public void success() {
+                                DonkyAccountController.getInstance().reRegisterWithSameUserDetails(new DonkyListener() {
 
-                                    performAsynchronous(apiKey, listener);
+                                    @Override
+                                    public void success() {
 
-                                }
+                                        performAsynchronous(apiKey, listener);
 
-                                @Override
-                                public void error(DonkyException donkyException, Map<String, String> validationErrors) {
-
-                                    if (listener != null) {
-                                        listener.error(donkyException, null);
                                     }
-                                }
-                            });
+
+                                    @Override
+                                    public void error(DonkyException donkyException, Map<String, String> validationErrors) {
+
+                                        new DLog("GenericAuthenticationServiceRequest").warning("Error performing network call. User don't exist. Re-registering failed.");
+
+                                        if (listener != null) {
+                                            listener.error(donkyException, null);
+                                        }
+                                    }
+                                });
+
+                            } else {
+
+                                new DLog("GenericAuthenticationServiceRequest").warning("Error performing register network call. Probably wrong API or AppSpace deleted.");
+
+                            }
 
                         } else if (statusCode == 403) {
 
