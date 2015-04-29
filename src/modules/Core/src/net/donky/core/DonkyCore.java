@@ -495,7 +495,7 @@ public class DonkyCore {
 
                 ModuleVersion moduleVersion = new ModuleVersion(modulesMap.get(name));
 
-                if (moduleVersion.isGreaterThan(minModuleVersion)) {
+                if (moduleVersion.isGreaterThanOrEqual(minModuleVersion)) {
                     return true;
                 }
             } else {
@@ -529,7 +529,7 @@ public class DonkyCore {
          * @param verToCompare Version to compare with
          * @return Returns true if module version is greater then the one provided as a parameter
          */
-        public boolean isGreaterThan(ModuleVersion verToCompare) {
+        public boolean isGreaterThanOrEqual(ModuleVersion verToCompare) {
 
             if (versionList != null && verToCompare != null && verToCompare.getVersionList() != null) {
                 for (int i = 0; i < versionList.size(); i++) {
@@ -540,6 +540,8 @@ public class DonkyCore {
                             return true;
                         } else if (versionList.get(i) < verToCompare.getVersionList().get(i)) {
                             return false;
+                        } else if (versionList.size() - 1 == i) {
+                            return true;
                         }
 
                     } else if (versionList.get(i) != null) {

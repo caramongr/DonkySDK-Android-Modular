@@ -3,6 +3,7 @@ package net.donky.core.messaging.rich.ui;
 import android.content.Context;
 import android.os.Handler;
 
+import net.donky.core.DonkyCore;
 import net.donky.core.events.ApplicationStartEvent;
 import net.donky.core.logging.DLog;
 import net.donky.core.messaging.rich.logic.RichMessageEvent;
@@ -52,7 +53,15 @@ public class EventHandler {
 
         if (event != null && !event.isReceivedExpired()) {
 
-            RichUIController.getInstance().checkActivityForegroundAndDisplayRichMessage(event.getRichMessage());
+            if (!DonkyCore.getInstance().isModuleRegistered("DonkyCore","2.0.0.3")) {
+
+                new DLog("RichUIEventHandler").error("Donky Core minimal version 2.0.0.3 required.");
+
+            } else {
+
+                RichUIController.getInstance().checkActivityForegroundAndDisplayRichMessage(event.getRichMessage());
+
+            }
 
         } else {
 

@@ -29,14 +29,11 @@ public class DonkyGcmIntentService extends IntentService {
 
     private static final String DONKY_TYPE_NOTIFICATIONS_PENDING = "NOTIFICATIONPENDING";
 
-    private final DLog log;
-
     /**
      * Creates an IntentService.  Invoked by your subclass's constructor.
      */
     public DonkyGcmIntentService() {
         super("GcmIntentService");
-        log = new DLog("GcmIntentService");
     }
 
     @Override
@@ -58,15 +55,15 @@ public class DonkyGcmIntentService extends IntentService {
             switch (messageType) {
                 case GoogleCloudMessaging.
                         MESSAGE_TYPE_SEND_ERROR:
-                    log.error("GCM send error");
+                    new DLog("DonkyGcmIntentService").error("GCM send error");
                     break;
                 case GoogleCloudMessaging.
                         MESSAGE_TYPE_DELETED:
-                    log.warning("GCM deleted messages notification received");
+                    new DLog("DonkyGcmIntentService").warning("GCM deleted messages notification received");
                     break;
                 case GoogleCloudMessaging.
                         MESSAGE_TYPE_MESSAGE:
-                    log.info("GCM message received.");
+                    new DLog("DonkyGcmIntentService").info("GCM message received.");
                     if (extras.containsKey(KEY_DONKY_TYPE)) {
                         String type = extras.getString(KEY_DONKY_TYPE);
                         handleDonkyMessage(intent, type);
@@ -100,19 +97,17 @@ public class DonkyGcmIntentService extends IntentService {
 
                             try {
 
-                                log.debug("getServerNotification triggered from GCM id " + notificationId);
-
                                 ServerNotification serverNotification = DonkyNetworkController.getInstance().getServerNotification(notificationId);
 
                                 SynchronisationHandler synchronisationHandler = new SynchronisationHandler(serverNotification);
 
                                 synchronisationHandler.processServerNotifications();
 
-                                log.info("GCM message with single notification processed successfully.");
+                                new DLog("DonkyGcmIntentService").info("GCM message with single notification processed successfully.");
 
                             } catch (DonkyException e) {
 
-                                log.error("Error processing single notification in GCM service. Running sync instead.", e);
+                                new DLog("DonkyGcmIntentService").error("Error processing single notification in GCM service. Running sync instead.", e);
 
                                 DonkyNetworkController.getInstance().synchroniseSynchronously();
 
@@ -122,7 +117,7 @@ public class DonkyGcmIntentService extends IntentService {
 
                             DonkyNetworkController.getInstance().synchroniseSynchronously();
 
-                            log.info("GCM message triggered synchronise successfully.");
+                            new DLog("DonkyGcmIntentService").info("GCM message triggered synchronise successfully.");
 
                         }
 
@@ -130,7 +125,7 @@ public class DonkyGcmIntentService extends IntentService {
 
                         DonkyNetworkController.getInstance().setReRunNotificationExchange(true);
 
-                        log.debug("Re run synchronisation scheduled. Notification synchronisation already in progress.");
+                        new DLog("DonkyGcmIntentService").debug("Re run synchronisation scheduled. Notification synchronisation already in progress.");
 
                     }
 
@@ -140,7 +135,7 @@ public class DonkyGcmIntentService extends IntentService {
 
             } catch (Exception e) {
 
-                log.error("Error when processing sync from GCM.", e);
+                Log.e("DonkyGcmIntentService","Error processing NOTIFICATIONS_PENDING message.");
 
             }
         }

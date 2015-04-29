@@ -203,7 +203,7 @@ public class RichUIController {
                         }
 
                         @Override
-                        public void failure(IOException e) {
+                        public void failure(Exception e) {
 
                             displayNotification(context, notificationManager, richMessage, getRichMessagePendingIntent(richMessage), null, null);
 

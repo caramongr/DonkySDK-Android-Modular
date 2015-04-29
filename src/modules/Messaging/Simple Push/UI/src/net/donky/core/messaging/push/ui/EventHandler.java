@@ -6,12 +6,12 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.text.TextUtils;
 
+import net.donky.core.DonkyCore;
+import net.donky.core.logging.DLog;
 import net.donky.core.messaging.push.logic.SimplePushData;
 import net.donky.core.messaging.push.logic.events.SimplePushMessageEvent;
 import net.donky.core.network.assets.DonkyAssetController;
 import net.donky.core.network.assets.NotificationImageLoader;
-
-import java.io.IOException;
 
 /**
  * Class to handle local events with received simple push data.
@@ -33,7 +33,15 @@ public class EventHandler {
 
         if (event != null && !event.isReceivedExpired()) {
 
-            displayNotification(context, simplePushUIConfiguration, event.getSimplePushData());
+            if (!DonkyCore.getInstance().isModuleRegistered("DonkyCore","2.0.0.3")) {
+
+                new DLog("PushUIEventHandler").error("Donky Core minimal version 2.0.0.3 required.");
+
+            } else {
+
+                displayNotification(context, simplePushUIConfiguration, event.getSimplePushData());
+
+            }
 
         }
 
@@ -60,7 +68,7 @@ public class EventHandler {
                 }
 
                 @Override
-                public void failure(IOException e) {
+                public void failure(Exception e) {
 
                     displayNotification(context, simplePushData, simplePushUIConfiguration, null);
 
