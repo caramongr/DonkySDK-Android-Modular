@@ -115,6 +115,7 @@ public class DonkyAssetController {
                             } else {
 
                                 if (listener != null) {
+                                    listener.failure(new Exception("Null response body"));
                                 }
 
                             }
@@ -122,6 +123,7 @@ public class DonkyAssetController {
                         } else {
 
                             if (listener != null) {
+                                listener.failure(new Exception("Null response"));
                             }
 
                         }
@@ -134,12 +136,14 @@ public class DonkyAssetController {
                 log.error("Error downloading avatar",exception);
 
                 if (listener != null) {
+                    listener.failure(exception);
                 }
 
             }
         } else {
 
             if (listener != null) {
+                listener.failure(new Exception("Empty asset id or network client not initialised."));
             }
 
         }
