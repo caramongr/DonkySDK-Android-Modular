@@ -4,6 +4,7 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.text.TextUtils;
 
 import net.donky.core.messaging.push.logic.SimplePushData;
 import net.donky.core.messaging.push.logic.events.SimplePushMessageEvent;
@@ -47,7 +48,7 @@ public class EventHandler {
      */
     public void displayNotification(final Context context, final SimplePushUIConfiguration simplePushUIConfiguration, final SimplePushData simplePushData) {
 
-        if (simplePushData != null && simplePushData.getAvatarAssetId() != null) {
+        if (simplePushData != null && !TextUtils.isEmpty(simplePushData.getAvatarAssetId())) {
 
             DonkyAssetController.getInstance().downloadAvatar(simplePushData.getAvatarAssetId(), new NotificationImageLoader(context) {
 

@@ -78,40 +78,71 @@ public class DonkyAssetController {
      */
     public void downloadAvatar(String assetId, final NotificationImageLoader listener) {
 
-        String path = getAssetUrl(assetId);
+        if (!TextUtils.isEmpty(assetId) && isInitialised()) {
 
-        Request request = new Request.Builder().url(path).build();
+            try {
 
-        okHttpClient.newCall(request).enqueue(new Callback() {
+                String path = getAssetUrl(assetId);
 
-            @Override
-            public void onFailure(Request request, IOException e) {
+                Request request = new Request.Builder().url(path).build();
 
-                if (listener != null) {
-                    listener.failure(e);
-                }
+                okHttpClient.newCall(request).enqueue(new Callback() {
 
-            }
+                    @Override
+                    public void onFailure(Request request, IOException e) {
 
-            @Override
-            public void onResponse(Response response) throws IOException {
+                        if (listener != null) {
+                            listener.failure(e);
+                        }
 
-                if (response.code() == SUCCESSFUL_DOWNLOAD) {
-
-                    ResponseBody responseBody = response.body();
-
-                    InputStream inputStream = responseBody.byteStream();
-
-                    if (listener != null) {
-                        listener.downloadCompleted(BitmapFactory.decodeStream(inputStream));
                     }
 
+                    @Override
+                    public void onResponse(Response response) throws IOException {
+
+                        if (response != null && response.code() == SUCCESSFUL_DOWNLOAD) {
+
+                            ResponseBody responseBody = response.body();
+
+                            if (responseBody != null) {
+
+                                InputStream inputStream = responseBody.byteStream();
+
+                                if (listener != null) {
+                                    listener.downloadCompleted(BitmapFactory.decodeStream(inputStream));
+                                }
+
+                            } else {
+
+                                if (listener != null) {
+                                }
+
+                            }
+
+                        } else {
+
+                            if (listener != null) {
+                            }
+
+                        }
+
+                    }
+
+                });
+            } catch (Exception exception) {
+
+                log.error("Error downloading avatar",exception);
+
+                if (listener != null) {
                 }
 
             }
+        } else {
 
-        });
+            if (listener != null) {
+            }
 
+        }
     }
 
     /**
@@ -122,33 +153,34 @@ public class DonkyAssetController {
      */
     public Bitmap downloadAvatar(String assetId) {
 
-        String path = getAssetUrl(assetId);
+        if (!TextUtils.isEmpty(assetId) && isInitialised()) {
 
-        Request request = new Request.Builder().url(path).build();
+            try {
 
-        try {
+                String path = getAssetUrl(assetId);
 
-            Response response = okHttpClient.newCall(request).execute();
+                Request request = new Request.Builder().url(path).build();
 
-            if (response != null) {
+                Response response = okHttpClient.newCall(request).execute();
 
-                ResponseBody responseBody = response.body();
+                if (response != null) {
 
-                InputStream inputStream = responseBody.byteStream();
+                    ResponseBody responseBody = response.body();
 
-                Resources resources = context.getResources();
+                    InputStream inputStream = responseBody.byteStream();
 
-                int size = ImageHelper.getPixelsFromDP(resources, 128);
+                    Resources resources = context.getResources();
 
-                return ImageHelper.resizeBitmap(BitmapFactory.decodeStream(inputStream), size, size, true);
+                    int size = ImageHelper.getPixelsFromDP(resources, 128);
 
+                    return ImageHelper.resizeBitmap(BitmapFactory.decodeStream(inputStream), size, size, true);
+
+                }
+
+
+            } catch (Exception exception) {
+                log.error("Error downloading avatar", exception);
             }
-
-
-        } catch (IOException e) {
-
-            e.printStackTrace();
-
         }
 
         return null;
@@ -163,23 +195,27 @@ public class DonkyAssetController {
      */
     public String getAssetUrl(String assetId) {
 
-        String query;
+        if (!TextUtils.isEmpty(assetId)) {
 
-        try {
+            String query;
 
-            query = URLEncoder.encode(assetId, "utf-8");
+            try {
 
-        } catch (UnsupportedEncodingException e) {
+                query = URLEncoder.encode(assetId, "utf-8");
 
-            log.error("Error URL encoding the asset Id.", e);
+            } catch (UnsupportedEncodingException e) {
 
-            query = assetId;
-        }
+                log.error("Error URL encoding the asset Id.", e);
 
-        String urlFormat = DonkyDataController.getInstance().getConfigurationDAO().getConfigurationItems().get(ConfigurationDAO.KEY_CONFIGURATION_AssetDownloadUrlFormat);
+                query = assetId;
+            }
 
-        if (!TextUtils.isEmpty(urlFormat) && !TextUtils.isEmpty(query)) {
-            return urlFormat.replace(ASSET_URL_ID_REPLACEMENT, query);
+            String urlFormat = DonkyDataController.getInstance().getConfigurationDAO().getConfigurationItems().get(ConfigurationDAO.KEY_CONFIGURATION_AssetDownloadUrlFormat);
+
+            if (!TextUtils.isEmpty(urlFormat) && !TextUtils.isEmpty(query)) {
+                return urlFormat.replace(ASSET_URL_ID_REPLACEMENT, query);
+            }
+
         }
 
         return null;

@@ -4,8 +4,6 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 
-import java.io.IOException;
-
 /**
  * Listener for image download tasks.
  *
@@ -45,7 +43,7 @@ public abstract class NotificationImageLoader {
      *
      * @param e Exception description.
      */
-    public abstract void failure(IOException e);
+    public abstract void failure(Exception e);
 
     /**
      * The method that will be called when image was downloaded and before returning to the API.

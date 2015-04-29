@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.text.TextUtils;
 
 import net.donky.core.lifecycle.LifeCycleObserver;
 import net.donky.core.messages.RichMessage;
@@ -190,7 +191,7 @@ public class RichUIController {
 
             if (richMessage != null && richMessage.getMessageId() != null) {
 
-                if (richMessage.getAvatarAssetId() != null) {
+                if (!TextUtils.isEmpty(richMessage.getAvatarAssetId())) {
 
                     DonkyAssetController.getInstance().downloadAvatar(richMessage.getAvatarAssetId(), new NotificationImageLoader(context) {
 
