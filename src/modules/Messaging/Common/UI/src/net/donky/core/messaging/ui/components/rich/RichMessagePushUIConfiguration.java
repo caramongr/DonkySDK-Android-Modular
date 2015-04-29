@@ -55,7 +55,7 @@ public class RichMessagePushUIConfiguration {
         this.ledOffMilliseconds = 2000;
         this.ledColour = R.color.donky_notification_led;
         this.contentIntent = null;
-        this.smallIconId = R.drawable.donky_notification_small_icon_simple_push;
+        this.smallIconId = R.drawable.donky_notification_small_icon_rich;
 
     }
 

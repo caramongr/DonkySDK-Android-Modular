@@ -107,7 +107,7 @@ public class DonkyGcmIntentService extends IntentService {
 
                             } catch (DonkyException e) {
 
-                                new DLog("DonkyGcmIntentService").error("Error processing single notification in GCM service. Running sync instead.", e);
+                                new DLog("DonkyGcmIntentService").warning("Error processing single notification in GCM service. Running sync instead.");
 
                                 DonkyNetworkController.getInstance().synchroniseSynchronously();
 
