@@ -184,7 +184,7 @@ public class DonkyCore {
                                             new NotificationListener<ServerNotification>() {
                                                 @Override
                                                 public void onNotification(ServerNotification notification) {
-                                                    DonkyLoggingController.getInstance().submitLog(UploadLog.SubmissionReason.NotDefined, null);
+                                                    DonkyLoggingController.getInstance().submitLog(UploadLog.SubmissionReason.ManualRequest, null);
                                                 }
                                             }));
 
