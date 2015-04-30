@@ -74,9 +74,7 @@ To read more about how to get started please see [here](http://docs.mobiledonky.
 If you are using Gradle just add the following dependancy (jCenter repo)
 
 ```shell
-    compile ('net.donky:donky-core:2.0.0.5@aar'){
-        transitive=true
-    }
+    compile 'net.donky:donky-core:2.0.0.5'
 ```
 
 # Donky-SimplePush-Logic
@@ -90,11 +88,8 @@ To read more about how to get started please see [here](http://docs.mobiledonky.
 If you are using Gradle just add the following dependancies (jCenter repo)
 
 ```shell
-    compile ('net.donky:donky-core:2.0.0.5@aar'){
-        transitive=true
-    }
-    compile 'net.donky:donky-module-messaging-logic:2.0.0.1@aar'
-    compile 'net.donky:donky-module-push-logic:2.0.0.1@aar'
+    compile 'net.donky:donky-module-messaging-logic:2.0.0.1'
+    compile 'net.donky:donky-module-push-logic:2.0.0.1'
 ```
 
 # Donky-SimplePush-UI
@@ -108,12 +103,8 @@ To read more about how to get started please see [here](http://docs.mobiledonky.
 If you are using Gradle just add the following dependancies (jCenter repo)
 
 ```shell
-    compile ('net.donky:donky-core:2.0.0.5@aar'){
-        transitive=true
-    }
-    compile 'net.donky:donky-module-messaging-logic:2.0.0.1@aar'
-    compile 'net.donky:donky-module-push-logic:2.0.0.1@aar'
-    compile 'net.donky:donky-module-push-ui:2.0.0.2@aar'
+    compile 'net.donky:donky-module-messaging-logic:2.0.0.1'
+    compile 'net.donky:donky-module-push-ui:2.0.0.2'
 ```
 
 # Donky-RichMessage-Logic
@@ -124,14 +115,10 @@ Use the Rich Message  module to enable your application to receive rich content 
 
 To read more about how to get started please see [here](http://docs.mobiledonky.com/v1.2/docs/start-here).
 
-If you are using Gradle just add the following dependancies (jCenter repo)
+If you are using Gradle just add the following dependancy (jCenter repo)
 
 ```shell
-    compile ('net.donky:donky-core:2.0.0.5@aar'){
-        transitive=true
-    }
-    compile 'net.donky:donky-module-messaging-logic:2.0.0.1@aar'
-    compile 'net.donky:donky-module-rich-logic:2.0.0.1@aar'
+    compile 'net.donky:donky-module-rich-logic:2.0.0.1'
 ```
 
 # Donky-RichMessage-PopUp
@@ -142,15 +129,10 @@ Use the Rich Message module to enable your application to disply rich content me
 
 To read more about how to get started please see [here](http://docs.mobiledonky.com/v1.2/docs/start-here).
 
-If you are using Gradle just add the following dependancies (jCenter repo)
+If you are using Gradle just add the following dependancy (jCenter repo)
 
 ```shell
-    compile ('net.donky:donky-core:2.0.0.5@aar'){
-        transitive=true
-    }
-    compile 'net.donky:donky-module-messaging-logic:2.0.0.1@aar'
-    compile 'net.donky:donky-module-rich-logic:2.0.0.1@aar'
-    compile 'net.donky:donky-module-rich-ui-popup:2.0.0.1@aar'
+    compile 'net.donky:donky-module-rich-ui-popup:2.0.0.1'
 ```
 
 # Donky-Analytics
@@ -161,13 +143,10 @@ The analytics module provides key metrics around app launches, app session times
 
 To read more about how to get started please see [here](http://docs.mobiledonky.com/v1.2/docs/start-here).
 
-If you are using Gradle just add the following dependancies (jCenter repo)
+If you are using Gradle just add the following dependancy (jCenter repo)
 
 ```shell
-    compile ('net.donky:donky-core:2.0.0.5@aar'){
-        transitive=true
-    }
-    compile 'net.donky:donky-module-analytics:2.0.0.1@aar'
+    compile 'net.donky:donky-module-analytics:2.0.0.1'
 ```
 
 # Donky-Automation
@@ -178,11 +157,8 @@ The automation layer adds the ability to invoke server defined behaviours.
 
 To read more about how to get started please see [here](http://docs.mobiledonky.com/v1.2/docs/start-here).
 
-If you are using Gradle just add the following dependancies (jCenter repo)
+If you are using Gradle just add the following dependancy (jCenter repo)
 
 ```shell
-    compile ('net.donky:donky-core:2.0.0.5@aar'){
-        transitive=true
-    }
-    compile 'net.donky:donky-module-automation:2.0.0.1@aar'
+    compile 'net.donky:donky-module-automation:2.0.0.1'
 ```
