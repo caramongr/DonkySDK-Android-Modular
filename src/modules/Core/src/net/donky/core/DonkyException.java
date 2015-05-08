@@ -24,6 +24,15 @@ public class DonkyException extends Exception {
     }
 
     /**
+     * @param description Exception description.
+     * @param
+     */
+    public DonkyException(String description, Map<String, String> validationErrors) {
+        super(description);
+        this.validationErrors = validationErrors;
+    }
+
+    /**
      * Get map of validation errors. Null if N/A
      * @return Map of validation errors. Null if N/A
      */

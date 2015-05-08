@@ -58,6 +58,7 @@ public class ConfigurationDAO extends SharedPreferencesBaseDAO {
     public static final String KEY_CONFIGURATION_UploadImageJpegQuality = "UploadImageJpegQuality";
     public static final String KEY_CONFIGURATION_UploadImageMaxResX = "UploadImageMaxResX";
     public static final String KEY_CONFIGURATION_UploadImageMaxResY = "UploadImageMaxResY";
+    public static final String KEY_CONFIGURATION_CustomContentMaxSizeBytes = "CustomContentMaxSizeBytes";
 
     public ConfigurationDAO(Context context) {
         super(context, SHARED_PREFERENCES_FILENAME_INTERNAL);

@@ -227,6 +227,21 @@ public class NotificationDAO {
     /**
      * Add Donky content notification to database.
      *
+     * @param contentNotification Donky content notifications to be saved.
+     */
+    public void addContentNotification(ContentNotification contentNotification) {
+
+        if (contentNotification != null) {
+
+            SQLiteDatabase db = databaseSQLHelper.getWritableDatabase();
+            addContentNotification(db, contentNotification);
+
+        }
+    }
+
+    /**
+     * Add Donky content notification to database.
+     *
      * @param db                  SQLite Database.
      * @param contentNotification Donky content notification to be added.
      */

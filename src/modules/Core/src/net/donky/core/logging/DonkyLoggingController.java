@@ -336,7 +336,7 @@ public class DonkyLoggingController {
      */
     private boolean canSubmitLogs() {
 
-        return ((System.currentTimeMillis() - lastSubmissionTimestamp) > 1000 * AppSettings.getInstance().getMinTimeSubmittingLogs());
+        return ((System.currentTimeMillis() - lastSubmissionTimestamp) > 1000 * AppSettings.getInstance().getMinTimeSubmittingLogsSeconds());
 
     }
 

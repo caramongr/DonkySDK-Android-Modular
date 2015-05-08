@@ -1,8 +1,5 @@
 package net.donky.core.network.restapi.secured;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-
 import net.donky.core.DonkyException;
 import net.donky.core.DonkyListener;
 import net.donky.core.DonkyResultListener;
@@ -12,14 +9,10 @@ import net.donky.core.model.DonkyDataController;
 import net.donky.core.network.ConnectionException;
 import net.donky.core.network.DonkyNetworkController;
 import net.donky.core.network.NetworkResultListener;
-import net.donky.core.network.OnConnectionListener;
 import net.donky.core.network.RetryPolicy;
 import net.donky.core.network.UserSuspendedException;
-import net.donky.core.network.restapi.FailureDetails;
+import net.donky.core.network.restapi.GenericServiceRequest;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.Map;
 
 import retrofit.RetrofitError;
@@ -32,7 +25,7 @@ import retrofit.mime.TypedInput;
  * 23/03/2015.
  * Copyright (C) Donky Networks Ltd. All rights reserved.
  */
-public abstract class GenericSecuredServiceRequest<T> extends OnConnectionListener {
+public abstract class GenericSecuredServiceRequest<T> extends GenericServiceRequest {
 
     private final RetryPolicy retryPolicy;
 
@@ -103,9 +96,15 @@ public abstract class GenericSecuredServiceRequest<T> extends OnConnectionListen
 
                         TypedInput body = r.getBody();
 
-                        String detailsJson = readInputStream(body);
+                        String failureJson = readInputStream(body);
 
-                        new DLog("GenericSecuredServiceRequest").error("Client Bad Request "+detailsJson,error);
+                        new DLog("GenericSecuredServiceRequest").error("Client Bad Request " + failureJson, error);
+
+                        parseFailureDetails(failureJson);
+
+                        DonkyException donkyException = new DonkyException("Validation failures.", getValidationFailures());
+                        donkyException.initCause(error);
+                        throw donkyException;
 
                     }
 
@@ -200,7 +199,15 @@ public abstract class GenericSecuredServiceRequest<T> extends OnConnectionListen
 
                                         TypedInput body = r.getBody();
 
-                                        new DLog("GenericSecuredServiceRequest").error("Client Bad Request " + readInputStream(body), error);
+                                        String failureJson = readInputStream(body);
+
+                                        new DLog("GenericSecuredServiceRequest").error("Client Bad Request " + failureJson, error);
+
+                                        parseFailureDetails(failureJson);
+
+                                        if (listener != null) {
+                                            listener.error(null, getValidationFailures());
+                                        }
 
                                     }
 
@@ -229,7 +236,7 @@ public abstract class GenericSecuredServiceRequest<T> extends OnConnectionListen
                                             public void error(DonkyException donkyException, Map<String, String> validationErrors) {
 
                                                 if (listener != null) {
-                                                    listener.error(donkyException, null);
+                                                    listener.error(donkyException, validationErrors);
                                                 }
                                             }
 
@@ -301,7 +308,15 @@ public abstract class GenericSecuredServiceRequest<T> extends OnConnectionListen
 
                                 TypedInput body = r.getBody();
 
-                                new DLog("GenericSecuredServiceRequest").error("Client Bad Request " + readInputStream(body), error);
+                                String failureJson = readInputStream(body);
+
+                                new DLog("GenericSecuredServiceRequest").error("Client Bad Request " + failureJson, error);
+
+                                parseFailureDetails(failureJson);
+
+                                if (listener != null) {
+                                    listener.error(null, getValidationFailures());
+                                }
 
                             }
 
@@ -379,50 +394,5 @@ public abstract class GenericSecuredServiceRequest<T> extends OnConnectionListen
             }
 
         }
-    }
-
-    /**
-     * Reads input stream from service response and decodes it to string.
-     *
-     * @param body Typed input stream to decode.
-     * @return String decoded from typed input stream.
-     */
-    private String readInputStream(TypedInput body) {
-
-        try {
-
-            BufferedReader reader = new BufferedReader(new InputStreamReader(body.in()));
-            StringBuilder out = new StringBuilder();
-            String newLine = System.getProperty("line.separator");
-            String line;
-            while ((line = reader.readLine()) != null) {
-                out.append(line);
-                out.append(newLine);
-            }
-
-            return out.toString();
-
-        } catch (IOException e) {
-
-            new DLog("GenericSecuredServiceRequest").error("Client Bad Request and response body processing",e);
-
-            return null;
-        }
-    }
-
-    private FailureDetails getFailureDetails(String detailsJson) {
-
-        FailureDetails failureDetails = null;
-
-        try {
-
-            Gson gson = new GsonBuilder().create();
-            failureDetails = gson.fromJson(detailsJson, FailureDetails.class);
-
-        } catch (Exception e) {
-            new DLog("GenericSecuredServiceRequest").warning("error parsing failure data");
-        }
-
-        return failureDetails;
     }
 }

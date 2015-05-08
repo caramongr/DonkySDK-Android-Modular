@@ -41,17 +41,16 @@ public class DLog {
         try {
 
             if (isErrorLogsEnabled()) {
-
                 Log.e(tag, msg);
-
-                DonkyLoggingController.getInstance().writeLog(msg, DonkyLoggingController.LogLevel.ERROR, null);
-
-                if (DonkyLoggingController.getInstance().getAutoSubmit()) {
-                    DonkyLoggingController.getInstance().submitLog(UploadLog.SubmissionReason.AutomaticByDevice, null);
-                }
-
-                DonkyCore.publishLocalEvent(new LogMessageEvent(DonkyLoggingController.LogLevel.ERROR, msg, null));
             }
+
+            DonkyLoggingController.getInstance().writeLog(msg, DonkyLoggingController.LogLevel.ERROR, null);
+
+            if (DonkyLoggingController.getInstance().getAutoSubmit()) {
+                DonkyLoggingController.getInstance().submitLog(UploadLog.SubmissionReason.AutomaticByDevice, null);
+            }
+
+            DonkyCore.publishLocalEvent(new LogMessageEvent(DonkyLoggingController.LogLevel.ERROR, msg, null));
 
         } catch (Exception e) {
             Log.e("Donky","Error logging");
@@ -69,17 +68,16 @@ public class DLog {
         try {
 
             if (isErrorLogsEnabled()) {
-
                 Log.e(tag, msg);
-
-                DonkyLoggingController.getInstance().writeLog(msg, DonkyLoggingController.LogLevel.ERROR, exception);
-
-                if (DonkyLoggingController.getInstance().getAutoSubmit()) {
-                    DonkyLoggingController.getInstance().submitLog(UploadLog.SubmissionReason.AutomaticByDevice, null);
-                }
-
-                DonkyCore.publishLocalEvent(new LogMessageEvent(DonkyLoggingController.LogLevel.ERROR, msg, exception));
             }
+
+            DonkyLoggingController.getInstance().writeLog(msg, DonkyLoggingController.LogLevel.ERROR, exception);
+
+            if (DonkyLoggingController.getInstance().getAutoSubmit()) {
+                DonkyLoggingController.getInstance().submitLog(UploadLog.SubmissionReason.AutomaticByDevice, null);
+            }
+
+            DonkyCore.publishLocalEvent(new LogMessageEvent(DonkyLoggingController.LogLevel.ERROR, msg, exception));
 
         } catch (Exception e) {
             Log.e("Donky","Error logging");
@@ -92,11 +90,12 @@ public class DLog {
      * @param msg The message you would like logged.
      */
     public void warning(String msg) {
+
         if (isWarningLogsEnabled()) {
             Log.w(tag, msg);
-            DonkyLoggingController.getInstance().writeLog(msg, DonkyLoggingController.LogLevel.WARNING, null);
         }
 
+        DonkyLoggingController.getInstance().writeLog(msg, DonkyLoggingController.LogLevel.WARNING, null);
         DonkyCore.publishLocalEvent(new LogMessageEvent(DonkyLoggingController.LogLevel.WARNING, msg, null));
     }
 
@@ -106,11 +105,12 @@ public class DLog {
      * @param msg The message you would like logged.
      */
     public void info(String msg) {
+
         if (isInfoLogsEnabled()) {
             Log.i(tag, msg);
-            DonkyLoggingController.getInstance().writeLog(msg, DonkyLoggingController.LogLevel.INFO, null);
         }
 
+        DonkyLoggingController.getInstance().writeLog(msg, DonkyLoggingController.LogLevel.INFO, null);
         DonkyCore.publishLocalEvent(new LogMessageEvent(DonkyLoggingController.LogLevel.INFO, msg, null));
     }
 
@@ -120,11 +120,12 @@ public class DLog {
      * @param msg The message you would like logged.
      */
     public void debug(String msg) {
+
         if (isDebugLogsEnabled()) {
             Log.d(tag, msg);
-            DonkyLoggingController.getInstance().writeLog(msg, DonkyLoggingController.LogLevel.DEBUG, null);
         }
 
+        DonkyLoggingController.getInstance().writeLog(msg, DonkyLoggingController.LogLevel.DEBUG, null);
         DonkyCore.publishLocalEvent(new LogMessageEvent(DonkyLoggingController.LogLevel.DEBUG, msg, null));
     }
 
@@ -134,12 +135,13 @@ public class DLog {
      * @param msg The message you would like logged.
      */
     public void sensitive(String msg) {
+
         if (isSensitiveLogsEnabled()) {
             Log.d(tag, msg);
             DonkyLoggingController.getInstance().writeLog(msg, DonkyLoggingController.LogLevel.SENSITIVE, null);
+            DonkyCore.publishLocalEvent(new LogMessageEvent(DonkyLoggingController.LogLevel.SENSITIVE, msg, null));
         }
 
-        DonkyCore.publishLocalEvent(new LogMessageEvent(DonkyLoggingController.LogLevel.SENSITIVE, msg, null));
     }
 
     /**

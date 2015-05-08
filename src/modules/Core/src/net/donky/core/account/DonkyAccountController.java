@@ -658,7 +658,15 @@ public class DonkyAccountController {
 
                     log.warning("Error registering. Registration process not completed. " + response.toString());
 
-                    throw new DonkyException("Invalid registration response.");
+                    throw new DonkyException("Invalid registration response.", registerRequest.getValidationFailures());
+                }
+
+                Map<String, String> failures = registerRequest.getValidationFailures();
+
+                if (failures != null && !failures.isEmpty()) {
+
+                    throw new DonkyException("Validation Failures for registration.", failures);
+
                 }
 
             } else {

@@ -70,6 +70,18 @@ public class SynchroniseResponse {
 
             return "Notification "+notification+"; Reason "+failureReason+"; Validation Failures: "+sb.toString();
         }
+
+        public Notification getNotification() {
+            return notification;
+        }
+
+        public String getFailureReason() {
+            return failureReason;
+        }
+
+        public List<ValidationFailure> getValidationFailures() {
+            return validationFailures;
+        }
     }
 
     /**
@@ -84,12 +96,16 @@ public class SynchroniseResponse {
         public String toString() {
             return "type: "+type;
         }
+
+        public String getType() {
+            return type;
+        }
     }
 
     /**
      * Represents details for failure reasons for notification sent by the client that couldn't be processed.
      */
-    private class ValidationFailure {
+    public class ValidationFailure {
 
         @SerializedName("property")
         private String property;
@@ -103,6 +119,18 @@ public class SynchroniseResponse {
         @Override
         public String toString() {
             return "property: "+property+" details "+details+" failure key: "+failureKey+"; ";
+        }
+
+        public String getProperty() {
+            return property;
+        }
+
+        public String getDetails() {
+            return details;
+        }
+
+        public String getFailureKey() {
+            return failureKey;
         }
     }
 }

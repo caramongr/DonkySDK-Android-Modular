@@ -31,6 +31,11 @@ public class ServerNotification extends Notification {
     public static final String NOTIFICATION_TYPE_TransmitDebugLog = "TransmitDebugLog";
 
     /**
+     * Notification that new device was registered against the user account.
+     */
+    public static final String NOTIFICATION_TYPE_NewDeviceAddedToUser = "NewDeviceAddedToUser";
+
+    /**
      * Notification triggering transmitting debug logs to the network.
      */
     public static final String NOTIFICATION_TYPE_SimplePushMessage = "SimplePushMessage";

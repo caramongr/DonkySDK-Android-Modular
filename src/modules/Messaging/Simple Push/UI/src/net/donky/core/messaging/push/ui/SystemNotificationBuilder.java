@@ -81,8 +81,6 @@ public class SystemNotificationBuilder {
 
             if (buttonSetToUse != null) {
 
-
-
                     if (buttonSetToUse.getButtonSetActions() != null) {
 
                         if (buttonSetToUse.getButtonSetActions().length == 2) {

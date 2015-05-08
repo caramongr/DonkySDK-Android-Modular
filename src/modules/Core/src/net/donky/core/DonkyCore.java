@@ -8,6 +8,7 @@ import android.text.TextUtils;
 
 import net.donky.core.account.DonkyAccountController;
 import net.donky.core.account.DeviceDetails;
+import net.donky.core.account.NewDeviceHandler;
 import net.donky.core.account.UserDetails;
 import net.donky.core.events.DonkyEventListener;
 import net.donky.core.events.EventObservable;
@@ -187,6 +188,16 @@ public class DonkyCore {
                                                     DonkyLoggingController.getInstance().submitLog(UploadLog.SubmissionReason.ManualRequest, null);
                                                 }
                                             }));
+
+                                    if (AppSettings.getInstance().isNewDeviceNotificationEnabled()) {
+                                        serverNotificationSubscriptions.add(new Subscription<>(ServerNotification.NOTIFICATION_TYPE_NewDeviceAddedToUser,
+                                                new NotificationListener<ServerNotification>() {
+                                                    @Override
+                                                    public void onNotification(ServerNotification notification) {
+                                                        new NewDeviceHandler(application.getApplicationContext()).process(notification);
+                                                    }
+                                                }));
+                                    }
 
                                     subscribeToDonkyNotifications(
                                             new ModuleDefinition(DonkyCore.class.getSimpleName(), AppSettings.getVersion()),

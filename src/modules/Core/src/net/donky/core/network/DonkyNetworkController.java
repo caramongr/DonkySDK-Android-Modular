@@ -8,6 +8,8 @@ import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Handler;
+import android.text.TextUtils;
+import android.util.Pair;
 
 import net.donky.core.DonkyCore;
 import net.donky.core.DonkyException;
@@ -17,6 +19,7 @@ import net.donky.core.account.DonkyAccountController;
 import net.donky.core.events.NetworkStateChangedEvent;
 import net.donky.core.helpers.DateAndTimeHelper;
 import net.donky.core.logging.DLog;
+import net.donky.core.model.ConfigurationDAO;
 import net.donky.core.model.DonkyDataController;
 import net.donky.core.network.content.ContentNotification;
 import net.donky.core.network.restapi.authentication.Login;
@@ -42,6 +45,7 @@ import net.donky.core.settings.AppSettings;
 import org.json.JSONException;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -329,7 +333,7 @@ public class DonkyNetworkController {
                                     DonkyException donkyException = new DonkyException("Error processing notification sync response.");
                                     donkyException.initCause(e);
                                     if (listener != null) {
-                                        listener.error(donkyException, null);
+                                        listener.error(donkyException, synchroniseRequest.getValidationFailures());
                                     }
                                 }
 
@@ -374,7 +378,7 @@ public class DonkyNetworkController {
                                 log.error("Invalid synchronise response.");
                                 DonkyException donkyException = new DonkyException("Invalid synchronise response.");
                                 if (listener != null) {
-                                    listener.error(donkyException, null);
+                                    listener.error(donkyException, synchroniseRequest.getValidationFailures());
                                 }
                             }
                         }
@@ -513,13 +517,106 @@ public class DonkyNetworkController {
         }
     }
 
+    private Integer getCustomContentMaxSizeBytes() {
+
+        String customContentMaxSizeBytes = DonkyDataController.getInstance().getConfigurationDAO().getConfigurationItems().get(ConfigurationDAO.KEY_CONFIGURATION_CustomContentMaxSizeBytes);
+
+        if (!TextUtils.isEmpty(customContentMaxSizeBytes)) {
+
+            return Integer.parseInt(customContentMaxSizeBytes);
+
+        }
+
+        return null;
+    }
+
+    private boolean isContentNotificationRespectingSizeLimit(Integer customContentMaxSizeBytes, ContentNotification contentNotification) {
+
+        final String json = contentNotification.getJsonString();
+
+        if (!TextUtils.isEmpty(json)) {
+
+            int size = json.getBytes().length;
+
+            if (customContentMaxSizeBytes != null && customContentMaxSizeBytes < size) {
+
+                return false;
+
+            }
+        }
+
+        return true;
+    }
+
     /**
-     * Adds content notifications to the queue for submission to the network.
+     * Adds content notification to the queue for submission to the network.
+     *
+     * @deprecated Please use {@link DonkyNetworkController#queueContentNotification(net.donky.core.network.content.ContentNotification)} or {@link DonkyNetworkController#queueContentNotifications(java.util.List)} instead.
+     *
+     * @param contentNotification Content notification to send when next notification sync.
+     */
+    @Deprecated
+    public void queueContentNotifications(ContentNotification contentNotification) {
+        List<ContentNotification> list = new LinkedList<>();
+        list.add(contentNotification);
+        queueContentNotifications(list);
+    }
+
+    /**
+     * Adds content notifications to the queue for submission to the network. Notification should conform to size limit configured on the network [256K by default].
      *
      * @param contentNotifications Content notifications to send when next notification sync.
+     * @return List of failed Content Notifications with a reason of failure. Null if none failed.
      */
-    public void queueContentNotifications(List<ContentNotification> contentNotifications) {
-        DonkyDataController.getInstance().getNotificationDAO().addContentNotifications(contentNotifications);
+    public ValidationResult<ContentNotification> queueContentNotifications(List<ContentNotification> contentNotifications) {
+
+        ValidationResult validationResult = new ValidationResult<ContentNotification>();
+
+        Integer sizeLimit = getCustomContentMaxSizeBytes();
+
+        if (sizeLimit != null) {
+
+            for (ContentNotification notification : contentNotifications) {
+
+                if (isContentNotificationRespectingSizeLimit(sizeLimit, notification)) {
+                    DonkyDataController.getInstance().getNotificationDAO().addContentNotification(notification);
+                } else {
+                    validationResult.addFailure(notification, ValidationResult.REASON_SIZE_LIMIT_EXCEEDED);
+                }
+            }
+
+        } else {
+
+            DonkyDataController.getInstance().getNotificationDAO().addContentNotifications(contentNotifications);
+
+        }
+
+        return validationResult;
+    }
+
+    /**
+     * Adds content notification to the queue for submission to the network.
+     *
+     * @param contentNotification Content notifications to send when next notification sync.
+     */
+    public ValidationResult<ContentNotification> queueContentNotification(ContentNotification contentNotification) {
+
+        ValidationResult validationResult = new ValidationResult<ContentNotification>();
+
+        if (contentNotification != null) {
+
+            if (isContentNotificationRespectingSizeLimit(getCustomContentMaxSizeBytes(), contentNotification)) {
+
+                DonkyDataController.getInstance().getNotificationDAO().addContentNotification(contentNotification);
+
+            } else {
+
+                validationResult.addFailure(contentNotification, ValidationResult.REASON_SIZE_LIMIT_EXCEEDED);
+
+            }
+        }
+
+        return validationResult;
     }
 
     /**
@@ -529,8 +626,23 @@ public class DonkyNetworkController {
      * @param listener             The callback to invoke when the notifications has been sent.
      */
     public void sendContentNotifications(List<ContentNotification> contentNotifications, DonkyListener listener) {
-        queueContentNotifications(contentNotifications);
-        synchronise(listener);
+
+        List<Pair<ContentNotification, String>> rejected = queueContentNotifications(contentNotifications).getFailures();
+
+        if (!rejected.isEmpty()) {
+
+            Map validationFailures = new HashMap<String, String>();
+
+            for (Pair<ContentNotification, String> pair : rejected) {
+                validationFailures.put(pair.first.getId(),pair.second);
+            }
+
+            listener.error(null, validationFailures);
+        }
+
+        if (contentNotifications.size() - rejected.size() > 0) {
+            synchronise(listener);
+        }
     }
 
     /**
@@ -540,10 +652,20 @@ public class DonkyNetworkController {
      * @param listener            The callback to invoke when the notifications has been sent.
      */
     public void sendContentNotification(ContentNotification contentNotification, DonkyListener listener) {
-        List<ContentNotification> list = new LinkedList<>();
-        list.add(contentNotification);
-        queueContentNotifications(list);
-        synchronise(listener);
+
+        List<Pair<ContentNotification, String>> rejected = queueContentNotification(contentNotification).getFailures();
+
+        if (!rejected.isEmpty()) {
+
+            Map validationFailures = new HashMap<String, String>();
+
+            validationFailures.put(rejected.get(0).first.getId(),rejected.get(0).second);
+
+            listener.error(null, validationFailures);
+        } else {
+
+            synchronise(listener);
+        }
     }
 
     /**
