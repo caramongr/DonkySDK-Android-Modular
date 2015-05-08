@@ -74,7 +74,7 @@ To read more about how to get started please see [here](http://docs.mobiledonky.
 If you are using Gradle just add the following dependancy (jCenter repo)
 
 ```shell
-    compile 'net.donky:donky-core:2.0.0.5'
+    compile 'net.donky:donky-core:2.1.0.16'
 ```
 
 # Donky-SimplePush-Logic
@@ -88,8 +88,7 @@ To read more about how to get started please see [here](http://docs.mobiledonky.
 If you are using Gradle just add the following dependancies (jCenter repo)
 
 ```shell
-    compile 'net.donky:donky-module-messaging-logic:2.0.0.1'
-    compile 'net.donky:donky-module-push-logic:2.0.0.1'
+    compile 'net.donky:donky-module-push-logic:2.1.0.16'
 ```
 
 # Donky-SimplePush-UI
@@ -103,8 +102,7 @@ To read more about how to get started please see [here](http://docs.mobiledonky.
 If you are using Gradle just add the following dependancies (jCenter repo)
 
 ```shell
-    compile 'net.donky:donky-module-messaging-logic:2.0.0.1'
-    compile 'net.donky:donky-module-push-ui:2.0.0.2'
+    compile 'net.donky:donky-module-push-ui:2.1.0.16'
 ```
 
 # Donky-RichMessage-Logic
@@ -118,7 +116,7 @@ To read more about how to get started please see [here](http://docs.mobiledonky.
 If you are using Gradle just add the following dependancy (jCenter repo)
 
 ```shell
-    compile 'net.donky:donky-module-rich-logic:2.0.0.1'
+    compile 'net.donky:donky-module-rich-logic:2.1.0.16'
 ```
 
 # Donky-RichMessage-PopUp
@@ -132,7 +130,7 @@ To read more about how to get started please see [here](http://docs.mobiledonky.
 If you are using Gradle just add the following dependancy (jCenter repo)
 
 ```shell
-    compile 'net.donky:donky-module-rich-ui-popup:2.0.0.1'
+    compile 'net.donky:donky-module-rich-ui-popup:2.1.0.16'
 ```
 
 # Donky-Analytics
@@ -146,7 +144,7 @@ To read more about how to get started please see [here](http://docs.mobiledonky.
 If you are using Gradle just add the following dependancy (jCenter repo)
 
 ```shell
-    compile 'net.donky:donky-module-analytics:2.0.0.1'
+    compile 'net.donky:donky-module-analytics:2.1.0.16'
 ```
 
 # Donky-Automation
@@ -160,5 +158,5 @@ To read more about how to get started please see [here](http://docs.mobiledonky.
 If you are using Gradle just add the following dependancy (jCenter repo)
 
 ```shell
-    compile 'net.donky:donky-module-automation:2.0.0.1'
+    compile 'net.donky:donky-module-automation:2.1.0.16'
 ```
