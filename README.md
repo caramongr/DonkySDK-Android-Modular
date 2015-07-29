@@ -69,7 +69,7 @@ Provides the basics of any Donkyintegration into your apps.  The Core SDK is res
 
 Only add this to your Project if this is the only part of the SDK you are going to use. 
 
-To read more about how to get started please see [here](http://docs.mobiledonky.com/v1.2/docs/start-here).
+To read more about how to get started please see [here](http://docs.mobiledonky.com/docs/start-here).
 
 If you are using Gradle just add the following dependancy (jCenter repo)
 
@@ -83,7 +83,7 @@ Use the Simple Push module to enable your application to receive Simple Push mes
 
 ## Usage
 
-To read more about how to get started please see [here](http://docs.mobiledonky.com/v1.2/docs/start-here).
+To read more about how to get started please see [here](http://docs.mobiledonky.com/docs/start-here).
 
 If you are using Gradle just add the following dependancies (jCenter repo)
 
@@ -97,7 +97,7 @@ Use the Simple Push module to enable your application to display Simple Push mes
 
 ## Usage
 
-To read more about how to get started please see [here](http://docs.mobiledonky.com/v1.2/docs/start-here).
+To read more about how to get started please see [here](http://docs.mobiledonky.com/docs/start-here).
 
 If you are using Gradle just add the following dependancies (jCenter repo)
 
@@ -111,7 +111,7 @@ Use the Rich Message  module to enable your application to receive rich content 
 
 ## Usage
 
-To read more about how to get started please see [here](http://docs.mobiledonky.com/v1.2/docs/start-here).
+To read more about how to get started please see [here](http://docs.mobiledonky.com/docs/start-here).
 
 If you are using Gradle just add the following dependancy (jCenter repo)
 
@@ -125,7 +125,7 @@ Use the Rich Message module to enable your application to disply rich content me
 
 ## Usage
 
-To read more about how to get started please see [here](http://docs.mobiledonky.com/v1.2/docs/start-here).
+To read more about how to get started please see [here](http://docs.mobiledonky.com/docs/start-here).
 
 If you are using Gradle just add the following dependancy (jCenter repo)
 
@@ -139,7 +139,7 @@ The analytics module provides key metrics around app launches, app session times
 
 ## Usage
 
-To read more about how to get started please see [here](http://docs.mobiledonky.com/v1.2/docs/start-here).
+To read more about how to get started please see [here](http://docs.mobiledonky.com/docs/start-here).
 
 If you are using Gradle just add the following dependancy (jCenter repo)
 
@@ -153,7 +153,7 @@ The automation layer adds the ability to invoke server defined behaviours.
 
 ## Usage
 
-To read more about how to get started please see [here](http://docs.mobiledonky.com/v1.2/docs/start-here).
+To read more about how to get started please see [here](http://docs.mobiledonky.com/docs/start-here).
 
 If you are using Gradle just add the following dependancy (jCenter repo)
 
