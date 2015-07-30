@@ -12,13 +12,13 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.SerializedName;
 
 import net.donky.core.DonkyCore;
+import net.donky.core.R;
 import net.donky.core.events.NewDeviceEvent;
 import net.donky.core.logging.DLog;
 import net.donky.core.network.ServerNotification;
 import net.donky.core.settings.AppSettings;
 
-import net.donky.core.R;
-
+import java.util.List;
 import java.util.Random;
 
 /**
@@ -43,22 +43,27 @@ public class NewDeviceHandler {
     /**
      * Process the new device registration notifications and displays a warning message in notification center.
      *
-     * @param notification A {@link ServerNotification#NOTIFICATION_TYPE_NewDeviceAddedToUser} type notification.
+     * @param notifications A list of {@link ServerNotification#NOTIFICATION_TYPE_NewDeviceAddedToUser} type notification.
      */
-    public void process(ServerNotification notification) {
+    public void process(List<ServerNotification> notifications) {
 
         try {
 
-            Gson gson = new GsonBuilder().create();
+            for (ServerNotification notification : notifications) {
 
-            DeviceDetails newDevice = gson.fromJson(notification.getData(), DeviceDetails.class);
+                Gson gson = new GsonBuilder().create();
 
-            if (newDevice != null) {
+                DeviceDetails newDevice = gson.fromJson(notification.getData(), DeviceDetails.class);
 
-                DonkyCore.publishLocalEvent(new NewDeviceEvent(newDevice.getModel(), newDevice.getSystem()));
-                displayNotification(newDevice);
+                if (newDevice != null) {
+
+                    DonkyCore.publishLocalEvent(new NewDeviceEvent(newDevice.getModel(), newDevice.getSystem()));
+                    displayNotification(newDevice);
+
+                }
 
             }
+
         } catch (Exception exception) {
 
             new DLog("NewDeviceHandler").error("Error processing new device notification.", exception);

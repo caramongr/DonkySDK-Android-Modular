@@ -1,10 +1,11 @@
 package net.donky;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 
@@ -15,6 +16,7 @@ import net.donky.core.automation.events.TriggerExecutedEvent;
 import net.donky.core.events.OnCreateEvent;
 import net.donky.core.events.OnPauseEvent;
 import net.donky.core.events.OnResumeEvent;
+import net.donky.core.messaging.rich.inbox.ui.components.RichInboxAndMessageActivityWithToolbar;
 import net.donky.core.network.DonkyNetworkController;
 import net.donky.core.network.content.ContentNotification;
 
@@ -26,7 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-public class MainActivity extends ActionBarActivity implements ColorListener {
+public class MainActivity extends AppCompatActivity implements ColorListener {
 
     private String TAG = "Donky Test App";
 
@@ -75,7 +77,7 @@ public class MainActivity extends ActionBarActivity implements ColorListener {
         }
 
         List<ContentNotification> contentNotifications = new LinkedList<>();
-        contentNotifications.add(new ContentNotification("john-smith", "changeColour", jsonObject));
+        contentNotifications.add(new ContentNotification("john-smith-test", "changeColour", jsonObject));
 
         DonkyNetworkController.getInstance().sendContentNotifications(contentNotifications, new DonkyListener() {
 
@@ -118,5 +120,11 @@ public class MainActivity extends ActionBarActivity implements ColorListener {
             }
         }, 5000);
 
+    }
+
+    public void openInbox(View view) {
+
+        Intent intent = new Intent(this, RichInboxAndMessageActivityWithToolbar.class);
+        startActivity(intent);
     }
 }

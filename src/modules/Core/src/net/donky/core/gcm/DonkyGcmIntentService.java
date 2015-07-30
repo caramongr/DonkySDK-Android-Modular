@@ -29,6 +29,8 @@ public class DonkyGcmIntentService extends IntentService {
 
     private static final String DONKY_TYPE_NOTIFICATIONS_PENDING = "NOTIFICATIONPENDING";
 
+    private static final String DONKY_TYPE_RICH_MSG = "RICHMSG";
+
     /**
      * Creates an IntentService.  Invoked by your subclass's constructor.
      */
@@ -75,9 +77,8 @@ public class DonkyGcmIntentService extends IntentService {
 
     /**
      * Performs appropriate Donky Core Actions according to GCM message type.
-     *
-     * @param intent GCM Intent delivered by the OS.
-     * @param type   Type of GCM message.
+     *  @param intent GCM Intent delivered by the OS.
+     * @param type Type of GCM message.
      */
     private void handleDonkyMessage(final Intent intent, String type) {
 
@@ -93,7 +94,7 @@ public class DonkyGcmIntentService extends IntentService {
 
                         String notificationId = extras.getString("notificationId");
 
-                        if (!TextUtils.isEmpty(notificationId)) {
+                        if (!TextUtils.isEmpty(notificationId) && !isRichMessageType(extras)) {
 
                             try {
 
@@ -121,6 +122,9 @@ public class DonkyGcmIntentService extends IntentService {
 
                         }
 
+                        DonkyNetworkController.getInstance().synchroniseSynchronously();
+
+
                     } else {
 
                         DonkyNetworkController.getInstance().setReRunNotificationExchange(true);
@@ -139,5 +143,15 @@ public class DonkyGcmIntentService extends IntentService {
 
             }
         }
+    }
+
+    /**
+     * Check if GCM message is notifying about pending rich message.
+     * @param extras GCM intent extras Bundle.
+     * @return
+     */
+    private boolean isRichMessageType(Bundle extras) {
+        String notificationType = extras.getString("notificationType");
+        return !TextUtils.isEmpty(notificationType) && notificationType.equals(DONKY_TYPE_RICH_MSG);
     }
 }

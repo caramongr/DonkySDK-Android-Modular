@@ -1,10 +1,97 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Theme.Donky.Messaging.Light.DonkyActivity" parent="Theme.AppCompat.Light.NoActionBar">
+    <style name="dk_text_small_style">
+        <item name="android:textSize">@dimen/dk_text_small</item>
     </style>
 
-    <style name="Theme.Donky.Messaging.DonkyActivity" parent="Theme.AppCompat.NoActionBar">
+    <style name="dk_text_medium_style">
+        <item name="android:textSize">@dimen/dk_text_medium</item>
+    </style>
+
+    <style name="dk_text_large_style">
+        <item name="android:textSize">@dimen/dk_text_large</item>
+    </style>
+
+    <!-- Colors of toolbar overflow menu list rows background and text -->
+    <style name="dk_toolbar_popup_menu_style" parent="ThemeOverlay.AppCompat.Light">
+        <item name="android:colorBackground">@color/dk_popup_option_menu_bg_color</item>
+        <item name="android:textColorPrimary">@color/dk_popup_option_menu_text_color</item>
+    </style>
+
+    <!-- Overflow menu icon -->
+    <style name="dk_overflow_menu_button_style" parent="@android:style/Widget.Holo.ActionButton.Overflow">
+        <item name="android:src">?attr/dk_ic_more_vert_24dp</item>
+    </style>
+
+    <!-- Style of toolbar action mode title text -->
+    <style name="dk_action_mode_style" parent="@style/Widget.AppCompat.ActionMode">
+        <item name="titleTextStyle">@style/dk_toolbar_title_style</item>
+        <item name="android:clickable">true</item>
+    </style>
+
+    <!-- Divider in split view -->
+    <style name="dk_divider_between_inbox_and_detail_fragments_style">
+        <item name="android:layout_width">1dp</item>
+        <item name="android:background">@android:color/darker_gray</item>
+    </style>
+
+    <!-- Empty message text style -->
+    <style name="dk_message_empty_text_style">
+        <item name="android:textColor">@color/dk_empty_list_view_text</item>
+        <item name="android:textSize">20sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:ellipsize">marquee</item>
+        <item name="android:singleLine">true</item>
+    </style>
+
+    <!-- Toolbar style -->
+    <style name="dk_toolbar_style" parent="ThemeOverlay.AppCompat.Dark">
+    </style>
+
+    <style name="dk_toolbar_title_style" parent="@style/TextAppearance.Widget.AppCompat.Toolbar.Title">
+        <item name="android:textSize">20sp</item>
+        <item name="android:textColor">?attr/dk_text_color_primary</item>
+    </style>
+
+    <!-- Window popup list style -->
+    <style name="dk_window_popup_list_element_style" parent="dk_text_large_style">
+        <item name="android:paddingTop">16dp</item>
+        <item name="android:paddingBottom">16dp</item>
+        <item name="android:paddingLeft">24dp</item>
+        <item name="android:paddingRight">24dp</item>
+        <item name="android:textColor">@color/dk_window_popup_list_element_text_color</item>
+        <item name="android:ellipsize">marquee</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:background">@drawable/dk_window_popup_list_item_selector</item>
+    </style>
+
+    <!-- alert dialog style e.g. expired rich message -->
+    <style name="dk_dialog_style_light" parent="Theme.AppCompat.Light.Dialog">
+    </style>
+
+    <style name="dk_dialog_style_dark" parent="Theme.AppCompat.Dialog">
+    </style>
+
+
+    <!-- Action bar styles when theme with action bar is being used -->
+
+    <style name="dk_action_bar_light_style" parent="@style/Widget.AppCompat.ActionBar.Solid">
+        <item name="android:titleTextStyle">@style/dk_action_bar_title_text_light_style</item>
+        <item name="titleTextStyle">@style/dk_action_bar_title_text_light_style</item>
+    </style>
+
+    <style name="dk_action_bar_title_text_light_style" parent="android:style/TextAppearance.Holo.Widget.ActionBar.Title">
+        <item name="android:textColor">@color/dk_action_bar_tool_bar_text_light_theme</item>
+    </style>
+
+    <style name="dk_action_bar_style" parent="@style/Widget.AppCompat.ActionBar.Solid">
+        <item name="android:titleTextStyle">@style/dk_action_bar_title_text_style</item>
+        <item name="titleTextStyle">@style/dk_action_bar_title_text_style</item>
+    </style>
+
+    <style name="dk_action_bar_title_text_style" parent="android:style/TextAppearance.Holo.Widget.ActionBar.Title">
+        <item name="android:textColor">@color/dk_action_bar_tool_bar_text</item>
     </style>
 
 </resources>

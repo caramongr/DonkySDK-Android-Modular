@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Width of the rich message list item avatar -->
+    <dimen name="dk_rich_message_avatar_width">96dp</dimen>
+    <!-- Height of the rich message list item avatar -->
+    <dimen name="dk_rich_message_avatar_height">@dimen/dk_rich_message_avatar_width</dimen>
+
+    <dimen name="dk_download_avatar_rescale_to_width">96px</dimen>
+
+    <dimen name="dk_new_flag_high">48dp</dimen>
+
+    <dimen name="dk_new_flag__corner_radius">48dp</dimen>
+
+    <dimen name="dk_new_flag_circle_diameter">30dp</dimen>
+
+    <dimen name="dk_text_size_rich_list_element_new_tag">26dp</dimen>
+
+    <dimen name="dk_list_divider_high">1px</dimen>
+
+</resources>

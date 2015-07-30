@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <string name="dk_message_new">NEW</string>
+
+    <!-- Rich Message clicked dialog list elements -->
+    <string name="dk_rich_message_option_forward">Forward</string>
+    <string name="dk_rich_message_option_share">Share</string>
+    <string name="dk_rich_message_option_delete">Delete</string>
+
+    <!-- Toolbar options -->
+    <string name="dk_toolbar_option_share">Share</string>
+    <string name="dk_toolbar_option_multiple">Edit Multiple</string>
+
+    <!-- Toolbar titles -->
+    <string name="dk_rich_message_inbox_action_mode_title">Inbox</string>
+    <string name="dk_inbox_fragment_title">Inbox</string>
+
+    <!-- Expired message dialog -->
+    <string name="dk_inbox_expired_dialog_title">Expired message</string>
+    <string name="dk_inbox_expired_dialog_message">This message has now expired, you can no longer view it, so please delete the message, or delete all your expired messages.</string>
+    <string name="dk_inbox_expired_dialog_delete_button">DELETE</string>
+    <string name="dk_inbox_expired_dialog_delete_all_expired_button">DELETE ALL</string>
+
+    <string name="dk_expired_tag">EXPIRED</string>
+
+</resources>

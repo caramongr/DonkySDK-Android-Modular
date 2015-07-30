@@ -5,7 +5,7 @@
 
         <service
             android:name="net.donky.core.messaging.push.logic.PushLogicIntentService"
-            android:exported="true" />
+            android:exported="false" />
 
     </application>
 

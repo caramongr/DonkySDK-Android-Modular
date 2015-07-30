@@ -124,9 +124,13 @@ public class LifeCycleObserver {
 
                         boolean isStartedFromNotification = extras.getBoolean(EXTRA_KEY_IS_APP_OPENED_FROM_NOTIFICATION);
 
-                        if (isStartedFromNotification) {
+                        if (isStartedFromNotification && !isApplicationForegrounded()) {
 
                             LifeCycleObserver.getInstance().setIsAppOpenedFromNotificationBanner(true);
+
+                        } else {
+
+                            LifeCycleObserver.getInstance().setIsAppOpenedFromNotificationBanner(false);
 
                         }
 

@@ -1,0 +1,15 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Customize your theme here. -->
+    </style>
+
+    <style name="Theme.Donky.Messaging.CustomDonkyActivity" parent="Theme.Donky.Messaging.DonkyActivity.ActionBar">
+
+        <!-- Multiselect mode icon -->
+        <item name="dk_ic_multi_select_24dp">@drawable/custom_ic_multi_select_24dp</item>
+
+    </style>
+
+</resources>

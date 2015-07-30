@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+
+    <solid android:color="@color/dk_rich_message_new_tag_background" />
+
+    <padding
+        android:bottom="@dimen/dk_padding_small"
+        android:top="@dimen/dk_padding_small"/>
+
+    <corners
+        android:topLeftRadius="@dimen/dk_new_flag__corner_radius"
+        android:topRightRadius="@dimen/dk_new_flag__corner_radius" />
+
+</shape>

@@ -9,6 +9,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Helper for Date and Time formats.
@@ -77,5 +78,48 @@ public class DateAndTimeHelper {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZZZZZ", Locale.US);
         sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
         return sdf.format(time);
+    }
+
+    /**
+     * Check if message expired or passed its availability period.
+     *
+     * @param sentTime Date when message was sent.
+     * @param expiryTime Expiry date.
+     * @param currentTime Current time in milliseconds.
+     * @param availabilityDays Number of days any message should be available.
+     * @return True if message can be seen.
+     */
+    public static boolean isExpired(Date sentTime, Date expiryTime, long currentTime, Integer availabilityDays) {
+
+        if (isExceededMaxAvailabilityDays(sentTime, currentTime, availabilityDays)) {
+            return true;
+        }
+
+        if (expiryTime != null) {
+            if (currentTime > expiryTime.getTime()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Check if message exceeded max availability days.
+     *
+     * @param sentTime Date when message was sent.
+     * @param currentTime Current time in milliseconds.
+     * @param availabilityDays Number of days any message should be available.
+     * @return True if message can be seen.
+     */
+    public static boolean isExceededMaxAvailabilityDays(Date sentTime, long currentTime, Integer availabilityDays) {
+
+        if (sentTime != null && availabilityDays != null) {
+            if (currentTime - sentTime.getTime() > TimeUnit.DAYS.toMillis(availabilityDays)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

@@ -1,7 +1,6 @@
 package net.donky.core.messaging.logic;
 
 import net.donky.core.DonkyListener;
-import net.donky.core.messages.RichMessage;
 import net.donky.core.network.DonkyNetworkController;
 
 /**
@@ -39,20 +38,32 @@ public class MessagingInternalController {
      *
      * @param listener Callback to be invoked when completed.
      */
-    public void sendMessageReadNotification(RichMessage richMessage, DonkyListener listener) {
+    public void sendMessageReadNotification(CommonMessage commonMessage, DonkyListener listener) {
 
-        DonkyNetworkController.getInstance().sendClientNotification(ClientNotification.createMessageReadNotification(richMessage), listener);
+        DonkyNetworkController.getInstance().sendClientNotification(ClientNotification.createMessageReadNotification(commonMessage), listener);
 
     }
 
     /**
-     * Send 'Message Received' client notification.
+     * Queue 'Message Received' client notification.
      *
      * @param messageReceivedDetails Description of received message.
      */
     public void queueMessageReceivedNotification(MessageReceivedDetails messageReceivedDetails) {
 
         DonkyNetworkController.getInstance().queueClientNotification(ClientNotification.createMessageReceivedNotification(messageReceivedDetails));
+
+    }
+
+    /**
+     * Send 'Message Shared' client notification.
+     *
+     * @param commonMessage Shared rich message.
+     * @param sharedTo App name that the message was shared with.
+     */
+    public void queueMessageSharedNotification(CommonMessage commonMessage, String sharedTo) {
+
+        DonkyNetworkController.getInstance().queueClientNotification(ClientNotification.createMessageSharedNotification(commonMessage, sharedTo));
 
     }
 

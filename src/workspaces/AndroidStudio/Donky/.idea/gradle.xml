@@ -5,17 +5,21 @@
       <GradleProjectSettings>
         <option name="distributionType" value="DEFAULT_WRAPPED" />
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="gradleJvm" value="1.7" />
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/analytics" />
             <option value="$PROJECT_DIR$/app" />
+            <option value="$PROJECT_DIR$/appstylingtest" />
+            <option value="$PROJECT_DIR$/appstylingtest2" />
             <option value="$PROJECT_DIR$/automation" />
             <option value="$PROJECT_DIR$/core" />
             <option value="$PROJECT_DIR$/messaging" />
             <option value="$PROJECT_DIR$/messagingui" />
             <option value="$PROJECT_DIR$/pushlogic" />
             <option value="$PROJECT_DIR$/pushui" />
+            <option value="$PROJECT_DIR$/richinboxui" />
             <option value="$PROJECT_DIR$/richlogic" />
             <option value="$PROJECT_DIR$/richui" />
           </set>
@@ -24,4 +28,3 @@
     </option>
   </component>
 </project>
-

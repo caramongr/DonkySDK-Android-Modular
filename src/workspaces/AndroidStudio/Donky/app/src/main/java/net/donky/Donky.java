@@ -7,14 +7,14 @@ import net.donky.core.DonkyCore;
 import net.donky.core.DonkyException;
 import net.donky.core.DonkyListener;
 import net.donky.core.ModuleDefinition;
-import net.donky.core.NotificationListener;
+import net.donky.core.NotificationBatchListener;
 import net.donky.core.Subscription;
 import net.donky.core.account.DeviceDetails;
 import net.donky.core.account.UserDetails;
 import net.donky.core.analytics.DonkyAnalytics;
 import net.donky.core.automation.DonkyAutomation;
 import net.donky.core.messaging.push.ui.DonkyPushUI;
-import net.donky.core.messaging.rich.ui.DonkyRichUI;
+import net.donky.core.messaging.rich.inbox.ui.DonkyRichInboxUI;
 import net.donky.core.network.ServerNotification;
 
 import java.util.LinkedHashSet;
@@ -84,16 +84,16 @@ public class Donky extends Application {
         });
 
         // Initialise Donky Rich UI Module
-        DonkyRichUI.initialiseDonkyRich(this, new DonkyListener() {
+        DonkyRichInboxUI.initialiseDonkyRich(this, new DonkyListener() {
 
             @Override
             public void success() {
-                Log.i(TAG,"Rich Messaging initialised");
+                Log.i(TAG, "Rich Messaging initialised");
             }
 
             @Override
             public void error(DonkyException donkyException, Map<String, String> validationErrors) {
-                Log.e(TAG,"Rich Messaging error", donkyException);
+                Log.e(TAG, "Rich Messaging error", donkyException);
             }
 
         });
@@ -106,11 +106,18 @@ public class Donky extends Application {
         // Subscribe to receive changeColour Content Notifications
         List<Subscription<ServerNotification>> serverNotificationSubscriptions = new LinkedList<>();
         serverNotificationSubscriptions.add(new Subscription<>("changeColour",
-                new NotificationListener<ServerNotification>() {
+                new NotificationBatchListener<ServerNotification>() {
 
                     @Override
                     public void onNotification(ServerNotification notification) {
-                        NotificationProcessor.getInstance().processServerNotification(notification);
+
+                    }
+
+                    @Override
+                    public void onNotification(List<ServerNotification> notifications) {
+                        for (ServerNotification notification : notifications) {
+                            NotificationProcessor.getInstance().processServerNotification(notification);
+                        }
                     }
 
                 }));
@@ -135,7 +142,7 @@ public class Donky extends Application {
         // User details
         UserDetails userDetails = new UserDetails();
         userDetails.setUserCountryCode("GBR").
-                setUserId("john-smith").
+                setUserId("john-smith-test").
                 setUserFirstName("John").
                 setUserLastName("Smith").
                 setUserMobileNumber("07555555555").
@@ -147,7 +154,7 @@ public class Donky extends Application {
         DeviceDetails deviceDetails = new DeviceDetails("John's phone", "Smartphone", null);
 
         // Put your Donky API key here
-        String apiKey = DONKY_API_KEY;
+        String apiKey = ">>ENTER API KEY HERE<<";
 
         // Initialise Donky Core SDK
         DonkyCore.initialiseDonkySDK(this, apiKey, userDetails, deviceDetails, "v1", new DonkyListener() {

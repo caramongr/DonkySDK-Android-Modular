@@ -7,7 +7,7 @@ import net.donky.core.DonkyCore;
 import net.donky.core.DonkyException;
 import net.donky.core.DonkyListener;
 import net.donky.core.ModuleDefinition;
-import net.donky.core.NotificationListener;
+import net.donky.core.NotificationBatchListener;
 import net.donky.core.Subscription;
 import net.donky.core.messaging.logic.DonkyMessaging;
 import net.donky.core.network.ServerNotification;
@@ -97,11 +97,17 @@ public class DonkyPushLogic {
                         List<Subscription<ServerNotification>> serverNotificationSubscriptions = new LinkedList<>();
 
                         serverNotificationSubscriptions.add(new Subscription<>(ServerNotification.NOTIFICATION_TYPE_SimplePushMessage,
-                                new NotificationListener<ServerNotification>() {
+                                new NotificationBatchListener<ServerNotification>() {
 
                                     @Override
                                     public void onNotification(ServerNotification notification) {
-                                        new SimplePushHandler().handleSimplePushMessage(notification);
+
+                                    }
+
+                                    @Override
+                                    public void onNotification(List<ServerNotification> notifications) {
+
+                                        new SimplePushHandler().handleSimplePushMessage(notifications);
                                     }
 
                                 }));

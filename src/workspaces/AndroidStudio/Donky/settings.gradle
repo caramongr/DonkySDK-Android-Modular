@@ -1,1 +1,1 @@
-include ':app', ':core', ':analytics', ':automation', ':messaging', ':pushlogic', ':pushui', ':richlogic', ':richui', ':messagingui'
+include ':app', ':core', ':analytics', ':automation', ':messaging', ':pushlogic', ':pushui', ':richlogic', ':richui', ':messagingui', ':richinboxui', ':appstylingtest', ':appstylingtest2'

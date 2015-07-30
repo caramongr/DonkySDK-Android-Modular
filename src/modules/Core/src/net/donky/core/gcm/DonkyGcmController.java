@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
+import android.os.Handler;
+import android.os.Looper;
 import android.text.TextUtils;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -221,69 +223,76 @@ public class DonkyGcmController {
      */
     private void registerToGcmInBackground(final String senderId, final GcmRegistrationListener listener) {
 
-        new AsyncTask<Void, Void, String>() {
-
-            IOException exception;
-
+        new Handler(Looper.getMainLooper()).post(new Runnable() {
             @Override
-            protected String doInBackground(Void... params) {
+            public void run() {
 
-                RetryPolicy retryPolicy = new RetryPolicy();
+                new AsyncTask<Void, Void, String>() {
 
-                String registrationId = null;
+                    IOException exception;
 
-                try {
+                    @Override
+                    protected String doInBackground(Void... params) {
 
-                    GoogleCloudMessaging gcm = GoogleCloudMessaging.getInstance(context);
+                        RetryPolicy retryPolicy = new RetryPolicy();
 
-                    if (gcm != null) {
+                        String registrationId = null;
 
-                        while (registrationId == null && retryPolicy.retry()) {
+                        try {
 
-                            registrationId = gcm.register(senderId);
+                            GoogleCloudMessaging gcm = GoogleCloudMessaging.getInstance(context);
 
-                            if (TextUtils.isEmpty(registrationId)) {
+                            if (gcm != null) {
 
-                                try {
-                                    Thread.sleep(retryPolicy.getDelayBeforeNextRetry());
-                                } catch (InterruptedException e) {
-                                    e.printStackTrace();
+                                while (registrationId == null && retryPolicy.retry()) {
+
+                                    registrationId = gcm.register(senderId);
+
+                                    if (TextUtils.isEmpty(registrationId)) {
+
+                                        try {
+                                            Thread.sleep(retryPolicy.getDelayBeforeNextRetry());
+                                        } catch (InterruptedException e) {
+                                            e.printStackTrace();
+                                        }
+
+                                    } else {
+
+                                        DonkyDataController.getInstance().getConfigurationDAO().setGcmRegistrationId(registrationId);
+                                    }
                                 }
-
-                            } else {
-
-                                DonkyDataController.getInstance().getConfigurationDAO().setGcmRegistrationId(registrationId);
                             }
+
+                        } catch (IOException e) {
+
+                            exception = e;
+                            log.error("Error registering to GCM", e);
+
                         }
+
+                        return registrationId;
                     }
 
-                } catch (IOException e) {
+                    @Override
+                    protected void onPostExecute(String registrationId) {
 
-                    exception = e;
-                    log.error("Error registering to GCM", e);
+                        if (!TextUtils.isEmpty(registrationId) && listener != null) {
 
-                }
+                            listener.success(registrationId);
 
-                return registrationId;
+                        } else if (listener != null) {
+
+                            DonkyException donkyException = new DonkyException("Error registering for GCM.");
+                            donkyException.initCause(exception);
+
+                            listener.failed(donkyException);
+
+                        }
+                    }
+                }.execute(null, null, null);
             }
+        });
 
-            @Override
-            protected void onPostExecute(String registrationId) {
-
-                if (!TextUtils.isEmpty(registrationId) && listener != null) {
-
-                    listener.success(registrationId);
-
-                } else if (listener != null) {
-
-                    DonkyException donkyException = new DonkyException("Error registering for GCM.");
-                    donkyException.initCause(exception);
-
-                    listener.failed(donkyException);
-
-                }
-            }
-        }.execute(null, null, null);
     }
 
     /**
@@ -352,11 +361,17 @@ public class DonkyGcmController {
 
         String appVersion = DonkyDataController.getInstance().getConfigurationDAO().getGcmRegistrationAppVersion();
 
-        Integer registeredVersion = Integer.getInteger(appVersion);
-
         int currentVersion = getAppVersion();
 
-        if (registeredVersion != null && registeredVersion != currentVersion) {
+        Integer registeredVersion;
+
+        try {
+            registeredVersion = Integer.parseInt(appVersion);
+        } catch (Exception exception) {
+            registeredVersion = null;
+        }
+
+        if (registeredVersion == null || registeredVersion != currentVersion) {
 
             DonkyDataController.getInstance().getConfigurationDAO().setGcmRegistrationId(null);
 
@@ -387,8 +402,7 @@ public class DonkyGcmController {
             donkyException.initCause(e);
             log.error("Could not get package name", donkyException);
 
-            // should never happen
-            throw new RuntimeException("Could not get package name: " + e);
+            return -1;
         }
     }
 }

@@ -31,7 +31,7 @@ public class EventHandler {
      */
     public void handleSimplePushEvent(Context context, SimplePushMessageEvent event, SimplePushUIConfiguration simplePushUIConfiguration) {
 
-        if (event != null && !event.isReceivedExpired()) {
+        if (event != null) {
 
             if (!DonkyCore.getInstance().isModuleRegistered("DonkyCore","2.0.0.3")) {
 
@@ -39,8 +39,13 @@ public class EventHandler {
 
             } else {
 
-                displayNotification(context, simplePushUIConfiguration, event.getSimplePushData());
+                for (SimplePushData simplePushData : event.getBatchSimplePushData()) {
 
+                    if (!simplePushData.isReceivedExpired()) {
+                        displayNotification(context, simplePushUIConfiguration, simplePushData);
+                    }
+
+                }
             }
 
         }

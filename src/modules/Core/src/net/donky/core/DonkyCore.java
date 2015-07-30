@@ -10,9 +10,11 @@ import net.donky.core.account.DonkyAccountController;
 import net.donky.core.account.DeviceDetails;
 import net.donky.core.account.NewDeviceHandler;
 import net.donky.core.account.UserDetails;
+import net.donky.core.events.CoreInitialisedSuccessfullyEvent;
 import net.donky.core.events.DonkyEventListener;
 import net.donky.core.events.EventObservable;
 import net.donky.core.events.LocalEvent;
+import net.donky.core.events.OnResumeEvent;
 import net.donky.core.gcm.DonkyGcmController;
 import net.donky.core.lifecycle.LifeCycleObserver;
 import net.donky.core.logging.DLog;
@@ -27,9 +29,11 @@ import net.donky.core.observables.SubscriptionController;
 import net.donky.core.settings.AppSettings;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -182,19 +186,27 @@ public class DonkyCore {
                                     DonkyAssetController.getInstance().init(context, RestClient.getInstance().getOkHttpClient());
 
                                     serverNotificationSubscriptions.add(new Subscription<>(ServerNotification.NOTIFICATION_TYPE_TransmitDebugLog,
-                                            new NotificationListener<ServerNotification>() {
+                                            new NotificationBatchListener<ServerNotification>() {
+
                                                 @Override
-                                                public void onNotification(ServerNotification notification) {
+                                                public void onNotification(ServerNotification notification) {}
+
+                                                @Override
+                                                public void onNotification(List<ServerNotification> notifications) {
                                                     DonkyLoggingController.getInstance().submitLog(UploadLog.SubmissionReason.ManualRequest, null);
                                                 }
                                             }));
 
                                     if (AppSettings.getInstance().isNewDeviceNotificationEnabled()) {
                                         serverNotificationSubscriptions.add(new Subscription<>(ServerNotification.NOTIFICATION_TYPE_NewDeviceAddedToUser,
-                                                new NotificationListener<ServerNotification>() {
+                                                new NotificationBatchListener<ServerNotification>() {
+
                                                     @Override
-                                                    public void onNotification(ServerNotification notification) {
-                                                        new NewDeviceHandler(application.getApplicationContext()).process(notification);
+                                                    public void onNotification(ServerNotification notification) {}
+
+                                                    @Override
+                                                    public void onNotification(List<ServerNotification> notifications) {
+                                                        new NewDeviceHandler(application.getApplicationContext()).process(notifications);
                                                     }
                                                 }));
                                     }
@@ -209,6 +221,8 @@ public class DonkyCore {
                                     initialised.set(true);
 
                                     sharedLock.notifyAll();
+
+                                    DonkyCore.publishLocalEvent(new CoreInitialisedSuccessfullyEvent());
 
                                 } catch (final Exception e) {
 
@@ -437,6 +451,22 @@ public class DonkyCore {
     }
 
     /**
+     * The Core SDK will act as a Service Provider, allowing modules to register ‘services’ that other modules can consume.  This is largely to enable other Donky modules to interoperate.
+     * Only a single instance of any given type can be tracked.  This will replace any previously registered instances of the given type.
+     *
+     * @param type The type of the service being registered.
+     * @param category The category of the service being registered. This can be used if some hierarchy of types is needed for Services.
+     * @param instance Instance of the specified type.
+     */
+    public void registerService(String type, String category, Object instance) {
+
+        if (type != null && instance != null) {
+            ServiceWrapper service = new ServiceWrapper(type, category, instance);
+            services.put(type, service);
+        }
+    }
+
+    /**
      * Gets a reference to a registered service.
      *
      * @param type The type of the required service.
@@ -451,6 +481,31 @@ public class DonkyCore {
             if (wrapper != null) {
                 return wrapper.getServiceInstance();
             }
+
+        }
+        return null;
+    }
+
+    /**
+     * Gets a reference to a registered service.
+     *
+     * @param category The category of the required services.
+     * @return Map of service instances of the specified category if registered, else null. Service type is the map key.
+     */
+    public Map<String, Object> getServices(String category) {
+
+        if (category != null) {
+
+            Map<String, Object> servicesWithGivenCategory = new HashMap<>();
+
+            for (Map.Entry<String,ServiceWrapper> entry : services.entrySet()) {
+                if (entry.getKey() != null && entry.getValue() != null && category.equals(entry.getValue().getCategory())) {
+                    servicesWithGivenCategory.put(entry.getKey(),entry.getValue().getServiceInstance());
+                }
+
+            }
+
+            return servicesWithGivenCategory;
 
         }
         return null;
@@ -603,6 +658,7 @@ public class DonkyCore {
     private class ServiceWrapper {
 
         String type;
+        String category;
         Object instance;
 
         /**
@@ -617,10 +673,30 @@ public class DonkyCore {
         }
 
         /**
+         * Class constructor to hold service subscription.
+         *
+         * @param type     Class type of the service instance.
+         * @param category The category of the service being registered. This can be used if some hierarchy of types is needed for Services.
+         * @param instance Service instance.
+         */
+        ServiceWrapper(String type, String category, Object instance) {
+            this.type = type;
+            this.category = category;
+            this.instance = instance;
+        }
+
+        /**
          * @return Type of subscribed service.
          */
         public String getType() {
             return type;
+        }
+
+        /**
+         * @return Category of subscribed service.
+         */
+        public String getCategory() {
+            return category;
         }
 
         /**

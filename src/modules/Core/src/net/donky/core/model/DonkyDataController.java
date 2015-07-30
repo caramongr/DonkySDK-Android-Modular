@@ -31,9 +31,14 @@ public class DonkyDataController {
      */
     private ConfigurationDAO configurationDAO;
 
+    /**
+     * Provides access to saved software version numbers.
+     */
+    private SoftwareVersionsDAO softwareVersionsDAO;
+
     private NotificationDAO notificationDAO;
 
-    private RichMessagesDAO richMessagesDAO;
+    private DatabaseSQLHelper databaseSQLHelper;
 
     // Private constructor. Prevents instantiation from other classes.
     private DonkyDataController() {
@@ -61,13 +66,13 @@ public class DonkyDataController {
      */
     public void init(Application application) {
         log.info("Donky Core Database version: " + DatabaseSQLHelper.DATABASE_VERSION);
-        DatabaseSQLHelper databaseSQLHelper = new DatabaseSQLHelper(application.getApplicationContext());
+        databaseSQLHelper = new DatabaseSQLHelper(application.getApplicationContext());
 
         notificationDAO = new NotificationDAO(databaseSQLHelper);
-        richMessagesDAO = new RichMessagesDAO(databaseSQLHelper);
         deviceDAO = new DeviceDAO(application.getApplicationContext());
         userDAO = new UserDAO(application.getApplicationContext());
         configurationDAO = new ConfigurationDAO(application.getApplicationContext());
+        softwareVersionsDAO = new SoftwareVersionsDAO(application.getApplicationContext());
 
         DonkyLoggingController.getInstance().setAutoSubmit(Boolean.getBoolean(DonkyDataController.getInstance().getConfigurationDAO().getConfigurationItems().get(ConfigurationDAO.KEY_CONFIGURATION_AlwaysSubmitErrors)));
     }
@@ -101,9 +106,17 @@ public class DonkyDataController {
     }
 
     /**
-     * @return Database Access Object for rich messages.
+     * Gets Database open helper
+     * @return SQLite Database helper
      */
-    public RichMessagesDAO getRichMessagesDAO() {
-        return richMessagesDAO;
+    public DatabaseSQLHelper getDatabaseSQLHelper() {
+        return databaseSQLHelper;
+    }
+
+    /**
+     * @return Database Access Object for software version numbers.
+     */
+    public SoftwareVersionsDAO getSoftwareVersionsDAO() {
+        return softwareVersionsDAO;
     }
 }

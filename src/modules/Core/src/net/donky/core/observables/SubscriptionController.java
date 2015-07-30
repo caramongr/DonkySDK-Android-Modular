@@ -4,13 +4,10 @@ import android.os.Handler;
 import android.os.Looper;
 
 import net.donky.core.ModuleDefinition;
-import net.donky.core.NotificationListener;
 import net.donky.core.OutboundNotification;
 import net.donky.core.Subscription;
 import net.donky.core.network.ClientNotification;
 import net.donky.core.network.ServerNotification;
-
-import org.json.JSONObject;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -187,12 +184,18 @@ public class SubscriptionController {
 
             if (outboundNotificationSubscriptionInternal.getNotificationType() != null && outboundNotificationSubscriptionInternal.getNotificationType().equals(clientNotification.getBaseNotificationType())) {
 
-                final NotificationListener<OutboundNotification> listener = outboundNotificationSubscriptionInternal.getListener();
+                final OutboundNotification outboundNotification = new OutboundNotification(clientNotification);
 
                 new Handler(Looper.getMainLooper()).post(new Runnable() {
                     @Override
                     public void run() {
-                        listener.onNotification(new OutboundNotification(clientNotification));
+                        if (outboundNotificationSubscriptionInternal.getBatchListener() != null) {
+                            List<OutboundNotification> outboundNotifications = new LinkedList<>();
+                            outboundNotifications.add(outboundNotification);
+                            outboundNotificationSubscriptionInternal.getBatchListener().onNotification(outboundNotifications);
+                        } else if (outboundNotificationSubscriptionInternal.getListener() != null) {
+                            outboundNotificationSubscriptionInternal.getListener().onNotification(outboundNotification);
+                        }
                     }
                 });
 

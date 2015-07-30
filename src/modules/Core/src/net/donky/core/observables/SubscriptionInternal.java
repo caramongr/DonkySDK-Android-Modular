@@ -2,6 +2,7 @@ package net.donky.core.observables;
 
 import net.donky.core.ModuleDefinition;
 import net.donky.core.Notification;
+import net.donky.core.NotificationBatchListener;
 import net.donky.core.NotificationListener;
 import net.donky.core.Subscription;
 
@@ -21,6 +22,11 @@ public class SubscriptionInternal<T extends Notification> {
      * Callback that will be invoked when the notification is was received or send.
      */
     private final NotificationListener<T> listener;
+
+    /**
+     * Callback that will be invoked when the notification is was received or send.
+     */
+    private final NotificationBatchListener<T> batchListener;
 
     /**
      * Type of the notification that when it is being send or received the Callback should be invoked.
@@ -48,6 +54,7 @@ public class SubscriptionInternal<T extends Notification> {
     public SubscriptionInternal(ModuleDefinition moduleDefinition, Subscription<T> notificationSubscription, String notificationCategory, boolean getAutoAcknowledge) {
         this.moduleDefinition = moduleDefinition;
         this.listener = notificationSubscription.getNotificationListener();
+        this.batchListener = notificationSubscription.getNotificationBatchListener();
         this.notificationType = notificationSubscription.getNotificationType();
         this.notificationCategory = notificationCategory;
         this.autoAcknowledge = getAutoAcknowledge;
@@ -62,6 +69,7 @@ public class SubscriptionInternal<T extends Notification> {
     public SubscriptionInternal(ModuleDefinition moduleDefinition, Subscription<T> notificationSubscription) {
         this.moduleDefinition = moduleDefinition;
         this.listener = notificationSubscription.getNotificationListener();
+        this.batchListener = notificationSubscription.getNotificationBatchListener();
         this.notificationType = notificationSubscription.getNotificationType();
     }
 
@@ -77,6 +85,13 @@ public class SubscriptionInternal<T extends Notification> {
      */
     public NotificationListener<T> getListener() {
         return listener;
+    }
+
+    /**
+     * @return Listener for server notifications.
+     */
+    public NotificationBatchListener<T> getBatchListener() {
+        return batchListener;
     }
 
     /**

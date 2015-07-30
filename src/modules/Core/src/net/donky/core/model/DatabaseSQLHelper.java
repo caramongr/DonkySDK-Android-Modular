@@ -4,6 +4,12 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import net.donky.core.DonkyCore;
+
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
 /**
  * Helper class to crate and update SQL database.
  *
@@ -16,7 +22,7 @@ public class DatabaseSQLHelper extends SQLiteOpenHelper {
     /**
      * If the database schema change, the database version will be incremented.
      */
-    public static final int DATABASE_VERSION = 1;
+    public static final int DATABASE_VERSION = 2;
 
     /**
      * File name for SQLite database.
@@ -27,6 +33,8 @@ public class DatabaseSQLHelper extends SQLiteOpenHelper {
     private static final String INT_TYPE = " INT";
     private static final String LONG_TYPE = " LONG";
     private static final String COMMA_SEP = ",";
+
+    private List<AbstractDonkySQLiteHelper> additionalQSLiteHelperInterfaces;
 
     private static final String SQL_CREATE_CLIENT_NOTIFICATIONS_TABLE =
             "CREATE TABLE " + DatabaseSQLContract.ClientNotificationEntry.TABLE_NAME + "(" +
@@ -44,49 +52,20 @@ public class DatabaseSQLHelper extends SQLiteOpenHelper {
     private static final String SQL_DELETE_CLIENT_NOTIFICATIONS_ENTRIES =
             "DROP TABLE IF EXISTS " + DatabaseSQLContract.ClientNotificationEntry.TABLE_NAME;
 
-    private static final String SQL_CREATE_RICH_MESSAGES_TABLE =
-            "CREATE TABLE " + DatabaseSQLContract.RichMessageEntry.TABLE_NAME + "(" +
-                    DatabaseSQLContract.RichMessageEntry._ID + " INTEGER PRIMARY KEY," +
-
-                    DatabaseSQLContract.RichMessageEntry.COLUMN_NAME_messageRead+ INT_TYPE + COMMA_SEP +
-                    DatabaseSQLContract.RichMessageEntry.COLUMN_NAME_internalId + TEXT_TYPE + COMMA_SEP +
-
-                    DatabaseSQLContract.RichMessageEntry.COLUMN_NAME_messageType + TEXT_TYPE + COMMA_SEP +
-                    DatabaseSQLContract.RichMessageEntry.COLUMN_NAME_senderExternalUserId + TEXT_TYPE + COMMA_SEP +
-                    DatabaseSQLContract.RichMessageEntry.COLUMN_NAME_description + TEXT_TYPE + COMMA_SEP +
-                    DatabaseSQLContract.RichMessageEntry.COLUMN_NAME_expiredBody + TEXT_TYPE + COMMA_SEP +
-                    DatabaseSQLContract.RichMessageEntry.COLUMN_NAME_canReply + TEXT_TYPE + COMMA_SEP +
-                    DatabaseSQLContract.RichMessageEntry.COLUMN_NAME_externalRef + TEXT_TYPE + COMMA_SEP +
-                    DatabaseSQLContract.RichMessageEntry.COLUMN_NAME_canForward + INT_TYPE + COMMA_SEP +
-                    DatabaseSQLContract.RichMessageEntry.COLUMN_NAME_canShare + INT_TYPE + COMMA_SEP +
-                    DatabaseSQLContract.RichMessageEntry.COLUMN_NAME_urlToShare + TEXT_TYPE + COMMA_SEP +
-                    DatabaseSQLContract.RichMessageEntry.COLUMN_NAME_silentNotification + INT_TYPE + COMMA_SEP +
-                    DatabaseSQLContract.RichMessageEntry.COLUMN_NAME_msgSentTimeStamp + TEXT_TYPE + COMMA_SEP +
-                    DatabaseSQLContract.RichMessageEntry.COLUMN_NAME_forwardedBy + TEXT_TYPE + COMMA_SEP +
-                    DatabaseSQLContract.RichMessageEntry.COLUMN_NAME_forwardingOverlayMessage + TEXT_TYPE + COMMA_SEP +
-                    DatabaseSQLContract.RichMessageEntry.COLUMN_NAME_conversationId + TEXT_TYPE + COMMA_SEP +
-                    DatabaseSQLContract.RichMessageEntry.COLUMN_NAME_senderAccountType + TEXT_TYPE + COMMA_SEP +
-                    DatabaseSQLContract.RichMessageEntry.COLUMN_NAME_senderDisplayName + TEXT_TYPE + COMMA_SEP +
-                    DatabaseSQLContract.RichMessageEntry.COLUMN_NAME_body + TEXT_TYPE + COMMA_SEP +
-                    DatabaseSQLContract.RichMessageEntry.COLUMN_NAME_messageScope + TEXT_TYPE + COMMA_SEP +
-                    DatabaseSQLContract.RichMessageEntry.COLUMN_NAME_senderInternalUserId + TEXT_TYPE + COMMA_SEP +
-                    DatabaseSQLContract.RichMessageEntry.COLUMN_NAME_senderMessageId + TEXT_TYPE + COMMA_SEP +
-                    DatabaseSQLContract.RichMessageEntry.COLUMN_NAME_messageId + TEXT_TYPE + COMMA_SEP +
-                    DatabaseSQLContract.RichMessageEntry.COLUMN_NAME_contextItems + TEXT_TYPE + COMMA_SEP +
-                    DatabaseSQLContract.RichMessageEntry.COLUMN_NAME_avatarAssetId + TEXT_TYPE + COMMA_SEP +
-                    DatabaseSQLContract.RichMessageEntry.COLUMN_NAME_sentTimestamp + TEXT_TYPE + COMMA_SEP +
-                    DatabaseSQLContract.RichMessageEntry.COLUMN_NAME_expiryTimeStamp + TEXT_TYPE + ")";
-
-    private static final String SQL_DELETE_RICH_MESSAGES_ENTRIES =
-            "DROP TABLE IF EXISTS " + DatabaseSQLContract.RichMessageEntry.TABLE_NAME;
-
     /**
      * Helper class to create and update SGLite database.
      * @param context Application context.
      */
     public DatabaseSQLHelper(Context context) {
-
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
+
+        additionalQSLiteHelperInterfaces = new LinkedList<>();
+        Map<String, Object> helpers = DonkyCore.getInstance().getServices(AbstractDonkySQLiteHelper.SERVICE_CATEGORY_SQLITE_HELPER);
+        if (helpers != null) {
+            for (Object helper : helpers.values()) {
+                additionalQSLiteHelperInterfaces.add((AbstractDonkySQLiteHelper)helper);
+            }
+        }
     }
 
     /**
@@ -96,8 +75,9 @@ public class DatabaseSQLHelper extends SQLiteOpenHelper {
 
         db.execSQL(SQL_CREATE_CLIENT_NOTIFICATIONS_TABLE);
 
-        db.execSQL(SQL_CREATE_RICH_MESSAGES_TABLE);
-
+        for (AbstractDonkySQLiteHelper helper : additionalQSLiteHelperInterfaces) {
+            helper.onCreate(db);
+        }
 
     }
 
@@ -110,11 +90,11 @@ public class DatabaseSQLHelper extends SQLiteOpenHelper {
      */
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 
-        db.execSQL(SQL_DELETE_CLIENT_NOTIFICATIONS_ENTRIES);
+        for (AbstractDonkySQLiteHelper helper : additionalQSLiteHelperInterfaces) {
+            helper.onUpgrade(db, oldVersion, newVersion);
+        }
 
-        db.execSQL(SQL_DELETE_RICH_MESSAGES_ENTRIES);
-
-        onCreate(db);
+        onUpgrade(db, oldVersion, newVersion);
     }
 
     /**
@@ -126,6 +106,10 @@ public class DatabaseSQLHelper extends SQLiteOpenHelper {
      */
     public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 
-        onUpgrade(db, oldVersion, newVersion);
+        for (AbstractDonkySQLiteHelper helper : additionalQSLiteHelperInterfaces) {
+            helper.onDowngrade(db, oldVersion, newVersion);
+        }
+
+        onDowngrade(db, oldVersion, newVersion);
     }
 }

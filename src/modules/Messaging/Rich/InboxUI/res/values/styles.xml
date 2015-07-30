@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <style name="dk_rich_message_list_view_style">
+        <item name="android:background">@color/dk_rich_message_list_view_background</item>
+        <item name="android:drawSelectorOnTop">false</item>
+        <item name="android:listSelector">@drawable/dk_list_element_simple_selector</item>
+        <item name="android:dividerHeight">@dimen/dk_list_divider_high</item>
+    </style>
+
+    <style name="dk_rich_message_list_element_style">
+        <item name="android:background">@drawable/dk_list_element_simple_selector</item>
+        <item name="android:paddingLeft">@dimen/dk_padding_medium</item>
+        <item name="android:paddingRight">@dimen/dk_padding_medium</item>
+    </style>
+
+    <style name="dk_rich_message_avatar_layout_style">
+        <item name="android:paddingRight">@dimen/dk_padding_medium</item>
+    </style>
+
+    <style name="dk_rich_message_avatar_style">
+    </style>
+
+    <style name="dk_rich_message_list_view_row_checkbox_style">
+        <item name="android:button">@drawable/dk_checkbox_selector</item>
+    </style>
+
+    <style name="dk_rich_message_list_view_row_new_flag_style">
+        <item name="android:background">@drawable/dk_new_tag_shape</item>
+        <item name="android:textSize">0sp</item>
+    </style>
+
+    <style name="dk_rich_message_list_view_row_display_name_style" parent="dk_text_large_style">
+        <item name="android:textStyle">bold</item>
+        <item name="android:padding">@dimen/dk_padding_small</item>
+        <item name="android:textColor">@color/dk_rich_message_display_name</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:singleLine">true</item>
+    </style>
+
+    <style name="dk_rich_message_list_view_row_timestamp_style" parent="dk_text_small_style">
+        <item name="android:padding">@dimen/dk_padding_small</item>
+        <item name="android:textColor">@color/dk_rich_message_timestamp</item>
+        <item name="android:singleLine">true</item>
+    </style>
+
+    <style name="dk_rich_message_list_view_row_content_style" parent="dk_text_small_style">
+        <item name="android:paddingLeft">@dimen/dk_padding_small</item>
+        <item name="android:paddingRight">@dimen/dk_padding_small</item>
+        <item name="android:paddingBottom">@dimen/dk_padding_small</item>
+        <item name="android:minLines">@integer/dk_rich_message_description_lines</item>
+        <item name="android:textColor">@color/dk_rich_message_description</item>
+    </style>
+
+</resources>

@@ -9,8 +9,8 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.annotations.SerializedName;
 
-import net.donky.core.account.DonkyAccountController;
 import net.donky.core.account.DeviceDetails;
+import net.donky.core.account.DonkyAccountController;
 import net.donky.core.account.UserDetails;
 import net.donky.core.events.DonkyEventListener;
 import net.donky.core.events.LocalEvent;
@@ -63,7 +63,7 @@ public class DonkyKnownUserTest extends ApplicationTestCase<Application> {
 
     private static int TIME_OUT = 30000;
 
-    private static String apiKey = DONKY_API_KEY;
+    private static String apiKey = ">>ENTER API KEY HERE<<";
 
     private static String initialUserId = "test_"+new Integer(Math.abs(new Random().nextInt(Integer.MAX_VALUE)));
 

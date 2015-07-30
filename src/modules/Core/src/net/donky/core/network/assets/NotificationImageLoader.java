@@ -32,6 +32,22 @@ public abstract class NotificationImageLoader {
 
     }
 
+    public NotificationImageLoader(Context context, int dps) {
+
+        Resources resources = context.getResources();
+
+        int size = ImageHelper.getPixelsFromDP(resources, dps);
+
+        this.width = size;
+        this.height = size;
+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.HONEYCOMB) {
+            this.width = (int)resources.getDimension(android.R.dimen.notification_large_icon_width);
+            this.height = (int)resources.getDimension(android.R.dimen.notification_large_icon_height);
+        }
+
+    }
+
     /**
      * Image downloaded successfully.
      * @param bitmap Image downloaded from the network.

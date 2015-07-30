@@ -6,14 +6,16 @@ import com.google.gson.JsonObject;
 import net.donky.core.DonkyCore;
 import net.donky.core.helpers.DateAndTimeHelper;
 import net.donky.core.helpers.IdHelper;
-import net.donky.core.messages.RichMessage;
+import net.donky.core.messaging.rich.logic.model.RichMessage;
 import net.donky.core.messaging.logic.MessageReceivedDetails;
 import net.donky.core.messaging.logic.MessagingInternalController;
-import net.donky.core.model.DonkyDataController;
+import net.donky.core.messaging.rich.logic.model.RichMessageDataController;
 import net.donky.core.network.AcknowledgementDetail;
 import net.donky.core.network.ServerNotification;
 
 import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Handler for received server notification.
@@ -27,70 +29,84 @@ public class NotificationHandler {
     /**
      * Handler for received server notification.
      *
-     * @param serverNotification Received server notification.
+     * @param serverNotifications Received server notifications.
      */
-    public void handleRichMessageNotification(ServerNotification serverNotification) {
+    public void handleRichMessageNotification(List<ServerNotification> serverNotifications) {
 
-        if (ServerNotification.NOTIFICATION_TYPE_RichMessage.equals(serverNotification.getType())) {
+        List<RichMessage> richMessages = new LinkedList<>();
 
-            JsonObject data = serverNotification.getData();
+        for (ServerNotification serverNotification : serverNotifications) {
 
-            Gson gson = new Gson();
+            if (ServerNotification.NOTIFICATION_TYPE_RichMessage.equals(serverNotification.getType())) {
 
-            final RichMessage richMessage = gson.fromJson(data.toString(), RichMessage.class);
+                JsonObject data = serverNotification.getData();
 
-            MessageReceivedDetails messageReceivedDetails = new MessageReceivedDetails();
+                Gson gson = new Gson();
 
-            messageReceivedDetails.setMessageType(richMessage.getMessageType());
-            messageReceivedDetails.setMessageId(richMessage.getMessageId());
-            messageReceivedDetails.setMessageScope(MessageReceivedDetails.MessageScope.A2P.toString());
-            messageReceivedDetails.setContextItems(richMessage.getContextItems());
-            messageReceivedDetails.setSenderInternalUserId(richMessage.getSenderInternalUserId());
-            messageReceivedDetails.setSenderMessageId(richMessage.getMessageId());
-            messageReceivedDetails.setSentTimestamp(richMessage.getSentTimestamp());
+                final RichMessage richMessage = gson.fromJson(data.toString(), RichMessage.class);
 
-            Date expiredTime = DateAndTimeHelper.parseUtcDate(richMessage.getExpiryTimeStamp());
+                RichMessageDataController.getInstance().getRichMessagesDAO().getRichMessageWithMessageId(richMessage.getMessageId());
 
-            boolean receivedExpired = false;
+                if (RichMessageDataController.getInstance().getRichMessagesDAO().getRichMessageWithMessageId(richMessage.getMessageId()) != null) {
+                    continue;
+                }
 
-            if (expiredTime != null) {
+                MessageReceivedDetails messageReceivedDetails = new MessageReceivedDetails();
 
-                Date currentTime = new Date(System.currentTimeMillis());
+                messageReceivedDetails.setMessageType(richMessage.getMessageType());
+                messageReceivedDetails.setMessageId(richMessage.getMessageId());
+                messageReceivedDetails.setMessageScope(MessageReceivedDetails.MessageScope.A2P.toString());
+                messageReceivedDetails.setContextItems(richMessage.getContextItems());
+                messageReceivedDetails.setSenderInternalUserId(richMessage.getSenderInternalUserId());
+                messageReceivedDetails.setSenderMessageId(richMessage.getMessageId());
+                messageReceivedDetails.setSentTimestamp(richMessage.getSentTimestamp());
 
-                receivedExpired = !currentTime.before(expiredTime) ;
+                Date expiredTime = DateAndTimeHelper.parseUtcDate(richMessage.getExpiryTimeStamp());
 
-                if (receivedExpired) {
+                boolean receivedExpired = false;
 
-                    messageReceivedDetails.setReceivedExpired(true);
+                if (expiredTime != null) {
 
-                } else {
+                    Date currentTime = new Date(System.currentTimeMillis());
 
-                    messageReceivedDetails.setReceivedExpired(false);
+                    receivedExpired = !currentTime.before(expiredTime);
+
+                    if (receivedExpired) {
+
+                        messageReceivedDetails.setReceivedExpired(true);
+
+                    } else {
+
+                        messageReceivedDetails.setReceivedExpired(false);
+
+                    }
+                }
+
+                AcknowledgementDetail acknowledgementDetail = new AcknowledgementDetail();
+                acknowledgementDetail.setCustomNotificationType(null);
+                acknowledgementDetail.setType(serverNotification.getType());
+                acknowledgementDetail.setResult(AcknowledgementDetail.Result.Delivered.toString());
+                acknowledgementDetail.setSentTime(serverNotification.getCreatedOn());
+                acknowledgementDetail.setServerNotificationId(serverNotification.getId());
+                messageReceivedDetails.setAcknowledgementDetail(acknowledgementDetail);
+
+                MessagingInternalController.getInstance().queueMessageReceivedNotification(messageReceivedDetails);
+
+                richMessage.setInternalId(IdHelper.generateId());
+
+                if (!receivedExpired) {
+
+                    RichMessageDataController.getInstance().getRichMessagesDAO().saveRichMessage(richMessage);
 
                 }
-            }
 
-            AcknowledgementDetail acknowledgementDetail = new AcknowledgementDetail();
-            acknowledgementDetail.setCustomNotificationType(null);
-            acknowledgementDetail.setType(serverNotification.getType());
-            acknowledgementDetail.setResult(AcknowledgementDetail.Result.Delivered.toString());
-            acknowledgementDetail.setSentTime(serverNotification.getCreatedOn());
-            acknowledgementDetail.setServerNotificationId(serverNotification.getId());
-            messageReceivedDetails.setAcknowledgementDetail(acknowledgementDetail);
-
-            MessagingInternalController.getInstance().queueMessageReceivedNotification(messageReceivedDetails);
-
-            richMessage.setInternalId(IdHelper.generateId());
-
-            if (!receivedExpired) {
-
-                DonkyDataController.getInstance().getRichMessagesDAO().saveRichMessage(richMessage);
+                richMessage.setReceivedExpired(receivedExpired);
+                richMessages.add(richMessage);
 
             }
-
-            DonkyCore.publishLocalEvent(new RichMessageEvent(richMessage, receivedExpired));
-
         }
+
+        DonkyCore.publishLocalEvent(new RichMessageEvent(richMessages));
 
     }
 }

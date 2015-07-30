@@ -6,9 +6,15 @@ import net.donky.core.DonkyCore;
 import net.donky.core.DonkyException;
 import net.donky.core.DonkyListener;
 import net.donky.core.ModuleDefinition;
-import net.donky.core.NotificationListener;
+import net.donky.core.NotificationBatchListener;
 import net.donky.core.Subscription;
+import net.donky.core.events.CoreInitialisedSuccessfullyEvent;
+import net.donky.core.events.DonkyEventListener;
+import net.donky.core.events.RegistrationChangedEvent;
 import net.donky.core.messaging.logic.DonkyMessaging;
+import net.donky.core.messaging.rich.logic.model.RichMessageDataController;
+import net.donky.core.messaging.rich.logic.model.RichMessagingSQLiteHelper;
+import net.donky.core.model.AbstractDonkySQLiteHelper;
 import net.donky.core.network.ServerNotification;
 
 import java.util.LinkedList;
@@ -25,7 +31,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public class DonkyRichLogic {
 
-
     // The following SDK versioning strategy must be adhered to; the strategy allows the SDK version to communicate what the nature of the changes are between versions.
     // 1 - Major version number, increment for breaking changes.
     // 2 - Minor version number, increment when adding new functionality.
@@ -34,6 +39,8 @@ public class DonkyRichLogic {
     private final String version = "2.0.0.1";
 
     public final static String PLATFORM = "Mobile";
+
+    private static String RICH_MESSAGES_SQLITE_HELPER = "RichMessagesSQLiteHelper";
 
     /**
      * Flag set to true after init() method call is completed
@@ -88,14 +95,21 @@ public class DonkyRichLogic {
                     @Override
                     public void success() {
 
+                        DonkyCore.getInstance().registerService(RICH_MESSAGES_SQLITE_HELPER, AbstractDonkySQLiteHelper.SERVICE_CATEGORY_SQLITE_HELPER, new RichMessagingSQLiteHelper());
+
                         List<Subscription<ServerNotification>> serverNotificationSubscriptions = new LinkedList<>();
 
                         serverNotificationSubscriptions.add(new Subscription<>(ServerNotification.NOTIFICATION_TYPE_RichMessage,
-                                new NotificationListener<ServerNotification>() {
+                                new NotificationBatchListener<ServerNotification>() {
 
                                     @Override
                                     public void onNotification(ServerNotification notification) {
-                                        new NotificationHandler().handleRichMessageNotification(notification);
+
+                                    }
+
+                                    @Override
+                                    public void onNotification(List<ServerNotification> notifications) {
+                                        new NotificationHandler().handleRichMessageNotification(notifications);
                                     }
 
                                 }));
@@ -104,6 +118,24 @@ public class DonkyRichLogic {
                                 new ModuleDefinition(DonkyRichLogic.class.getSimpleName(), version),
                                 serverNotificationSubscriptions,
                                 false);
+
+                        DonkyCore.subscribeToLocalEvent(new DonkyEventListener<CoreInitialisedSuccessfullyEvent>(CoreInitialisedSuccessfullyEvent.class) {
+                            @Override
+                            public void onDonkyEvent(CoreInitialisedSuccessfullyEvent event) {
+
+                                RichMessageDataController.getInstance().getRichMessagesDAO().removeMessagesThatExceededTheAvailabilityPeriod();
+
+                            }
+                        });
+
+                        DonkyCore.subscribeToLocalEvent(new DonkyEventListener<RegistrationChangedEvent>(RegistrationChangedEvent.class) {
+                            @Override
+                            public void onDonkyEvent(RegistrationChangedEvent event) {
+                                if (event.isReplaceRegistration()) {
+                                    RichMessageDataController.getInstance().getRichMessagesDAO().removeAllRichMessages();
+                                }
+                            }
+                        });
 
                         initialised.set(true);
 
@@ -151,4 +183,5 @@ public class DonkyRichLogic {
     public static boolean isInitialised() {
         return initialised.get();
     }
+
 }

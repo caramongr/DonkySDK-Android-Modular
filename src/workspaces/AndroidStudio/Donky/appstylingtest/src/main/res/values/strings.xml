@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="WelcomeMessage">This Activity is only an entry point to Donky Rich Inbox Module Example. The Rich Inbox has very unusual styling to show how much can be accomplished providing few colour definitions in your app. This example is using a theme without ActionBar. SDK displays Toolbar instead.</string>
+
+    <string name="LoggingEnabled">true</string>
+    <string name="ErrorLogsEnabled">true</string>
+    <string name="WarningLogsEnabled">true</string>
+    <string name="InfoLogsEnabled">true</string>
+    <string name="DebugLogsEnabled">true</string>
+    <string name="SensitiveLogsEnabled">true</string>
+
+    <integer name="MinimalTimeBetweenSubmittingLogsSeconds">30</integer>
+
+    <string name="NewDeviceNotificationEnabled">true</string>
+
+    <string name="app_name">DonkyStyleA</string>
+
+</resources>

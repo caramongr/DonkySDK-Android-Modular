@@ -54,6 +54,8 @@ public class ServerNotification extends Notification {
     @SerializedName("createdOn")
     private String createdOn;
 
+    private String category;
+
     protected ServerNotification() {
         super(null, IdHelper.generateId());
     }
@@ -86,11 +88,37 @@ public class ServerNotification extends Notification {
         return createdOn;
     }
 
+    /**
+     * @return Category of the notification
+     */
+    public String getCategory() {
+        return category;
+    }
+
+    /**
+     * Category of the notification {@link ServerNotification#NOTIFICATION_CATEGORY_CUSTOM} or {@link ServerNotification#NOTIFICATION_CATEGORY_DONKY}
+     * @param category Category of the notification.
+     */
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
     @Override
     public String toString() {
 
         String divider = " | ";
 
         return "ServerNotification: " + " type: " + type + divider + " serverNotificationId : " + id + divider + " data : " + data.toString() + divider + " createdOn : " + createdOn;
+    }
+
+    /*
+    Access methods for testes.
+     */
+
+    protected void setMockData(String type, String id, JsonObject data, String createdOn) {
+        this.type = type;
+        this.id = id;
+        this.data = data;
+        this.createdOn = createdOn;
     }
 }

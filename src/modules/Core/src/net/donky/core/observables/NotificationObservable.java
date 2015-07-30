@@ -10,7 +10,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Observable for subscriptions for notifications being send or received. The generic type is the type of notification that this observable can store subscriptions for.
- *
+ * <p/>
  * Created by Marcin Swierczek
  * 02/04/2015.
  * Copyright (C) Donky Networks Ltd. All rights reserved.
@@ -66,7 +66,7 @@ class NotificationObservable<T extends Notification> {
      * Unsubscribe from notifications. Callbacks are made during the Synchronise flow.
      *
      * @param moduleDefinition The module details.
-     * @param subscription Subscriptions to remove.
+     * @param subscription     Subscriptions to remove.
      */
     public void unsubscribeFromNotifications(ModuleDefinition moduleDefinition, Subscription<T> subscription) {
 
@@ -78,8 +78,14 @@ class NotificationObservable<T extends Notification> {
 
                 if (notificationSubscription.getNotificationType() != null &&
                         notificationSubscription.getNotificationType().equals(subscription.getNotificationType()) &&
-                        notificationSubscription.getListener() != null &&
-                        notificationSubscription.getListener().equals(subscription.getNotificationListener())) {
+                        (
+                                (notificationSubscription.getListener() != null &&
+                                        notificationSubscription.getListener().equals(subscription.getNotificationListener())) ||
+
+                                        (notificationSubscription.getBatchListener() != null &&
+                                                notificationSubscription.getBatchListener().equals(subscription.getNotificationBatchListener()))
+                        )
+                        ) {
 
                     moduleSubscriptionsToRemove.add(notificationSubscription);
 

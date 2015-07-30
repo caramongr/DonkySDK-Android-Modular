@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- From: file:/C:/Users/marcin.swierczek/GitHubSrc/Donky-Android-Internal/src/modules/Core/res/values/colors.xml -->
+    <eat-comment/>
+    <color name="donky_new_device_notification_color">#FF8904</color>
+</resources>

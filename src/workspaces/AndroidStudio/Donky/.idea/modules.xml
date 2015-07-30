@@ -5,15 +5,17 @@
       <module fileurl="file://$PROJECT_DIR$/Donky.iml" filepath="$PROJECT_DIR$/Donky.iml" />
       <module fileurl="file://$PROJECT_DIR$/analytics/analytics.iml" filepath="$PROJECT_DIR$/analytics/analytics.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/appstylingtest/appstylingtest.iml" filepath="$PROJECT_DIR$/appstylingtest/appstylingtest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/appstylingtest2/appstylingtest2.iml" filepath="$PROJECT_DIR$/appstylingtest2/appstylingtest2.iml" />
       <module fileurl="file://$PROJECT_DIR$/automation/automation.iml" filepath="$PROJECT_DIR$/automation/automation.iml" />
       <module fileurl="file://$PROJECT_DIR$/core/core.iml" filepath="$PROJECT_DIR$/core/core.iml" />
       <module fileurl="file://$PROJECT_DIR$/messaging/messaging.iml" filepath="$PROJECT_DIR$/messaging/messaging.iml" />
       <module fileurl="file://$PROJECT_DIR$/messagingui/messagingui.iml" filepath="$PROJECT_DIR$/messagingui/messagingui.iml" />
       <module fileurl="file://$PROJECT_DIR$/pushlogic/pushlogic.iml" filepath="$PROJECT_DIR$/pushlogic/pushlogic.iml" />
       <module fileurl="file://$PROJECT_DIR$/pushui/pushui.iml" filepath="$PROJECT_DIR$/pushui/pushui.iml" />
+      <module fileurl="file://$PROJECT_DIR$/richinboxui/richinboxui.iml" filepath="$PROJECT_DIR$/richinboxui/richinboxui.iml" />
       <module fileurl="file://$PROJECT_DIR$/richlogic/richlogic.iml" filepath="$PROJECT_DIR$/richlogic/richlogic.iml" />
       <module fileurl="file://$PROJECT_DIR$/richui/richui.iml" filepath="$PROJECT_DIR$/richui/richui.iml" />
     </modules>
   </component>
 </project>
-

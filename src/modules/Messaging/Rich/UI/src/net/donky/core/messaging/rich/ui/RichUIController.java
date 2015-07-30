@@ -12,21 +12,22 @@ import android.os.Bundle;
 import android.text.TextUtils;
 
 import net.donky.core.lifecycle.LifeCycleObserver;
-import net.donky.core.messages.RichMessage;
+import net.donky.core.messaging.logic.DonkyMessaging;
+import net.donky.core.messaging.rich.logic.model.RichMessage;
+import net.donky.core.messaging.rich.logic.model.RichMessageDataController;
 import net.donky.core.messaging.rich.ui.components.RichMessagePopUpActivity;
-import net.donky.core.messaging.ui.components.rich.RichMessageActivity;
-import net.donky.core.messaging.ui.components.rich.RichMessageNotificationBuilder;
-import net.donky.core.messaging.ui.components.rich.RichMessagePushUIConfiguration;
-import net.donky.core.model.DonkyDataController;
+import net.donky.core.messaging.ui.notifications.RichMessageNotificationBuilder;
+import net.donky.core.messaging.ui.notifications.RichMessagePushUIConfiguration;
 import net.donky.core.network.assets.DonkyAssetController;
 import net.donky.core.network.assets.NotificationImageLoader;
 
-import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
+ * Internal controller for Rich MEssaging Pop-Up
+ *
  * Created by Marcin Swierczek
  * 17/04/2015.
  * Copyright (C) Donky Networks Ltd. All rights reserved.
@@ -69,23 +70,28 @@ public class RichUIController {
     }
 
     /**
-     * Adds {@link net.donky.core.messages.RichMessage} to the queue than displays next one if application is in foreground and no other RichMessage is currently displaying. In other case
+     * Adds {@link RichMessage} to the queue than displays next one if application is in foreground and no other RichMessage is currently displaying. In other case
      * display Notification.
      *
-     * @param richMessage RichMessage to display.
+     * @param richMessages RichMessages to display.
      */
-    public void checkActivityForegroundAndDisplayRichMessage(RichMessage richMessage) {
+    public void checkActivityForegroundAndDisplayRichMessage(List<RichMessage> richMessages) {
 
-        if (richMessage != null) {
-            pendingRichMessages.add(richMessage);
+        if (richMessages != null) {
+
+            for (RichMessage richMessage : richMessages) {
+                if (!richMessage.isReceivedExpired()) {
+                    pendingRichMessages.add(richMessage);
+                }
+            }
+
+            checkActivityForegroundAndDisplayRichMessage();
         }
-
-        checkActivityForegroundAndDisplayRichMessage();
 
     }
 
     /**
-     * Displays {@link net.donky.core.messages.RichMessage} from the queue if application is in foreground and no other RichMessage is currently displaying. In other case
+     * Displays {@link RichMessage} from the queue if application is in foreground and no other RichMessage is currently displaying. In other case
      * display Notification.
      */
     public void checkActivityForegroundAndDisplayRichMessage() {
@@ -124,7 +130,7 @@ public class RichUIController {
      */
     public void displayAllRichMessagesOnAppStart() {
 
-        List<RichMessage> unreadMessages = DonkyDataController.getInstance().getRichMessagesDAO().getUnreadRichMessages();
+        List<RichMessage> unreadMessages = RichMessageDataController.getInstance().getRichMessagesDAO().getUnreadRichMessages();
 
         NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 
@@ -171,14 +177,14 @@ public class RichUIController {
 
             RichMessage richMessageToDisplay = pendingRichMessages.poll();
 
-            context.startActivity(createRichPopupActivityIntent(richMessageToDisplay));
+            context.startActivity(createRichPopupActivityIntent(richMessageToDisplay, false));
 
         }
 
     }
 
     /**
-     * Create Notification for every pending {@link net.donky.core.messages.RichMessage}
+     * Create Notification for every pending {@link RichMessage}
      */
     private synchronized void displayRichMessageNotifications() {
 
@@ -189,7 +195,7 @@ public class RichUIController {
 
             final RichMessage richMessage = pendingRichMessages.poll();
 
-            if (richMessage != null && richMessage.getMessageId() != null) {
+            if (richMessage != null && richMessage.getMessageId() != null && !richMessage.isSilentNotification()) {
 
                 if (!TextUtils.isEmpty(richMessage.getAvatarAssetId())) {
 
@@ -198,14 +204,14 @@ public class RichUIController {
                         @Override
                         public void success(Bitmap bitmap) {
 
-                            displayNotification(context, notificationManager,  richMessage, getRichMessagePendingIntent(richMessage), null, bitmap);
+                            displayNotification(context, notificationManager,  richMessage, getRichMessagePendingIntent(richMessage, true), null, bitmap);
 
                         }
 
                         @Override
                         public void failure(Exception e) {
 
-                            displayNotification(context, notificationManager, richMessage, getRichMessagePendingIntent(richMessage), null, null);
+                            displayNotification(context, notificationManager, richMessage, getRichMessagePendingIntent(richMessage, true), null, null);
 
                         }
 
@@ -213,7 +219,7 @@ public class RichUIController {
 
                 } else {
 
-                    displayNotification(context, notificationManager, richMessage, getRichMessagePendingIntent(richMessage), null, null);
+                    displayNotification(context, notificationManager, richMessage, getRichMessagePendingIntent(richMessage, true), null, null);
 
                 }
             }
@@ -243,9 +249,9 @@ public class RichUIController {
      *
      * @return PendingIntent to open application main Activity.
      */
-    private PendingIntent getApplicationPendingIntent() {
+    private PendingIntent getApplicationPendingIntent(boolean openedFromNotification) {
 
-        return PendingIntent.getActivity(context, requestCode, createApplicationIntent(), PendingIntent.FLAG_UPDATE_CURRENT);
+        return PendingIntent.getActivity(context, requestCode, createApplicationIntent(openedFromNotification), PendingIntent.FLAG_UPDATE_CURRENT);
 
     }
 
@@ -255,9 +261,9 @@ public class RichUIController {
      * @param richMessageToDisplay RichMessage to display in an Activity.
      * @return
      */
-    private PendingIntent getRichMessagePendingIntent(RichMessage richMessageToDisplay) {
+    private PendingIntent getRichMessagePendingIntent(RichMessage richMessageToDisplay, boolean openedFromNotification) {
 
-        return PendingIntent.getActivity(context, requestCode, createRichPopupActivityIntent(richMessageToDisplay), PendingIntent.FLAG_UPDATE_CURRENT);
+        return PendingIntent.getActivity(context, requestCode, createRichPopupActivityIntent(richMessageToDisplay, openedFromNotification), PendingIntent.FLAG_UPDATE_CURRENT);
 
     }
 
@@ -266,7 +272,7 @@ public class RichUIController {
      *
      * @return Intent to open application main Activity.
      */
-    private Intent createApplicationIntent() {
+    private Intent createApplicationIntent(boolean openedFromNotification) {
 
         String packageName = context.getApplicationContext().getPackageName();
 
@@ -278,6 +284,8 @@ public class RichUIController {
             intent.addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES);
         }
 
+        intent.putExtra(LifeCycleObserver.EXTRA_KEY_IS_APP_OPENED_FROM_NOTIFICATION, openedFromNotification);
+
         return intent;
     }
 
@@ -286,7 +294,7 @@ public class RichUIController {
      *
      * @return Intent to open RichMessage Activity.
      */
-    private Intent createRichPopupActivityIntent(RichMessage richMessageToDisplay) {
+    private Intent createRichPopupActivityIntent(RichMessage richMessageToDisplay, boolean openedFromNotification) {
 
         Intent intent = new Intent(context, RichMessagePopUpActivity.class);
 
@@ -294,9 +302,11 @@ public class RichUIController {
             intent.addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES);
         }
 
+        intent.putExtra(LifeCycleObserver.EXTRA_KEY_IS_APP_OPENED_FROM_NOTIFICATION, openedFromNotification);
+
         Bundle bundle = new Bundle();
 
-        bundle.putSerializable(RichMessageActivity.KEY_INTENT_BUNDLE_RICH_MESSAGE, richMessageToDisplay);
+        bundle.putSerializable(DonkyMessaging.KEY_INTENT_BUNDLE_RICH_MESSAGE, richMessageToDisplay);
 
         intent.putExtras(bundle);
 

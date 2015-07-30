@@ -1,7 +1,10 @@
 package net.donky.core.messaging.rich.logic;
 
 import net.donky.core.events.LocalEvent;
-import net.donky.core.messages.RichMessage;
+import net.donky.core.messaging.rich.logic.model.RichMessage;
+
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Local Event representing RichMessage
@@ -12,29 +15,19 @@ import net.donky.core.messages.RichMessage;
  */
 public class RichMessageEvent extends LocalEvent {
 
-    private RichMessage richMessage;
+    private List<RichMessage> richMessages;
 
+    @Deprecated
     private boolean receivedExpired;
 
     /**
      * Local Event representing RichMessage
      *
-     * @param richMessage Received RichMessage
-     * @param receivedExpired True if RichMessage was received expired.
+     * @param richMessages Received RichMessages
      */
-    public RichMessageEvent(RichMessage richMessage, boolean receivedExpired) {
+    public RichMessageEvent(List<RichMessage> richMessages) {
         super();
-        this.richMessage = richMessage;
-        this.receivedExpired = receivedExpired;
-    }
-
-    /**
-     * Was the RichMessage received expired.
-     *
-     * @return True if RichMessage was received expired.
-     */
-    public boolean isReceivedExpired() {
-        return receivedExpired;
+        this.richMessages = richMessages;
     }
 
     /**
@@ -42,7 +35,42 @@ public class RichMessageEvent extends LocalEvent {
      *
      * @return Received RichMessage
      */
+    public List<RichMessage> getRichMessages() {
+        return richMessages;
+    }
+
+    /**
+     * Local Event representing RichMessage
+     * @deprecated please use RichMessageEvent#RichMessageEvent(List)
+     * @param richMessage Received RichMessages
+     * @param receivedExpired True if SimplePush was received expired.
+     */
+    @Deprecated
+    public RichMessageEvent(RichMessage richMessage, boolean receivedExpired) {
+        super();
+        this.receivedExpired = receivedExpired;
+        richMessages = new LinkedList<>();
+        richMessages.add(richMessage);
+    }
+
+    /**
+     * @deprecated please use SimplePushMessageEvent#getBatchSimplePushData
+     * @return
+     */
+    @Deprecated
     public RichMessage getRichMessage() {
-        return richMessage;
+        if (richMessages != null && !richMessages.isEmpty()) {
+            return richMessages.get(0);
+        }
+        return null;
+    }
+
+    /**
+     * @deprecated This method should not be used anymore. Rich Logic will not set expiry flag at this level anymore!
+     * @return
+     */
+    @Deprecated
+    public boolean isReceivedExpired() {
+        return receivedExpired;
     }
 }

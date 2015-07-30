@@ -5,12 +5,7 @@
         <!-- Customize your theme here. -->
     </style>
 
-    <style name="Theme.Donky.Messaging.Light.CustomDonkyActivity" parent="Theme.Donky.Messaging.Light.DonkyActivity">
-
-        <item name="colorPrimary">@color/donkyColorPrimary</item>
-        <item name="colorPrimaryDark">@color/donkyColorPrimaryDark</item>
-        <item name="android:textColorPrimary">@color/donkyTextColorPrimary</item>
-
+    <style name="Theme.Donky.Messaging.CustomDonkyActivity" parent="Theme.Donky.Messaging.DonkyActivity">
     </style>
 
 </resources>

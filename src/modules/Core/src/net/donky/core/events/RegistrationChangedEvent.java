@@ -16,6 +16,8 @@ public class RegistrationChangedEvent extends LocalEvent {
 
     private final DeviceDetails deviceDetails;
 
+    private final boolean isReplaceRegistration;
+
     /**
      * Local Donky event delivered to subscribers when the registration details change.
      *
@@ -26,6 +28,21 @@ public class RegistrationChangedEvent extends LocalEvent {
         super();
         this.userDetails = userDetails;
         this.deviceDetails = deviceDetails;
+        this.isReplaceRegistration = false;
+    }
+
+    /**
+     * Local Donky event delivered to subscribers when the registration details change.
+     *
+     * @param userDetails New user details fro registration update.
+     * @param deviceDetails New device details fro registration update.
+     * @param isReplaceRegistration Is the change a complete replacing of old registration. Be aware that setting this value to true may cause some modules to wipe out user specific data.
+     */
+    public RegistrationChangedEvent(UserDetails userDetails, DeviceDetails deviceDetails, boolean isReplaceRegistration) {
+        super();
+        this.userDetails = userDetails;
+        this.deviceDetails = deviceDetails;
+        this.isReplaceRegistration = isReplaceRegistration;
     }
 
     /**
@@ -44,5 +61,14 @@ public class RegistrationChangedEvent extends LocalEvent {
      */
     public DeviceDetails getDeviceDetails() {
         return deviceDetails;
+    }
+
+    /**
+     * Was the update the complete replacing of registered user.
+     *
+     * @return True if the update was a complete replacing of registered user.
+     */
+    public boolean isReplaceRegistration() {
+        return isReplaceRegistration;
     }
 }

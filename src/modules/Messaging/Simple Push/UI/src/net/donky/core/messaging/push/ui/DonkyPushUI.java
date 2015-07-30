@@ -85,7 +85,7 @@ public class DonkyPushUI {
 
             this.context = application.getApplicationContext();
 
-            this.simplePushUIConfiguration = new SimplePushUIConfiguration();
+            this.simplePushUIConfiguration = new SimplePushUIConfiguration(context);
 
             try {
 

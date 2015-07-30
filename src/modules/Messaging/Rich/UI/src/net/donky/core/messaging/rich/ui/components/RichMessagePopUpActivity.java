@@ -7,9 +7,8 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 
+import net.donky.core.messaging.rich.logic.model.RichMessageDataController;
 import net.donky.core.messaging.rich.ui.RichUIController;
-import net.donky.core.messaging.ui.components.rich.RichMessageActivity;
-import net.donky.core.model.DonkyDataController;
 
 /**
  * RichMessage popup Activity.
@@ -58,7 +57,7 @@ public class RichMessagePopUpActivity extends RichMessageActivity {
 
         registerReceiver(intentReceiver, intentFilter);
 
-        DonkyDataController.getInstance().getRichMessagesDAO().removeRichMessage(richMessageDetailFragment.getRichMessage());
+        RichMessageDataController.getInstance().getRichMessagesDAO().removeRichMessage(richMessageDetailFragment.getRichMessage());
 
         super.onResume();
     }

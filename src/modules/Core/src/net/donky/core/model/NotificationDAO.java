@@ -79,7 +79,9 @@ public class NotificationDAO {
 
 
             if (cursor != null) {
+
                 if (cursor.moveToFirst()) {
+
                     do {
 
                         AcknowledgementDetail acknowledgementDetail = new AcknowledgementDetail();
@@ -113,8 +115,8 @@ public class NotificationDAO {
 
                         clientNotifications.add(notification);
 
-                    }
-                    while (cursor.moveToNext());
+                    } while (cursor.moveToNext());
+
                 }
                 if (!cursor.isClosed()) {
                     cursor.close();

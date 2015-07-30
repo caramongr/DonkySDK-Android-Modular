@@ -51,7 +51,7 @@ public class EventHandler {
      */
     public void handleRichMessageEvent(RichMessageEvent event) {
 
-        if (event != null && !event.isReceivedExpired()) {
+        if (event != null) {
 
             if (!DonkyCore.getInstance().isModuleRegistered("DonkyCore","2.0.0.3")) {
 
@@ -59,7 +59,7 @@ public class EventHandler {
 
             } else {
 
-                RichUIController.getInstance().checkActivityForegroundAndDisplayRichMessage(event.getRichMessage());
+                RichUIController.getInstance().checkActivityForegroundAndDisplayRichMessage(event.getRichMessages());
 
             }
 

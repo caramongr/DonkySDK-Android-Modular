@@ -3,10 +3,10 @@
 buildscript {
     repositories {
         jcenter()
+        mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:1.1.0'
-
+        classpath 'com.android.tools.build:gradle:1.2.3'
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
     }
@@ -15,5 +15,18 @@ buildscript {
 allprojects {
     repositories {
         jcenter()
+        mavenCentral()
     }
+}
+
+// ext is a gradle closure allowing the declaration of global properties
+ext {
+    PUBLISH_GROUP_ID = 'net.donky'
+    MOBILE_DONKY_URL = 'http://www.mobiledonky.com/'
+    SDK_VERSION = '2.1.0.16'
+}
+
+// Running 'gradle wrapper' will generate gradlew - Getting gradle wrapper working and using it will save you a lot of pain.
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.2.1'
 }

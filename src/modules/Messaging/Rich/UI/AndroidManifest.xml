@@ -5,7 +5,8 @@
 
         <activity
             android:name="net.donky.core.messaging.rich.ui.components.RichMessagePopUpActivity"
-            android:theme="@style/Theme.Donky.Messaging.Light.DonkyActivity"></activity>
+            android:theme="@style/Theme.Donky.Messaging.DonkyActivity">
+        </activity>
 
     </application>
 

@@ -13,6 +13,8 @@ import net.donky.core.network.AcknowledgementDetail;
 import net.donky.core.network.ServerNotification;
 
 import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Class responsible for translating Server notification with Simple/Interactive notification into Local Event.
@@ -40,59 +42,69 @@ public class SimplePushHandler {
     /**
      * Translating Server notification with Simple/Interactive notification into Local Event and fire this event.
      *
-     * @param serverNotification Server notification with Simpe/Interactive Push message.
+     * @param serverNotifications Server notifications with Simpe/Interactive Push message.
      */
-    void handleSimplePushMessage(ServerNotification serverNotification) {
+    void handleSimplePushMessage(List<ServerNotification> serverNotifications) {
 
-        if (ServerNotification.NOTIFICATION_TYPE_SimplePushMessage.equals(serverNotification.getType())) {
+        List<SimplePushData> simplePushDataList = new LinkedList<>();
 
-            JsonObject data = serverNotification.getData();
+        for (ServerNotification serverNotification : serverNotifications) {
 
-            Gson gson = new Gson();
+            if (ServerNotification.NOTIFICATION_TYPE_SimplePushMessage.equals(serverNotification.getType())) {
 
-            SimplePushData simplePushData = gson.fromJson(data.toString(), SimplePushData.class);
+                JsonObject data = serverNotification.getData();
 
-            MessageReceivedDetails messageReceivedDetails = new MessageReceivedDetails();
+                Gson gson = new Gson();
 
-            messageReceivedDetails.setMessageType(simplePushData.getMessageType());
-            messageReceivedDetails.setMessageId(simplePushData.getMessageId());
-            messageReceivedDetails.setMessageScope(MessageReceivedDetails.MessageScope.A2P.toString());
-            messageReceivedDetails.setContextItems(simplePushData.getContextItems());
-            messageReceivedDetails.setSenderInternalUserId(simplePushData.getSenderInternalUserId());
-            messageReceivedDetails.setSenderMessageId(simplePushData.getSenderMessageId());
-            messageReceivedDetails.setSentTimestamp(simplePushData.getSentTimestamp());
+                SimplePushData simplePushData = gson.fromJson(data.toString(), SimplePushData.class);
 
-            Date expiredTime = DateAndTimeHelper.parseUtcDate(simplePushData.getExpiryTimeStamp());
+                MessageReceivedDetails messageReceivedDetails = new MessageReceivedDetails();
 
-            boolean receivedExpired = false;
+                messageReceivedDetails.setMessageType(simplePushData.getMessageType());
+                messageReceivedDetails.setMessageId(simplePushData.getMessageId());
+                messageReceivedDetails.setMessageScope(MessageReceivedDetails.MessageScope.A2P.toString());
+                messageReceivedDetails.setContextItems(simplePushData.getContextItems());
+                messageReceivedDetails.setSenderInternalUserId(simplePushData.getSenderInternalUserId());
+                messageReceivedDetails.setSenderMessageId(simplePushData.getSenderMessageId());
+                messageReceivedDetails.setSentTimestamp(simplePushData.getSentTimestamp());
 
-            if (expiredTime != null) {
+                Date expiredTime = DateAndTimeHelper.parseUtcDate(simplePushData.getExpiryTimeStamp());
 
-                receivedExpired = expiredTime.getTime() > System.currentTimeMillis();
+                boolean receivedExpired = false;
 
-                if (receivedExpired) {
+                if (expiredTime != null) {
 
-                    messageReceivedDetails.setReceivedExpired(true);
+                    receivedExpired = expiredTime.getTime() > System.currentTimeMillis();
 
-                } else {
+                    if (receivedExpired) {
 
-                    messageReceivedDetails.setReceivedExpired(false);
+                        messageReceivedDetails.setReceivedExpired(true);
 
+                    } else {
+
+                        messageReceivedDetails.setReceivedExpired(false);
+
+                    }
                 }
+
+                AcknowledgementDetail acknowledgementDetail = new AcknowledgementDetail();
+                acknowledgementDetail.setCustomNotificationType(null);
+                acknowledgementDetail.setType(serverNotification.getType());
+                acknowledgementDetail.setResult(AcknowledgementDetail.Result.Delivered.toString());
+                acknowledgementDetail.setSentTime(serverNotification.getCreatedOn());
+                acknowledgementDetail.setServerNotificationId(serverNotification.getId());
+                messageReceivedDetails.setAcknowledgementDetail(acknowledgementDetail);
+
+                MessagingInternalController.getInstance().queueMessageReceivedNotification(messageReceivedDetails);
+
+                simplePushData.setReceivedExpired(receivedExpired);
+
+                simplePushDataList.add(simplePushData);
+
             }
-
-            AcknowledgementDetail acknowledgementDetail = new AcknowledgementDetail();
-            acknowledgementDetail.setCustomNotificationType(null);
-            acknowledgementDetail.setType(serverNotification.getType());
-            acknowledgementDetail.setResult(AcknowledgementDetail.Result.Delivered.toString());
-            acknowledgementDetail.setSentTime(serverNotification.getCreatedOn());
-            acknowledgementDetail.setServerNotificationId(serverNotification.getId());
-            messageReceivedDetails.setAcknowledgementDetail(acknowledgementDetail);
-
-            MessagingInternalController.getInstance().queueMessageReceivedNotification(messageReceivedDetails);
-
-            DonkyCore.publishLocalEvent(new SimplePushMessageEvent(simplePushData, receivedExpired));
         }
+
+        DonkyCore.publishLocalEvent(new SimplePushMessageEvent(simplePushDataList));
     }
 
 }

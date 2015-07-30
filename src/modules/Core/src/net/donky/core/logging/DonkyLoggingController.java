@@ -2,6 +2,7 @@ package net.donky.core.logging;
 
 import android.app.Application;
 import android.content.Context;
+import android.util.Log;
 
 import net.donky.core.DonkyCore;
 import net.donky.core.DonkyException;
@@ -137,6 +138,10 @@ public class DonkyLoggingController {
 
         synchronized (sharedLock) {
             try {
+
+                if (context == null) {
+                    Log.e("DonkyLoggingController", "Application context is null! Please check if the code to initialise the Donky SDK is placed in onCreate method of Application class not Activity. Application class need to be defined in Android Manifest: <application android:name=\"MyApplicationClassName\"");
+                }
 
                 File dir = context.getFilesDir();
 

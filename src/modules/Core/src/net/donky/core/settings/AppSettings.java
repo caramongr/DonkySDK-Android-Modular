@@ -51,6 +51,8 @@ public class AppSettings {
 
     private static final String KEY_NEW_DEVICE_NOTIFICATION_ENABLED = "NewDeviceNotificationEnabled";
 
+    private static final String KEY_RICH_MESSAGE_SHARE_MESSAGE = "ShareMessage";
+
     private static final String KEY_NEW_DEVICE_TITLE = "NewDeviceTitle";
 
     private static final String DEFAULT_NEW_DEVICE_SMALL_ICON = "ic_donky_new_device_default";
@@ -76,6 +78,8 @@ public class AppSettings {
     private String newDeviceTitle;
     private int newDeviceSmallIcon;
     private boolean newDeviceNotificationEnabled;
+
+    private String shareMessage;
 
     // Private constructor. Prevents instantiation from other classes.
     private AppSettings() {
@@ -121,6 +125,7 @@ public class AppSettings {
         if (newDeviceSmallIcon == 0) {
             newDeviceSmallIcon = getResourceDrawableId(context, DEFAULT_NEW_DEVICE_SMALL_ICON);
         }
+        shareMessage = getString(context, KEY_RICH_MESSAGE_SHARE_MESSAGE, "Have a look at this: {UrlToShare}");
     }
 
     /**
@@ -343,5 +348,13 @@ public class AppSettings {
      */
     public boolean isNewDeviceNotificationEnabled() {
         return newDeviceNotificationEnabled;
+    }
+
+    /**
+     * Get message used when rich message is being shared with othe users.
+     * @return
+     */
+    public String getShareMessage() {
+        return shareMessage;
     }
 }

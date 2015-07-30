@@ -10,6 +10,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
 
+import net.donky.core.lifecycle.LifeCycleObserver;
 import net.donky.core.logging.DLog;
 
 import java.util.List;
@@ -66,9 +67,11 @@ public class PushLogicIntentService extends IntentService {
 
             setDonkyDataBundle(intent, newIntent);
 
-            intent.setAction(Intent.ACTION_VIEW);
+            newIntent.putExtra(LifeCycleObserver.EXTRA_KEY_IS_APP_OPENED_FROM_NOTIFICATION, true);
 
-            intent.addCategory(Intent.CATEGORY_DEFAULT);
+            newIntent.setAction(Intent.ACTION_VIEW);
+
+            newIntent.addCategory(Intent.CATEGORY_DEFAULT);
 
             newIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
@@ -90,9 +93,11 @@ public class PushLogicIntentService extends IntentService {
 
             setDonkyDataBundle(intent, newIntent);
 
-            intent.setAction(Intent.ACTION_VIEW);
+            newIntent.putExtra(LifeCycleObserver.EXTRA_KEY_IS_APP_OPENED_FROM_NOTIFICATION, true);
 
-            intent.addCategory(Intent.CATEGORY_DEFAULT);
+            newIntent.setAction(Intent.ACTION_VIEW);
+
+            newIntent.addCategory(Intent.CATEGORY_DEFAULT);
 
             newIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 

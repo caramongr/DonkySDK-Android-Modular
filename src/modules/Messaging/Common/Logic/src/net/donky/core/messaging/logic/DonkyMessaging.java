@@ -18,6 +18,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public class DonkyMessaging {
 
+    public static final String KEY_INTENT_BUNDLE_RICH_MESSAGE = "richMessage";
     // The following SDK versioning strategy must be adhered to; the strategy allows the SDK version to communicate what the nature of the changes are between versions.
     // 1 - Major version number, increment for breaking changes.
     // 2 - Minor version number, increment when adding new functionality.

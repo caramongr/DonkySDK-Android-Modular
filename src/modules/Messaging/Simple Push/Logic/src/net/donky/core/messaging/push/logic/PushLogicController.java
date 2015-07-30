@@ -7,7 +7,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 
-import net.donky.core.logging.DLog;
+import net.donky.core.lifecycle.LifeCycleObserver;
 import net.donky.core.network.DonkyNetworkController;
 
 import java.util.Random;
@@ -29,16 +29,11 @@ public class PushLogicController {
 
     final static String EXTRAS_KEY_NOTIFICATION_ID = "AndroidSystemNotificationId";
 
-    /**
-     * Logging helper instance.
-     */
-    private final DLog log;
-
     private Context context;
 
     // Private constructor. Prevents instantiation from other classes.
     private PushLogicController() {
-        log = new DLog("AccountController");
+
     }
 
     /**
@@ -123,11 +118,11 @@ public class PushLogicController {
                     intent.addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES);
                 }
 
+                newIntent.putExtra(LifeCycleObserver.EXTRA_KEY_IS_APP_OPENED_FROM_NOTIFICATION, true);
+
                 return PendingIntent.getActivity(context, notificationId, newIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
             }
-
-
 
         } else {
 
@@ -143,7 +138,7 @@ public class PushLogicController {
      * @param simplePushData Description of Simple Push message.
      * @return
      */
-    private Bundle getReportingDataBundle(SimplePushData.ButtonSetAction buttonSetAction, SimplePushData simplePushData) {
+    protected Bundle getReportingDataBundle(SimplePushData.ButtonSetAction buttonSetAction, SimplePushData simplePushData) {
 
         Bundle bundle = new Bundle();
         bundle.putSerializable("simplePushData", simplePushData);

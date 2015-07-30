@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Default theme with black icons -->
+    <style name="Theme.Donky.Messaging.Light.DonkyActivity" parent="Theme.AppCompat.Light.NoActionBar">
+
+        <!-- WINDOW -->
+        <item name="windowActionBar">false</item>
+        <item name="windowActionModeOverlay">true</item>
+        <item name="android:windowActionModeOverlay">true</item>
+
+        <!-- ICONS -->
+        <item name="dk_ic_arrow_back_24dp">@drawable/dk_ic_arrow_back_black_24dp</item>
+        <item name="dk_ic_arrow_forward_24dp">@drawable/dk_ic_arrow_forward_black_24dp</item>
+        <item name="dk_ic_check_box_24dp">@drawable/dk_ic_check_box_black_24dp</item>
+        <item name="dk_ic_check_box_outline_blank_24dp">
+            @drawable/dk_ic_check_box_outline_blank_black_24dp
+        </item>
+        <item name="dk_ic_close_24dp">@drawable/dk_ic_close_black_24dp</item>
+        <item name="dk_ic_delete_24dp">@drawable/dk_ic_delete_black_24dp</item>
+        <item name="dk_ic_more_vert_24dp">@drawable/dk_ic_more_vert_black_24dp</item>
+        <item name="dk_ic_multi_select_24dp">@drawable/dk_ic_multi_select_black_24dp</item>
+        <item name="dk_ic_search_24dp">@drawable/dk_ic_search_black_24dp</item>
+        <item name="dk_ic_share_24dp">@drawable/dk_ic_share_black_24dp</item>
+
+        <!-- Status bar -->
+        <item name="colorPrimaryDark">@color/dk_status_bar_background_light_theme</item>
+
+        <!-- Action bar -->
+        <item name="dk_color_primary">@color/dk_action_bar_tool_bar_background_light_theme</item>
+        <item name="dk_text_color_primary">@color/dk_action_bar_tool_bar_text_light_theme</item>
+
+        <!-- Action mode -->
+        <item name="actionModeBackground">@color/dk_action_mode_background_light_theme</item>
+        <item name="android:actionModeBackground">@color/dk_action_mode_background_light_theme</item>
+        <item name="actionModeStyle">@style/dk_action_mode_style</item>
+        <item name="android:actionOverflowButtonStyle">@style/dk_overflow_menu_button_style</item>
+
+        <!-- components styles -->
+        <item name="dk_toolbar_popup_menu_style">@style/dk_toolbar_popup_menu_style</item>
+        <item name="dk_overflow_menu_button_style">@style/dk_overflow_menu_button_style</item>
+        <item name="dk_action_mode_style">@style/dk_action_mode_style</item>
+        <item name="dk_divider_between_inbox_and_detail_fragments_style">@style/dk_divider_between_inbox_and_detail_fragments_style</item>
+        <item name="dk_message_empty_text_style">@style/dk_message_empty_text_style</item>
+        <item name="dk_toolbar_style">@style/dk_toolbar_style</item>
+        <item name="dk_toolbar_title_style">@style/dk_toolbar_title_style</item>
+        <item name="dk_window_popup_list_element_style">@style/dk_window_popup_list_element_style</item>
+        <item name="dk_dialog_style">@style/dk_dialog_style_light</item>
+
+    </style>
+
+    <!-- Default theme with white icons -->
+    <style name="Theme.Donky.Messaging.DonkyActivity" parent="Theme.AppCompat.NoActionBar">
+
+        <!-- WINDOW -->
+        <item name="windowActionBar">false</item>
+        <item name="windowActionModeOverlay">true</item>
+        <item name="android:windowActionModeOverlay">true</item>
+
+        <!-- ICONS -->
+        <item name="dk_ic_arrow_back_24dp">@drawable/dk_ic_arrow_back_white_24dp</item>
+        <item name="dk_ic_arrow_forward_24dp">@drawable/dk_ic_arrow_forward_white_24dp</item>
+        <item name="dk_ic_check_box_24dp">@drawable/dk_ic_check_box_black_24dp</item>
+        <item name="dk_ic_check_box_outline_blank_24dp">
+            @drawable/dk_ic_check_box_outline_blank_black_24dp
+        </item>
+        <item name="dk_ic_close_24dp">@drawable/dk_ic_close_white_24dp</item>
+        <item name="dk_ic_delete_24dp">@drawable/dk_ic_delete_white_24dp</item>
+        <item name="dk_ic_more_vert_24dp">@drawable/dk_ic_more_vert_white_24dp</item>
+        <item name="dk_ic_multi_select_24dp">@drawable/dk_ic_multi_select_white_24dp</item>
+        <item name="dk_ic_search_24dp">@drawable/dk_ic_search_white_24dp</item>
+        <item name="dk_ic_share_24dp">@drawable/dk_ic_share_white_24dp</item>
+
+        <!-- Status bar -->
+        <item name="colorPrimaryDark">@color/dk_status_bar_background</item>
+
+        <!-- Action bar -->
+        <item name="dk_color_primary">@color/dk_action_bar_tool_bar_background</item>
+        <item name="dk_text_color_primary">@color/dk_action_bar_tool_bar_text</item>
+
+        <!-- Action mode -->
+        <item name="actionModeBackground">@color/dk_action_mode_background</item>
+        <item name="android:actionModeBackground">@color/dk_action_mode_background</item>
+        <item name="actionModeStyle">@style/dk_action_mode_style</item>
+        <item name="android:actionOverflowButtonStyle">@style/dk_overflow_menu_button_style</item>
+        <item name="actionOverflowButtonStyle">@style/dk_overflow_menu_button_style</item>
+
+        <!-- components styles -->
+        <item name="dk_toolbar_popup_menu_style">@style/dk_toolbar_popup_menu_style</item>
+        <item name="dk_overflow_menu_button_style">@style/dk_overflow_menu_button_style</item>
+        <item name="dk_action_mode_style">@style/dk_action_mode_style</item>
+        <item name="dk_divider_between_inbox_and_detail_fragments_style">@style/dk_divider_between_inbox_and_detail_fragments_style</item>
+        <item name="dk_message_empty_text_style">@style/dk_message_empty_text_style</item>
+        <item name="dk_toolbar_style">@style/dk_toolbar_style</item>
+        <item name="dk_toolbar_title_style">@style/dk_toolbar_title_style</item>
+        <item name="dk_window_popup_list_element_style">@style/dk_window_popup_list_element_style</item>
+        <item name="dk_dialog_style">@style/dk_dialog_style_light</item>
+
+    </style>
+
+    <style name="Theme.Donky.Messaging.Light.DonkyActivity.ActionBar" parent="Theme.AppCompat.Light">
+
+        <!-- WINDOW -->
+        <item name="windowActionBar">true</item>
+        <item name="windowNoTitle">false</item>
+        <item name="windowActionModeOverlay">true</item>
+        <item name="android:windowActionModeOverlay">true</item>
+
+        <!-- ICONS -->
+        <item name="dk_ic_arrow_back_24dp">@drawable/dk_ic_arrow_back_black_24dp</item>
+        <item name="dk_ic_arrow_forward_24dp">@drawable/dk_ic_arrow_forward_black_24dp</item>
+        <item name="dk_ic_check_box_24dp">@drawable/dk_ic_check_box_black_24dp</item>
+        <item name="dk_ic_check_box_outline_blank_24dp">@drawable/dk_ic_check_box_outline_blank_black_24dp</item>
+        <item name="dk_ic_close_24dp">@drawable/dk_ic_close_black_24dp</item>
+        <item name="dk_ic_delete_24dp">@drawable/dk_ic_delete_black_24dp</item>
+        <item name="dk_ic_more_vert_24dp">@drawable/dk_ic_more_vert_black_24dp</item>
+        <item name="dk_ic_multi_select_24dp">@drawable/dk_ic_multi_select_black_24dp</item>
+        <item name="dk_ic_search_24dp">@drawable/dk_ic_search_black_24dp</item>
+        <item name="dk_ic_share_24dp">@drawable/dk_ic_share_black_24dp</item>
+
+        <!-- Status bar -->
+        <item name="colorPrimaryDark">@color/dk_status_bar_background_light_theme</item>
+
+        <!-- Action bar -->
+        <item name="colorPrimary">@color/dk_action_bar_tool_bar_background_light_theme</item>
+        <item name="dk_text_color_primary">@color/dk_action_bar_tool_bar_text_light_theme</item>
+        <item name="android:actionBarStyle">@style/dk_action_bar_light_style</item>
+        <item name="actionBarStyle">@style/dk_action_bar_light_style</item>
+
+        <!-- Action mode -->
+        <item name="actionModeBackground">@color/dk_action_mode_background_light_theme</item>
+        <item name="android:actionModeBackground">@color/dk_action_mode_background_light_theme</item>
+        <item name="actionModeStyle">@style/dk_action_mode_style</item>
+        <item name="android:actionOverflowButtonStyle">@style/dk_overflow_menu_button_style</item>
+
+        <!-- components styles -->
+        <item name="dk_toolbar_popup_menu_style">@style/dk_toolbar_popup_menu_style</item>
+        <item name="dk_overflow_menu_button_style">@style/dk_overflow_menu_button_style</item>
+        <item name="dk_action_mode_style">@style/dk_action_mode_style</item>
+        <item name="dk_divider_between_inbox_and_detail_fragments_style">@style/dk_divider_between_inbox_and_detail_fragments_style</item>
+        <item name="dk_message_empty_text_style">@style/dk_message_empty_text_style</item>
+        <item name="dk_toolbar_style">@style/dk_toolbar_style</item>
+        <item name="dk_toolbar_title_style">@style/dk_toolbar_title_style</item>
+        <item name="dk_window_popup_list_element_style">@style/dk_window_popup_list_element_style</item>
+        <item name="dk_dialog_style">@style/dk_dialog_style_light</item>
+
+    </style>
+
+    <style name="Theme.Donky.Messaging.DonkyActivity.ActionBar" parent="Theme.AppCompat">
+
+        <!-- WINDOW -->
+        <item name="windowActionBar">true</item>
+        <item name="windowNoTitle">false</item>
+        <item name="windowActionModeOverlay">true</item>
+        <item name="android:windowActionModeOverlay">true</item>
+
+        <!-- ICONS -->
+        <item name="dk_ic_arrow_back_24dp">@drawable/dk_ic_arrow_back_white_24dp</item>
+        <item name="dk_ic_arrow_forward_24dp">@drawable/dk_ic_arrow_forward_white_24dp</item>
+        <item name="dk_ic_check_box_24dp">@drawable/dk_ic_check_box_black_24dp</item>
+        <item name="dk_ic_check_box_outline_blank_24dp">
+            @drawable/dk_ic_check_box_outline_blank_black_24dp
+        </item>
+        <item name="dk_ic_close_24dp">@drawable/dk_ic_close_white_24dp</item>
+        <item name="dk_ic_delete_24dp">@drawable/dk_ic_delete_white_24dp</item>
+        <item name="dk_ic_more_vert_24dp">@drawable/dk_ic_more_vert_white_24dp</item>
+        <item name="dk_ic_multi_select_24dp">@drawable/dk_ic_multi_select_white_24dp</item>
+        <item name="dk_ic_search_24dp">@drawable/dk_ic_search_white_24dp</item>
+        <item name="dk_ic_share_24dp">@drawable/dk_ic_share_white_24dp</item>
+
+        <!-- Status bar -->
+        <item name="colorPrimaryDark">@color/dk_status_bar_background</item>
+
+        <!-- Action bar -->
+        <item name="colorPrimary">@color/dk_action_bar_tool_bar_background</item>
+        <item name="dk_text_color_primary">@color/dk_action_bar_tool_bar_text</item>
+        <item name="android:actionBarStyle">@style/dk_action_bar_style</item>
+        <item name="actionBarStyle">@style/dk_action_bar_style</item>
+
+        <!-- Action mode -->
+        <item name="actionModeBackground">@color/dk_action_mode_background</item>
+        <item name="android:actionModeBackground">@color/dk_action_mode_background</item>
+        <item name="actionModeStyle">@style/dk_action_mode_style</item>
+        <item name="android:actionOverflowButtonStyle">@style/dk_overflow_menu_button_style</item>
+        <item name="actionOverflowButtonStyle">@style/dk_overflow_menu_button_style</item>
+
+        <!-- components styles -->
+        <item name="dk_toolbar_popup_menu_style">@style/dk_toolbar_popup_menu_style</item>
+        <item name="dk_overflow_menu_button_style">@style/dk_overflow_menu_button_style</item>
+        <item name="dk_action_mode_style">@style/dk_action_mode_style</item>
+        <item name="dk_divider_between_inbox_and_detail_fragments_style">@style/dk_divider_between_inbox_and_detail_fragments_style</item>
+        <item name="dk_message_empty_text_style">@style/dk_message_empty_text_style</item>
+        <item name="dk_toolbar_style">@style/dk_toolbar_style</item>
+        <item name="dk_toolbar_title_style">@style/dk_toolbar_title_style</item>
+        <item name="dk_window_popup_list_element_style">@style/dk_window_popup_list_element_style</item>
+        <item name="dk_dialog_style">@style/dk_dialog_style_light</item>
+
+    </style>
+
+    <style name="Theme.Donky.Messaging.Light.DonkyActivity.DarkActionBar" parent="Theme.AppCompat.Light.DarkActionBar">
+
+        <!-- WINDOW -->
+        <item name="windowActionBar">true</item>
+        <item name="windowNoTitle">false</item>
+        <item name="windowActionModeOverlay">true</item>
+        <item name="android:windowActionModeOverlay">true</item>
+
+        <!-- ICONS -->
+        <item name="dk_ic_arrow_back_24dp">@drawable/dk_ic_arrow_back_white_24dp</item>
+        <item name="dk_ic_arrow_forward_24dp">@drawable/dk_ic_arrow_forward_white_24dp</item>
+        <item name="dk_ic_check_box_24dp">@drawable/dk_ic_check_box_black_24dp</item>
+        <item name="dk_ic_check_box_outline_blank_24dp">
+            @drawable/dk_ic_check_box_outline_blank_black_24dp
+        </item>
+        <item name="dk_ic_close_24dp">@drawable/dk_ic_close_white_24dp</item>
+        <item name="dk_ic_delete_24dp">@drawable/dk_ic_delete_white_24dp</item>
+        <item name="dk_ic_more_vert_24dp">@drawable/dk_ic_more_vert_white_24dp</item>
+        <item name="dk_ic_multi_select_24dp">@drawable/dk_ic_multi_select_white_24dp</item>
+        <item name="dk_ic_search_24dp">@drawable/dk_ic_search_white_24dp</item>
+        <item name="dk_ic_share_24dp">@drawable/dk_ic_share_white_24dp</item>
+
+        <!-- Status bar -->
+        <item name="colorPrimaryDark">@color/dk_status_bar_background</item>
+
+        <!-- Action bar -->
+        <item name="colorPrimary">@color/dk_action_bar_tool_bar_background</item>
+        <item name="dk_text_color_primary">@color/dk_action_bar_tool_bar_text</item>
+        <item name="android:actionBarStyle">@style/dk_action_bar_style</item>
+        <item name="actionBarStyle">@style/dk_action_bar_style</item>
+
+        <!-- Action mode -->
+        <item name="actionModeBackground">@color/dk_action_mode_background</item>
+        <item name="android:actionModeBackground">@color/dk_action_mode_background</item>
+        <item name="actionModeStyle">@style/dk_action_mode_style</item>
+        <item name="android:actionOverflowButtonStyle">@style/dk_overflow_menu_button_style</item>
+        <item name="actionOverflowButtonStyle">@style/dk_overflow_menu_button_style</item>
+
+        <!-- components styles -->
+        <item name="dk_toolbar_popup_menu_style">@style/dk_toolbar_popup_menu_style</item>
+        <item name="dk_overflow_menu_button_style">@style/dk_overflow_menu_button_style</item>
+        <item name="dk_action_mode_style">@style/dk_action_mode_style</item>
+        <item name="dk_divider_between_inbox_and_detail_fragments_style">@style/dk_divider_between_inbox_and_detail_fragments_style</item>
+        <item name="dk_message_empty_text_style">@style/dk_message_empty_text_style</item>
+        <item name="dk_toolbar_style">@style/dk_toolbar_style</item>
+        <item name="dk_toolbar_title_style">@style/dk_toolbar_title_style</item>
+        <item name="dk_window_popup_list_element_style">@style/dk_window_popup_list_element_style</item>
+        <item name="dk_dialog_style">@style/dk_dialog_style_light</item>
+
+    </style>
+
+</resources>

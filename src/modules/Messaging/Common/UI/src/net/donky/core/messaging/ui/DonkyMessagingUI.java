@@ -50,7 +50,7 @@ public class DonkyMessagingUI {
     }
 
     /**
-     * Get instance of Donky Analytics singleton.
+     * Get instance of Donky Messaging UI singleton.
      *
      * @return Static instance of Donky Analytics singleton.
      */
@@ -59,7 +59,7 @@ public class DonkyMessagingUI {
     }
 
     /**
-     * Initialise Donky Messaging Module.
+     * Initialise Donky Messaging UI Module.
      *
      * @param donkyListener The callback to invoke when the module is initialised.
      */
@@ -74,8 +74,6 @@ public class DonkyMessagingUI {
         if (!initialised.get()) {
 
             try {
-
-                UIConfigurationSettings.getInstance().init(application);
 
                 DonkyMessaging.initialiseDonkyMessaging(application, new DonkyListener() {
 

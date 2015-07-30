@@ -3,9 +3,15 @@ package net.donky.core.messaging.push.ui;
 import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.PendingIntent;
+import android.content.Context;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.content.res.TypedArray;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
+
+import net.donky.core.logging.DLog;
 
 /**
  * UI configuration for system notification.
@@ -40,8 +46,10 @@ public class SimplePushUIConfiguration {
 
     private PendingIntent[] pendingIntents;
 
+    private int smallIconId;
+
     @SuppressLint("NewApi")
-    public SimplePushUIConfiguration() {
+    public SimplePushUIConfiguration(Context context) {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             this.category = Notification.CATEGORY_MESSAGE;
@@ -56,6 +64,25 @@ public class SimplePushUIConfiguration {
         this.ledColour = R.color.donky_notification_led;
         this.actionButtonIconIds = new int[] { android.R.color.transparent, android.R.color.transparent };
         this.pendingIntents = new PendingIntent[] {null, null};
+
+        int attributeResourceId = -1;
+        try {
+            String packageName = context.getApplicationContext().getPackageName();
+            PackageInfo packageInfo = context.getPackageManager().getPackageInfo(packageName, PackageManager.GET_META_DATA);
+            int theme = packageInfo.applicationInfo.theme;
+            int[] attribute = new int[] {R.attr.dk_notification_small_icon_simple_push};
+            TypedArray array = context.getTheme().obtainStyledAttributes(theme, attribute);
+            attributeResourceId = array.getResourceId(0, -1);
+            array.recycle();
+        } catch (PackageManager.NameNotFoundException e) {
+            new DLog("SimplePushUIConfiguration").error("Error getting styled notification icon",e);
+        }
+
+        if (attributeResourceId != -1) {
+            this.smallIconId = attributeResourceId;
+        } else {
+            this.smallIconId = R.drawable.donky_notification_small_icon_simple_push;
+        }
     }
 
     /**
@@ -64,7 +91,7 @@ public class SimplePushUIConfiguration {
      * @return Small icon for system notification.
      */
     public int getSmallIconId() {
-        return R.drawable.donky_notification_small_icon_simple_push;
+        return smallIconId;
     }
 
     /**

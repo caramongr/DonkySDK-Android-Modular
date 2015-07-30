@@ -26,7 +26,6 @@ public class LifeCycleDAO extends SharedPreferencesBaseDAO {
     public LifeCycleDAO(Context context) {
         super(context, SHARED_PREFERENCES_FILENAME_ANALYTICS);
         this.context = context;
-
     }
 
     /**

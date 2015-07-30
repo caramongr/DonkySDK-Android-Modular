@@ -51,6 +51,8 @@ public class SimplePushData implements Serializable {
     @SerializedName("expiryTimeStamp")
     private String expiryTimeStamp;
 
+    private boolean receivedExpired;
+
     /**
      * Get type of message.
      *
@@ -154,6 +156,14 @@ public class SimplePushData implements Serializable {
         return buttonSets;
     }
 
+    public boolean isReceivedExpired() {
+        return receivedExpired;
+    }
+
+    public void setReceivedExpired(boolean receivedExpired) {
+        this.receivedExpired = receivedExpired;
+    }
+
     public class ButtonSet implements Serializable {
 
         @SerializedName("buttonSetId")
@@ -198,8 +208,23 @@ public class SimplePushData implements Serializable {
         public ButtonSetAction[] getButtonSetActions() {
             return buttonSetActions;
         }
-    }
 
+        protected void setButtonSetId(String buttonSetId) {
+            this.buttonSetId = buttonSetId;
+        }
+
+        protected void setPlatform(String platform) {
+            this.platform = platform;
+        }
+
+        protected void setInteractionType(String interactionType) {
+            this.interactionType = interactionType;
+        }
+
+        protected void setButtonSetActions(ButtonSetAction[] buttonSetActions) {
+            this.buttonSetActions = buttonSetActions;
+        }
+    }
 
     public class ButtonSetAction implements Serializable {
 
@@ -238,5 +263,69 @@ public class SimplePushData implements Serializable {
         public String getLabel() {
             return label;
         }
+
+        protected void setActionType(String actionType) {
+            this.actionType = actionType;
+        }
+
+        protected void setData(String data) {
+            this.data = data;
+        }
+
+        protected void setLabel(String label) {
+            this.label = label;
+        }
+    }
+
+    /*
+    Access methods for tests
+    */
+
+    protected void setMessageType(String messageType) {
+        this.messageType = messageType;
+    }
+
+    protected void setMsgSentTimeStamp(String msgSentTimeStamp) {
+        this.msgSentTimeStamp = msgSentTimeStamp;
+    }
+
+    protected void setSenderDisplayName(String senderDisplayName) {
+        this.senderDisplayName = senderDisplayName;
+    }
+
+    protected void setButtonSets(List<ButtonSet> buttonSets) {
+        this.buttonSets = buttonSets;
+    }
+
+    protected void setBody(String body) {
+        this.body = body;
+    }
+
+    protected void setSenderInternalUserId(String senderInternalUserId) {
+        this.senderInternalUserId = senderInternalUserId;
+    }
+
+    protected void setSenderMessageId(String senderMessageId) {
+        this.senderMessageId = senderMessageId;
+    }
+
+    protected void setMessageId(String messageId) {
+        this.messageId = messageId;
+    }
+
+    protected void setContextItems(Map<String, String> contextItems) {
+        this.contextItems = contextItems;
+    }
+
+    protected void setAvatarAssetId(String avatarAssetId) {
+        this.avatarAssetId = avatarAssetId;
+    }
+
+    protected void setSentTimestamp(String sentTimestamp) {
+        this.sentTimestamp = sentTimestamp;
+    }
+
+    protected void setExpiryTimeStamp(String expiryTimeStamp) {
+        this.expiryTimeStamp = expiryTimeStamp;
     }
 }

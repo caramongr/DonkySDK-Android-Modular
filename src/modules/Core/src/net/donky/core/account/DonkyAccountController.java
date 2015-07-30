@@ -9,6 +9,7 @@ import net.donky.core.DonkyCore;
 import net.donky.core.DonkyException;
 import net.donky.core.DonkyListener;
 import net.donky.core.DonkyResultListener;
+import net.donky.core.ModuleDefinition;
 import net.donky.core.events.RegistrationChangedEvent;
 import net.donky.core.helpers.IdHelper;
 import net.donky.core.lifecycle.LifeCycleObserver;
@@ -27,7 +28,10 @@ import net.donky.core.network.restapi.secured.UpdateClient;
 import net.donky.core.network.restapi.secured.UpdateDevice;
 import net.donky.core.network.restapi.secured.UpdateRegistration;
 import net.donky.core.network.restapi.secured.UpdateUser;
+import net.donky.core.settings.AppSettings;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -337,18 +341,40 @@ public class DonkyAccountController {
                     log.warning("Registration details changed: user");
                 }
 
-                if (deviceDetails != null && !deviceDetails.equals(getDeviceDetails())) {
+                String newOSVersion = DeviceDetails.getOSVersion();
+                String oldOSVersion = DeviceDetails.getOSVersion();
+
+                boolean osVersionChanged = (newOSVersion != null && !newOSVersion.equals(oldOSVersion));
+                boolean deviceDetailsChanged = deviceDetails != null && !deviceDetails.equals(getDeviceDetails());
+
+                if (deviceDetailsChanged || osVersionChanged) {
 
                     (new UpdateDevice(deviceDetails)).performSynchronous();
 
                     DonkyDataController.getInstance().getDeviceDAO().setDeviceDetails(deviceDetails);
 
-                    areRegistrationDetailsDifferent = true;
+                    if (deviceDetailsChanged) {
+                        areRegistrationDetailsDifferent = true;
+                    }
 
                     log.warning("Registration details changed: device");
                 }
 
-                if (!TextUtils.isEmpty(appVersion) && !appVersion.equals(DonkyDataController.getInstance().getConfigurationDAO().getAppVersion())) {
+                String newSDKVersion = AppSettings.getVersion();
+                String oldSDKVersion = DonkyDataController.getInstance().getSoftwareVersionsDAO().getSavedDonkySDKVersion();
+
+                List<ModuleDefinition> newModules = DonkyCore.getInstance().getRegisteredModules();
+                Map<String, String> newModulesVersions = new HashMap<>();
+                for (ModuleDefinition moduleDefinition : newModules) {
+                    newModulesVersions.put(moduleDefinition.getName(), moduleDefinition.getVersion());
+                }
+                Map<String, String> oldModulesVersions = DonkyDataController.getInstance().getSoftwareVersionsDAO().getSavedDonkySDKModulesVersions();
+
+                boolean isAppVersionChanged = !TextUtils.isEmpty(appVersion) && !appVersion.equals(DonkyDataController.getInstance().getConfigurationDAO().getAppVersion());
+                boolean isSDKModulesChanged = !newModulesVersions.equals(oldModulesVersions);
+                boolean isSDKVersionChanged = newSDKVersion != null && !newSDKVersion.equals(oldSDKVersion);
+
+                if ( isAppVersionChanged || isSDKModulesChanged || isSDKVersionChanged) {
 
                     (new UpdateClient(appVersion)).performSynchronous();
 
@@ -358,10 +384,12 @@ public class DonkyAccountController {
 
                 }
 
+                if (isSDKVersionChanged || isSDKModulesChanged || osVersionChanged) {
+                    DonkyDataController.getInstance().getSoftwareVersionsDAO().setSoftwareVersions(newOSVersion, newSDKVersion, newModulesVersions);
+                }
+
                 if (areRegistrationDetailsDifferent) {
-
                     DonkyCore.publishLocalEvent(new RegistrationChangedEvent(userDetails, deviceDetails));
-
                 }
 
             } catch (Exception e) {
@@ -594,6 +622,8 @@ public class DonkyAccountController {
         }
 
         DonkyDataController.getInstance().getConfigurationDAO().setAppVersion(appVersion);
+
+        DonkyDataController.getInstance().getSoftwareVersionsDAO().setSoftwareVersions(DeviceDetails.getOSVersion(), AppSettings.getVersion(), DonkyCore.getInstance().getRegisteredModules());
     }
 
     /**
@@ -873,7 +903,7 @@ public class DonkyAccountController {
 
                             log.info("Successfully replaced registration.");
 
-                            DonkyCore.publishLocalEvent(new RegistrationChangedEvent(userDetails, deviceDetails));
+                            DonkyCore.publishLocalEvent(new RegistrationChangedEvent(userDetails, deviceDetails, true));
 
                             if (listener != null) {
                                 listener.success();

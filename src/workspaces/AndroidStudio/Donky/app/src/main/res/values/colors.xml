@@ -1,8 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <color name="donkyColorPrimary">#222222</color>
-    <color name="donkyColorPrimaryDark">#000000</color>
-    <color name="donkyTextColorPrimary">#ffffff</color>
-
 </resources>

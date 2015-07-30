@@ -5,7 +5,6 @@ import com.google.gson.annotations.SerializedName;
 
 import net.donky.core.helpers.DateAndTimeHelper;
 import net.donky.core.helpers.IdHelper;
-import net.donky.core.messages.RichMessage;
 import net.donky.core.network.AcknowledgementDetail;
 
 import org.json.JSONException;
@@ -29,7 +28,8 @@ public class ClientNotification extends net.donky.core.network.ClientNotificatio
     enum Type {
 
         MessageReceived,
-        MessageRead
+        MessageRead,
+        MessageShared
 
     }
 
@@ -71,10 +71,10 @@ public class ClientNotification extends net.donky.core.network.ClientNotificatio
     /**
      * Create 'Message Read' client notification.
      *
-     * @param richMessage Read rich message.
+     * @param richCommonMessage Read rich message.
      * @return 'Message Read' Client Notification
      */
-    static net.donky.core.network.ClientNotification createMessageReadNotification(RichMessage richMessage) {
+    static net.donky.core.network.ClientNotification createMessageReadNotification(CommonMessage richCommonMessage) {
 
         ClientNotification n = new ClientNotification(Type.MessageRead.toString(), IdHelper.generateId());
 
@@ -82,7 +82,7 @@ public class ClientNotification extends net.donky.core.network.ClientNotificatio
 
         try {
 
-            n.data = new JSONObject(gson.toJson(createMessageRead(n, richMessage)));
+            n.data = new JSONObject(gson.toJson(createMessageRead(n, richCommonMessage)));
 
         } catch (JSONException e) {
 
@@ -91,6 +91,50 @@ public class ClientNotification extends net.donky.core.network.ClientNotificatio
         };
 
         return n;
+    }
+
+    /**
+     * Create 'Message Shared' client notification.
+     *
+     * @param richCommonMessage Shared rich message.
+     * @return 'Message Shared' Client Notification
+     */
+    static net.donky.core.network.ClientNotification createMessageSharedNotification(CommonMessage richCommonMessage, String sharedTo) {
+
+        ClientNotification n = new ClientNotification(Type.MessageShared.toString(), IdHelper.generateId());
+
+        Gson gson = new Gson();
+
+        try {
+
+            n.data = new JSONObject(gson.toJson(createMessageShared(n, richCommonMessage, sharedTo)));
+
+        } catch (JSONException e) {
+
+            e.printStackTrace();
+
+        };
+
+        return n;
+    }
+
+    /**
+     * Create serialized object for message shared data.
+     */
+    private static MessageShared createMessageShared(ClientNotification n, CommonMessage richCommonMessage, String sharedTo) {
+
+        MessageShared u = n.new MessageShared();
+
+        u.sharedTo = sharedTo;
+        u.type = Type.MessageShared.toString();
+        u.messageType = richCommonMessage.getMessageType();
+        u.messageId = richCommonMessage.getMessageId();
+        u.messageScope = richCommonMessage.getMessageScope();
+        u.originalMessageSentTimestamp = richCommonMessage.getSentTimestamp();
+        u.sharedTimestamp = DateAndTimeHelper.getCurrentLocalTime();
+        u.contextItems = richCommonMessage.getContextItems();
+
+        return u;
     }
 
     /**
@@ -117,21 +161,21 @@ public class ClientNotification extends net.donky.core.network.ClientNotificatio
     /**
      * Create serialized object for message read data.
      */
-    private static MessageRead createMessageRead(ClientNotification n, RichMessage richMessage) {
+    private static MessageRead createMessageRead(ClientNotification n, CommonMessage richCommonMessage) {
 
         MessageRead u = n.new MessageRead();
 
         u.type = Type.MessageRead.toString();
-        u.senderInternalUserId = richMessage.getSenderInternalUserId();
-        u.messageId = richMessage.getMessageId();
-        u.senderMessageId = richMessage.getSenderMessageId();
-        u.messageType = richMessage.getMessageType();
-        u.messageScope = richMessage.getMessageScope();
-        u.sentTimestamp = richMessage.getSentTimestamp();
+        u.senderInternalUserId = richCommonMessage.getSenderInternalUserId();
+        u.messageId = richCommonMessage.getMessageId();
+        u.senderMessageId = richCommonMessage.getSenderMessageId();
+        u.messageType = richCommonMessage.getMessageType();
+        u.messageScope = richCommonMessage.getMessageScope();
+        u.sentTimestamp = richCommonMessage.getSentTimestamp();
 
-        if (richMessage.getSentTimestamp() != null) {
+        if (richCommonMessage.getSentTimestamp() != null) {
 
-            Date sentDate = DateAndTimeHelper.parseUtcDate(richMessage.getSentTimestamp());
+            Date sentDate = DateAndTimeHelper.parseUtcDate(richCommonMessage.getSentTimestamp());
 
             if (sentDate != null) {
                 u.timeToReadSeconds = (int) (System.currentTimeMillis() - sentDate.getTime()) / 1000;
@@ -139,7 +183,7 @@ public class ClientNotification extends net.donky.core.network.ClientNotificatio
 
         }
 
-        u.contextItems = richMessage.getContextItems();
+        u.contextItems = richCommonMessage.getContextItems();
 
 
         return u;
@@ -213,6 +257,37 @@ public class ClientNotification extends net.donky.core.network.ClientNotificatio
 
         @SerializedName("timeToReadSeconds")
         private int timeToReadSeconds;
+
+    }
+
+    /**
+     * Description of json content of 'Message Shared' client notification.
+     */
+    private class MessageShared {
+
+        @SerializedName("type")
+        private String type;
+
+        @SerializedName("messageId")
+        private String messageId;
+
+        @SerializedName("messageType")
+        private String messageType;
+
+        @SerializedName("messageScope")
+        private String messageScope;
+
+        @SerializedName("originalMessageSentTimestamp")
+        private String originalMessageSentTimestamp;
+
+        @SerializedName("sharedTo")
+        private String sharedTo;
+
+        @SerializedName("sharedTimestamp")
+        private String sharedTimestamp;
+
+        @SerializedName("contextItems")
+        private  Map<String,String> contextItems;
 
     }
 }

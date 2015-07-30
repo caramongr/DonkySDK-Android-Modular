@@ -27,7 +27,7 @@ public class ConfigurationDAO extends SharedPreferencesBaseDAO {
     private static final String KEY_GCM_SENDER_ID = "senderId";
     private static final String KEY_DONKY_API_KEY = "apiKey";
     private static final String KEY_APP_VERSION = "appVersion";
-    private static final String KEY_GCM_REGISTRATION_APP_VERSION = "appVersion";
+    private static final String KEY_GCM_REGISTRATION_APP_VERSION_CODE = "appVersionCode";
     private static final String KEY_GCM_ALLOW_PUSH_NOTIFICATIONS = "allowPush";
     private static final String KEY_USER_SUSPENDED = "userSuspended";
     private static final String KEY_SECURE_SERVICE_DOMAIN = "secureServiceDomain";
@@ -59,6 +59,8 @@ public class ConfigurationDAO extends SharedPreferencesBaseDAO {
     public static final String KEY_CONFIGURATION_UploadImageMaxResX = "UploadImageMaxResX";
     public static final String KEY_CONFIGURATION_UploadImageMaxResY = "UploadImageMaxResY";
     public static final String KEY_CONFIGURATION_CustomContentMaxSizeBytes = "CustomContentMaxSizeBytes";
+
+    public static int DEFAULT_RICH_MESSAGE_AVAILABILITY_DAYS = 30;
 
     public ConfigurationDAO(Context context) {
         super(context, SHARED_PREFERENCES_FILENAME_INTERNAL);
@@ -138,14 +140,14 @@ public class ConfigurationDAO extends SharedPreferencesBaseDAO {
      * @return Application version obtain at a time of last GCM registration. If App was updated GCM should re-register.
      */
     public String getGcmRegistrationAppVersion() {
-        return getString(KEY_GCM_REGISTRATION_APP_VERSION, null);
+        return getString(KEY_GCM_REGISTRATION_APP_VERSION_CODE, null);
     }
 
     /**
      * @param appVersion Application version obtain at a time of last GCM registration. If App was updated GCM should re-register.
      */
     public void setGcmRegistrationAppVersion(String appVersion) {
-        setString(KEY_GCM_REGISTRATION_APP_VERSION, appVersion);
+        setString(KEY_GCM_REGISTRATION_APP_VERSION_CODE, appVersion);
     }
 
     /**
@@ -251,5 +253,23 @@ public class ConfigurationDAO extends SharedPreferencesBaseDAO {
 
     public java.util.TreeMap<String, String> getConfigurationItems() {
         return getStringMap(KEY_CONFIGURATION_ITEMS);
+    }
+
+    /**
+     * Gets max availability days for network content.
+     *
+     * @return Max availability days for network content.
+     */
+    public Integer getMaxAvailabilityDays() {
+
+        Integer availabilityDays;
+
+        try {
+            availabilityDays = Integer.parseInt(DonkyDataController.getInstance().getConfigurationDAO().getConfigurationItems().get(ConfigurationDAO.KEY_CONFIGURATION_RichMessageAvailabilityDays));
+        } catch (NumberFormatException exception) {
+            availabilityDays = ConfigurationDAO.DEFAULT_RICH_MESSAGE_AVAILABILITY_DAYS;
+        }
+
+        return availabilityDays;
     }
 }
