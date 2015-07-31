@@ -39,7 +39,7 @@ Donky-Core-SDK is available under the MIT license. See the LICENSE file for more
 
 <ul>
 <li>Simple Push Module (Logic + UI)</li>
-<li>Rich Messaging Module (Logic + Pop-Up)</li>
+<li>Rich Messaging Modules (Logic + Inbox + Pop-Up)</li>
 <li>Common Messaging Module (Logic + UI)</li>
 <li>Core Analytics Module</li>
 <li>Automation Module</li>
@@ -74,7 +74,7 @@ To read more about how to get started please see [here](http://docs.mobiledonky.
 If you are using Gradle just add the following dependancy (jCenter repo)
 
 ```shell
-    compile 'net.donky:donky-core:2.1.0.16'
+    compile 'net.donky:donky-core:2.2.0.0'
 ```
 
 # Donky-SimplePush-Logic
@@ -88,7 +88,7 @@ To read more about how to get started please see [here](http://docs.mobiledonky.
 If you are using Gradle just add the following dependancies (jCenter repo)
 
 ```shell
-    compile 'net.donky:donky-module-push-logic:2.1.0.16'
+    compile 'net.donky:donky-module-push-logic:2.2.0.0'
 ```
 
 # Donky-SimplePush-UI
@@ -102,7 +102,7 @@ To read more about how to get started please see [here](http://docs.mobiledonky.
 If you are using Gradle just add the following dependancies (jCenter repo)
 
 ```shell
-    compile 'net.donky:donky-module-push-ui:2.1.0.16'
+    compile 'net.donky:donky-module-push-ui:2.2.0.0'
 ```
 
 # Donky-RichMessage-Logic
@@ -116,7 +116,21 @@ To read more about how to get started please see [here](http://docs.mobiledonky.
 If you are using Gradle just add the following dependancy (jCenter repo)
 
 ```shell
-    compile 'net.donky:donky-module-rich-logic:2.1.0.16'
+    compile 'net.donky:donky-module-rich-logic:2.2.0.0'
+```
+
+# Donky-RichMessage-Inbox
+
+Use the Rich Messaging Inbox module to enable your application to disply rich messaging inbox and rich messages.
+
+## Usage
+
+To read more about how to get started please see [here](http://docs.mobiledonky.com/docs/start-here).
+
+If you are using Gradle just add the following dependancy (jCenter repo)
+
+```shell
+    compile 'net.donky:donky-module-rich-ui-inbox:2.2.0.0'
 ```
 
 # Donky-RichMessage-PopUp
@@ -130,7 +144,7 @@ To read more about how to get started please see [here](http://docs.mobiledonky.
 If you are using Gradle just add the following dependancy (jCenter repo)
 
 ```shell
-    compile 'net.donky:donky-module-rich-ui-popup:2.1.0.16'
+    compile 'net.donky:donky-module-rich-ui-popup:2.2.0.0'
 ```
 
 # Donky-Analytics
@@ -144,7 +158,7 @@ To read more about how to get started please see [here](http://docs.mobiledonky.
 If you are using Gradle just add the following dependancy (jCenter repo)
 
 ```shell
-    compile 'net.donky:donky-module-analytics:2.1.0.16'
+    compile 'net.donky:donky-module-analytics:2.2.0.0'
 ```
 
 # Donky-Automation
@@ -158,5 +172,5 @@ To read more about how to get started please see [here](http://docs.mobiledonky.
 If you are using Gradle just add the following dependancy (jCenter repo)
 
 ```shell
-    compile 'net.donky:donky-module-automation:2.1.0.16'
+    compile 'net.donky:donky-module-automation:2.2.0.0'
 ```
