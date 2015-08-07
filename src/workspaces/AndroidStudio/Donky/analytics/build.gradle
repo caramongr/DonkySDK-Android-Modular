@@ -41,7 +41,7 @@ dependencies {
 
 def groupId = project.PUBLISH_GROUP_ID
 def artifactId = 'donky-module-analytics'
-def version = '2.0.0.1'
+def version = project.SDK_VERSION
 
 def localReleaseDest = "${buildDir}/release/${version}"
 
