@@ -195,22 +195,6 @@ public abstract class GenericSecuredServiceRequest<T> extends GenericServiceRequ
 
                                 if (r != null) {
 
-                                    if (statusCode == 400) {
-
-                                        TypedInput body = r.getBody();
-
-                                        String failureJson = readInputStream(body);
-
-                                        new DLog("GenericSecuredServiceRequest").error("Client Bad Request " + failureJson, error);
-
-                                        parseFailureDetails(failureJson);
-
-                                        if (listener != null) {
-                                            listener.error(null, getValidationFailures());
-                                        }
-
-                                    }
-
                                     if (getRetryPolicy().shouldRetryForStatusCode(statusCode) && getRetryPolicy().retry()) {
 
                                         try {
@@ -249,6 +233,20 @@ public abstract class GenericSecuredServiceRequest<T> extends GenericServiceRequ
 
                                         if (listener != null) {
                                             listener.userSuspended();
+                                        }
+
+                                    } else if (statusCode == 400) {
+
+                                        TypedInput body = r.getBody();
+
+                                        String failureJson = readInputStream(body);
+
+                                        new DLog("GenericSecuredServiceRequest").error("Client Bad Request " + failureJson, error);
+
+                                        parseFailureDetails(failureJson);
+
+                                        if (listener != null) {
+                                            listener.error(null, getValidationFailures());
                                         }
 
                                     } else {
@@ -304,22 +302,6 @@ public abstract class GenericSecuredServiceRequest<T> extends GenericServiceRequ
 
                             int statusCode = r.getStatus();
 
-                            if (statusCode == 400) {
-
-                                TypedInput body = r.getBody();
-
-                                String failureJson = readInputStream(body);
-
-                                new DLog("GenericSecuredServiceRequest").error("Client Bad Request " + failureJson, error);
-
-                                parseFailureDetails(failureJson);
-
-                                if (listener != null) {
-                                    listener.error(null, getValidationFailures());
-                                }
-
-                            }
-
                             if (getRetryPolicy().shouldRetryForStatusCode(statusCode) && getRetryPolicy().retry()) {
 
                                 try {
@@ -356,6 +338,20 @@ public abstract class GenericSecuredServiceRequest<T> extends GenericServiceRequ
 
                                 if (listener != null) {
                                     listener.userSuspended();
+                                }
+
+                            } else if (statusCode == 400) {
+
+                                TypedInput body = r.getBody();
+
+                                String failureJson = readInputStream(body);
+
+                                new DLog("GenericSecuredServiceRequest").error("Client Bad Request " + failureJson, error);
+
+                                parseFailureDetails(failureJson);
+
+                                if (listener != null) {
+                                    listener.error(null, getValidationFailures());
                                 }
 
                             } else {

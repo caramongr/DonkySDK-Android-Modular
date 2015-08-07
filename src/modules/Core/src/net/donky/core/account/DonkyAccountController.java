@@ -19,6 +19,7 @@ import net.donky.core.model.ConfigurationDAO;
 import net.donky.core.model.DonkyDataController;
 import net.donky.core.network.DonkyNetworkController;
 import net.donky.core.network.RetryPolicy;
+import net.donky.core.network.restapi.FailureDetails;
 import net.donky.core.network.restapi.RestClient;
 import net.donky.core.network.restapi.authentication.Login;
 import net.donky.core.network.restapi.authentication.LoginResponse;
@@ -186,7 +187,10 @@ public class DonkyAccountController {
                 @Override
                 public void error(DonkyException donkyException, Map<String, String> validationErrors) {
 
-                    if (listener != null) {
+                    log.warning("Failed to update registration details, replacing instead.");
+                    if (FailureDetails.isValidationErrorMapContainingUserIdAlreadyTaken(validationErrors)) {
+                        replaceRegistration(userDetails, deviceDetails, listener);
+                    } else if (listener != null) {
                         listener.error(donkyException, validationErrors);
                     }
 
@@ -231,7 +235,10 @@ public class DonkyAccountController {
                 @Override
                 public void error(DonkyException donkyException, Map<String, String> validationErrors) {
 
-                    if (listener != null) {
+                    log.warning("Failed to update user details, replacing instead.");
+                    if (FailureDetails.isValidationErrorMapContainingUserIdAlreadyTaken(validationErrors)) {
+                        replaceRegistration(user, getDeviceDetails(), listener);
+                    } else if (listener != null) {
                         listener.error(donkyException, validationErrors);
                     }
 
@@ -328,36 +335,56 @@ public class DonkyAccountController {
 
             try {
 
-                boolean areRegistrationDetailsDifferent = false;
-
-                if (userDetails != null && !userDetails.equals(getCurrentDeviceUser())) {
-
-                    (new UpdateUser(userDetails)).performSynchronous();
-
-                    DonkyDataController.getInstance().getUserDAO().setUserDetails(userDetails);
-
-                    areRegistrationDetailsDifferent = true;
-
-                    log.warning("Registration details changed: user");
-                }
-
                 String newOSVersion = DeviceDetails.getOSVersion();
                 String oldOSVersion = DeviceDetails.getOSVersion();
 
+                boolean areRegistrationDetailsDifferent = false;
+                boolean areRegistrationDetailsReplaced = false;
                 boolean osVersionChanged = (newOSVersion != null && !newOSVersion.equals(oldOSVersion));
                 boolean deviceDetailsChanged = deviceDetails != null && !deviceDetails.equals(getDeviceDetails());
+                boolean userDetailsChanged = userDetails != null && !userDetails.equals(getCurrentDeviceUser());
 
-                if (deviceDetailsChanged || osVersionChanged) {
+                if (userDetailsChanged && (deviceDetailsChanged || osVersionChanged)) {
+
+                    try {
+                        (new UpdateRegistration(userDetails, deviceDetails)).performSynchronous();
+                    } catch (DonkyException donkyException) {
+                        if (FailureDetails.isValidationErrorMapContainingUserIdAlreadyTaken(donkyException.getValidationErrors())) {
+                            replaceRegistrationSynchronously(userDetails, deviceDetails);
+                            areRegistrationDetailsReplaced = true;
+                        }
+                    }
+
+                    DonkyDataController.getInstance().getUserDAO().setUserDetails(userDetails);
+                    DonkyDataController.getInstance().getDeviceDAO().setDeviceDetails(deviceDetails);
+                    areRegistrationDetailsDifferent = true;
+                    log.info("Registration details changed: user+device");
+
+                } else if (userDetailsChanged) {
+
+                    try {
+                        (new UpdateUser(userDetails)).performSynchronous();
+                    } catch (DonkyException donkyException) {
+                        if (FailureDetails.isValidationErrorMapContainingUserIdAlreadyTaken(donkyException.getValidationErrors())) {
+                            replaceRegistrationSynchronously(userDetails, deviceDetails);
+                            areRegistrationDetailsReplaced = true;
+                        }
+                    }
+
+                    DonkyDataController.getInstance().getUserDAO().setUserDetails(userDetails);
+                    areRegistrationDetailsDifferent = true;
+                    log.info("Registration details changed: user");
+
+                } else if (deviceDetailsChanged || osVersionChanged) {
 
                     (new UpdateDevice(deviceDetails)).performSynchronous();
 
                     DonkyDataController.getInstance().getDeviceDAO().setDeviceDetails(deviceDetails);
-
                     if (deviceDetailsChanged) {
                         areRegistrationDetailsDifferent = true;
                     }
+                    log.info("Registration details changed: device");
 
-                    log.warning("Registration details changed: device");
                 }
 
                 String newSDKVersion = AppSettings.getVersion();
@@ -374,12 +401,10 @@ public class DonkyAccountController {
                 boolean isSDKModulesChanged = !newModulesVersions.equals(oldModulesVersions);
                 boolean isSDKVersionChanged = newSDKVersion != null && !newSDKVersion.equals(oldSDKVersion);
 
-                if ( isAppVersionChanged || isSDKModulesChanged || isSDKVersionChanged) {
+                if (isAppVersionChanged || isSDKModulesChanged || isSDKVersionChanged) {
 
                     (new UpdateClient(appVersion)).performSynchronous();
-
                     DonkyDataController.getInstance().getConfigurationDAO().setAppVersion(appVersion);
-
                     log.warning("Registration details changed: client");
 
                 }
@@ -389,16 +414,14 @@ public class DonkyAccountController {
                 }
 
                 if (areRegistrationDetailsDifferent) {
-                    DonkyCore.publishLocalEvent(new RegistrationChangedEvent(userDetails, deviceDetails));
+                    DonkyCore.publishLocalEvent(new RegistrationChangedEvent(userDetails, deviceDetails, areRegistrationDetailsReplaced));
                 }
 
             } catch (Exception e) {
-
                 log.error("Error checking registration differences.", e);
             }
 
         } else {
-
             log.warning("User details couldn't be updated on initialisation. Check if account was suspended.");
         }
     }
@@ -678,7 +701,7 @@ public class DonkyAccountController {
 
                     log.info("Successfully registered into Donky Network.");
 
-                    DonkyCore.publishLocalEvent(new RegistrationChangedEvent(userDetails, deviceDetails));
+                    DonkyCore.publishLocalEvent(new RegistrationChangedEvent(userDetails, deviceDetails, true));
 
                     DonkyNetworkController.getInstance().synchronise();
 
@@ -873,7 +896,6 @@ public class DonkyAccountController {
      */
     public void replaceRegistration(final UserDetails userDetails, final DeviceDetails deviceDetails, final DonkyListener listener) {
 
-
         DonkyNetworkController.getInstance().synchronise(new DonkyListener() {
 
             @Override
@@ -957,6 +979,52 @@ public class DonkyAccountController {
                 }
             }
         });
+    }
+
+    /**
+     * Replaces the current registration with new details.  This will remove the existing registration details and create a new registration (not update the existing one).
+     * This is a blocking method.
+     *
+     * @param userDetails   User details to use for the registration
+     * @param deviceDetails Device details to use for the registration
+     */
+    private void replaceRegistrationSynchronously(final UserDetails userDetails, final DeviceDetails deviceDetails) throws DonkyException {
+
+        DonkyNetworkController.getInstance().synchroniseSynchronously();
+
+        final String appVersion = DonkyDataController.getInstance().getConfigurationDAO().getAppVersion();
+        Register registerRequest = new Register(DonkyDataController.getInstance().getConfigurationDAO().getDonkyNetworkApiKey(), userDetails, deviceDetails, appVersion);
+
+        RegisterResponse registerResponse = DonkyNetworkController.getInstance().registerToNetwork(registerRequest);
+
+        log.sensitive(registerResponse.toString());
+
+        if (processRegistrationResponse(registerResponse)) {
+
+            final boolean isAnonymousRegistration = ((userDetails == null || TextUtils.isEmpty(userDetails.getUserId())));
+
+            saveRegistrationData(DonkyDataController.getInstance().getConfigurationDAO().getDonkyNetworkApiKey(), userDetails, deviceDetails, appVersion, isAnonymousRegistration);
+
+            synchronized (sharedLock) {
+                isRegistered.set(true);
+                sharedLock.notifyAll();
+            }
+
+            log.info("Successfully replaced registration.");
+
+            DonkyCore.publishLocalEvent(new RegistrationChangedEvent(userDetails, deviceDetails, true));
+
+        } else {
+
+            synchronized (sharedLock) {
+                isRegistered.set(true);
+                sharedLock.notifyAll();
+            }
+
+            log.error("Reregistration process failed. processRegistrationResponse returned false.");
+
+        }
+
     }
 
     /**

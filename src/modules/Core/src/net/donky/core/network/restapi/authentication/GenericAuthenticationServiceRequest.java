@@ -83,22 +83,6 @@ public abstract class GenericAuthenticationServiceRequest<T> extends GenericServ
 
                     int statusCode = r.getStatus();
 
-                    if (statusCode == 400) {
-
-                        TypedInput body = r.getBody();
-
-                        String failureJson = readInputStream(body);
-
-                        new DLog("GenericAuthenticationServiceRequest").error("Client Bad Request " + failureJson, error);
-
-                        parseFailureDetails(failureJson);
-
-                        DonkyException donkyException = new DonkyException("Validation failures.", getValidationFailures());
-                        donkyException.initCause(error);
-                        throw donkyException;
-
-                    }
-
                     if (getRetryPolicy().shouldRetryForStatusCode(statusCode) && getRetryPolicy().retry()) {
 
                         try {
@@ -142,6 +126,20 @@ public abstract class GenericAuthenticationServiceRequest<T> extends GenericServ
                         UserSuspendedException userSuspendedException = new UserSuspendedException();
                         userSuspendedException.initCause(error);
                         throw userSuspendedException;
+
+                    } else if (statusCode == 400) {
+
+                        TypedInput body = r.getBody();
+
+                        String failureJson = readInputStream(body);
+
+                        new DLog("GenericAuthenticationServiceRequest").error("Client Bad Request " + failureJson, error);
+
+                        parseFailureDetails(failureJson);
+
+                        DonkyException donkyException = new DonkyException("Validation failures.", getValidationFailures());
+                        donkyException.initCause(error);
+                        throw donkyException;
 
                     } else {
 
@@ -199,22 +197,6 @@ public abstract class GenericAuthenticationServiceRequest<T> extends GenericServ
 
                         int statusCode = r.getStatus();
 
-                        if (statusCode == 400) {
-
-                            TypedInput body = r.getBody();
-
-                            String failureJson = readInputStream(body);
-
-                            new DLog("GenericAuthenticationServiceRequest").error("Client Bad Request " + failureJson, error);
-
-                            parseFailureDetails(failureJson);
-
-                            if (listener != null) {
-                                listener.error(null, getValidationFailures());
-                            }
-
-                        }
-
                         if (getRetryPolicy().shouldRetryForStatusCode(statusCode) && getRetryPolicy().retry()) {
 
                             try {
@@ -260,6 +242,20 @@ public abstract class GenericAuthenticationServiceRequest<T> extends GenericServ
                             DonkyAccountController.getInstance().setSuspended(true);
 
                             listener.userSuspended();
+
+                        } else if (statusCode == 400) {
+
+                            TypedInput body = r.getBody();
+
+                            String failureJson = readInputStream(body);
+
+                            new DLog("GenericAuthenticationServiceRequest").error("Client Bad Request " + failureJson, error);
+
+                            parseFailureDetails(failureJson);
+
+                            if (listener != null) {
+                                listener.error(null, getValidationFailures());
+                            }
 
                         } else {
 

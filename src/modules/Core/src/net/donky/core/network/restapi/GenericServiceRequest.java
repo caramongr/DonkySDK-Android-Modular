@@ -15,6 +15,8 @@ import java.util.Map;
 import retrofit.mime.TypedInput;
 
 /**
+ * Base class for all network request objects.
+ *
  * Created by Marcin Swierczek
  * 06/05/2015.
  * Copyright (C) Donky Networks Ltd. All rights reserved.
@@ -66,10 +68,20 @@ public abstract class GenericServiceRequest extends OnConnectionListener {
         return validationFailureDetails;
     }
 
+    /**
+     * Gets network failure errors.
+     *
+     * @return Network failure errors.
+     */
     public FailureDetails[] getValidationFailureDetails() {
         return validationFailureDetails;
     }
 
+    /**
+     * Gets map of network failure errors. Key is the property that caused the failure. Value is the failureKey String. Starting from v2.2.0.1 SDK is relaying on this definition.
+     *
+     * @return Map of network failure errors.
+     */
     public Map<String, String> getValidationFailures() {
 
         Map<String, String> failureMap = new HashMap<>();
@@ -78,7 +90,7 @@ public abstract class GenericServiceRequest extends OnConnectionListener {
 
             for (FailureDetails failure : validationFailureDetails) {
 
-                failureMap.put(failure.getProperty(), failure.getDetails());
+                failureMap.put(failure.getProperty(), failure.getFailureKey());
 
             }
         }
