@@ -24,6 +24,9 @@ android {
         main.java.srcDirs = ['../../../../modules/Messaging/Rich/InboxUI/src']
         main.res.srcDirs = ['../../../../modules/Messaging/Rich/InboxUI/res']
     }
+    lintOptions {
+        warning 'InvalidPackage'
+    }
 }
 
 dependencies {

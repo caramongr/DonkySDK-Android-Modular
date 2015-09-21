@@ -24,6 +24,9 @@ android {
         main.java.srcDirs = ['../../../../modules/Messaging/Simple Push/UI/src']
         main.res.srcDirs = ['../../../../modules/Messaging/Simple Push/UI/res']
     }
+    lintOptions {
+        warning 'InvalidPackage'
+    }
 }
 
 dependencies {

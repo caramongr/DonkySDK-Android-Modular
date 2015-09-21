@@ -24,6 +24,9 @@ android {
         main.java.srcDirs = ['../../../../modules/Messaging/Common/UI/src']
         main.res.srcDirs = ['../../../../modules/Messaging/Common/UI/res']
     }
+    lintOptions {
+        warning 'InvalidPackage'
+    }
 }
 
 dependencies {

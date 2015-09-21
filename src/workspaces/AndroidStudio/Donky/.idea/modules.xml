@@ -16,6 +16,7 @@
       <module fileurl="file://$PROJECT_DIR$/richinboxui/richinboxui.iml" filepath="$PROJECT_DIR$/richinboxui/richinboxui.iml" />
       <module fileurl="file://$PROJECT_DIR$/richlogic/richlogic.iml" filepath="$PROJECT_DIR$/richlogic/richlogic.iml" />
       <module fileurl="file://$PROJECT_DIR$/richui/richui.iml" filepath="$PROJECT_DIR$/richui/richui.iml" />
+      <module fileurl="file://$PROJECT_DIR$/sequencing/sequencing.iml" filepath="$PROJECT_DIR$/sequencing/sequencing.iml" />
     </modules>
   </component>
 </project>

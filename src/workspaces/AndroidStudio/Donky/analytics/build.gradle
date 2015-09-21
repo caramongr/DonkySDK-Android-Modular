@@ -28,6 +28,9 @@ android {
         androidTest.java.srcDirs = ['../../../../tests/Donky-Analytics-Tests/androidTest']
         //test.java.srcDirs = ['../../../../tests/Donky-Analytics-Tests/androidTest']
     }
+    lintOptions {
+        warning 'InvalidPackage'
+    }
 }
 
 dependencies {

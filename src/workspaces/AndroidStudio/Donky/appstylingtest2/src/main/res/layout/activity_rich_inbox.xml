@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <View xmlns:android="http://schemas.android.com/apk/res/android"
+    <View
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:background="@color/app_top"
@@ -18,21 +18,21 @@
         android:layout_weight="8"
         android:orientation="horizontal">
 
-        <View xmlns:android="http://schemas.android.com/apk/res/android"
+        <View
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:background="@color/app_left"
             android:layout_weight="1">
         </View>
 
-        <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        <FrameLayout
             android:id="@+id/rich_inbox_fragment_container"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="8">
         </FrameLayout>
 
-        <View xmlns:android="http://schemas.android.com/apk/res/android"
+        <View
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:background="@color/app_right"
@@ -41,7 +41,7 @@
 
     </LinearLayout>
 
-    <View xmlns:android="http://schemas.android.com/apk/res/android"
+    <View
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:background="@color/app_bottom"

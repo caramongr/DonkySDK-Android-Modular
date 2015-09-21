@@ -24,9 +24,12 @@ android {
         main.java.srcDirs = ['../../../../modules/Messaging/Rich/Logic/src']
         main.res.srcDirs = ['../../../../modules/Messaging/Rich/Logic/res']
 
-        instrumentTest.java.srcDirs = ['../../../../tests/Donky-Rich-Logic-Tests/androidTest']
+        //instrumentTest.java.srcDirs = ['../../../../tests/Donky-Rich-Logic-Tests/androidTest']
         androidTest.java.srcDirs = ['../../../../tests/Donky-Rich-Logic-Tests/androidTest']
-        test.java.srcDirs = ['../../../../tests/Donky-Rich-Logic-Tests/androidTest']
+        //test.java.srcDirs = ['../../../../tests/Donky-Rich-Logic-Tests/androidTest']
+    }
+    lintOptions {
+        warning 'InvalidPackage'
     }
 }
 

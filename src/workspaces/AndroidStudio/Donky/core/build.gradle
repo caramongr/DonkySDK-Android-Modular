@@ -19,9 +19,9 @@ android {
         main.java.srcDirs = ['../../../../modules/Core/src']
         main.res.srcDirs = ['../../../../modules/Core/res']
 
-        instrumentTest.java.srcDirs = ['../../../../tests/Donky-Core-Tests/androidTest']
+        //instrumentTest.java.srcDirs = ['../../../../tests/Donky-Core-Tests/androidTest']
         androidTest.java.srcDirs = ['../../../../tests/Donky-Core-Tests/androidTest']
-        test.java.srcDirs = ['../../../../tests/Donky-Core-Tests/androidTest']
+        //test.java.srcDirs = ['../../../../tests/Donky-Core-Tests/androidTest']
     }
 
     buildTypes {
@@ -29,6 +29,9 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+    }
+    lintOptions {
+        warning 'InvalidPackage'
     }
 }
 

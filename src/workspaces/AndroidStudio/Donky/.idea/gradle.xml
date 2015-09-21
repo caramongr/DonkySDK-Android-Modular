@@ -22,6 +22,7 @@
             <option value="$PROJECT_DIR$/richinboxui" />
             <option value="$PROJECT_DIR$/richlogic" />
             <option value="$PROJECT_DIR$/richui" />
+            <option value="$PROJECT_DIR$/sequencing" />
           </set>
         </option>
       </GradleProjectSettings>
