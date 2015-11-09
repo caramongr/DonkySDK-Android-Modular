@@ -8,7 +8,7 @@ import net.donky.core.model.DonkyDataController;
 import net.donky.core.observables.SubscriptionController;
 import net.donky.core.observables.SubscriptionInternal;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -51,10 +51,18 @@ public class SynchronisationHandler {
      * Send Notifications to subscribers and send acknowledge messages back to Donky Network.
      */
     public void processServerNotifications() {
+        processServerNotifications(null);
+    }
 
-        Map<String, List<ServerNotification>> customNotificationsByType = new HashMap<>();
+    /**
+     * Send Notifications to subscribers and send acknowledge messages back to Donky Network.  You can choose if you want to keep the current thread when notifying listeners or notify in main thread. If you pass null
+     * the SDK will decide to apply internal strategy.
+     */
+    public void processServerNotifications(Boolean shouldNotifyInMainThread) {
 
-        Map<String, List<ServerNotification>> donkyNotificationsByType = new HashMap<>();
+        LinkedHashMap<String, List<ServerNotification>> customNotificationsByType = new LinkedHashMap<>();
+
+        LinkedHashMap<String, List<ServerNotification>> donkyNotificationsByType = new LinkedHashMap<>();
 
         for (final ServerNotification serverNotification : serverNotifications) {
 
@@ -93,9 +101,17 @@ public class SynchronisationHandler {
             }
         }
 
-        processNotificationOfGivenCategoryAndType(ServerNotification.NOTIFICATION_CATEGORY_DONKY, donkyNotificationsByType, false);
+        if (shouldNotifyInMainThread == null) {
+            processNotificationOfGivenCategoryAndType(ServerNotification.NOTIFICATION_CATEGORY_DONKY, donkyNotificationsByType, false);
+        } else {
+            processNotificationOfGivenCategoryAndType(ServerNotification.NOTIFICATION_CATEGORY_DONKY, donkyNotificationsByType, shouldNotifyInMainThread);
+        }
 
-        processNotificationOfGivenCategoryAndType(ServerNotification.NOTIFICATION_CATEGORY_CUSTOM, customNotificationsByType, true);
+        if (shouldNotifyInMainThread == null) {
+            processNotificationOfGivenCategoryAndType(ServerNotification.NOTIFICATION_CATEGORY_CUSTOM, customNotificationsByType, true);
+        } else {
+            processNotificationOfGivenCategoryAndType(ServerNotification.NOTIFICATION_CATEGORY_CUSTOM, customNotificationsByType, shouldNotifyInMainThread);
+        }
 
     }
 
@@ -111,19 +127,19 @@ public class SynchronisationHandler {
 
     }
 
-    private void processNotificationOfGivenCategoryAndType(String category, Map<String, List<ServerNotification>> notificationsByType, boolean shouldNotifyInMainThread) {
+    private void processNotificationOfGivenCategoryAndType(String category, LinkedHashMap<String, List<ServerNotification>> notificationsByType, boolean shouldNotifyInMainThread) {
 
-        for (String type : notificationsByType.keySet()) {
+        for (Map.Entry<String, List<ServerNotification>> entry : notificationsByType.entrySet()) {
 
-            List<ServerNotification> notifications = notificationsByType.get(type);
+            List<ServerNotification> notifications = entry.getValue();
 
-            List<SubscriptionInternal<ServerNotification>> subscriptions = SubscriptionController.getInstance().getSubscriptionsForServerNotification(category, type);
+            List<SubscriptionInternal<ServerNotification>> subscriptions = SubscriptionController.getInstance().getSubscriptionsForServerNotification(category, entry.getKey());
 
             for (ServerNotification serverNotification : notifications) {
-                acknowledgeNotification(serverNotification, subscriptions, type);
+                acknowledgeNotification(serverNotification, subscriptions, entry.getKey());
             }
 
-            notifySubscribers(type, notifications, subscriptions, shouldNotifyInMainThread);
+            notifySubscribers(entry.getKey(), notifications, subscriptions, shouldNotifyInMainThread);
 
         }
 
@@ -168,7 +184,6 @@ public class SynchronisationHandler {
             if (type != null && type.equals(subscription.getNotificationType())) {
 
                 if (shouldNotifyInMainThread) {
-
                     handler.post(new Runnable() {
                         @Override
                         public void run() {
@@ -180,7 +195,6 @@ public class SynchronisationHandler {
                                     subscription.getListener().onNotification(serverNotification);
                                 }
                             }
-
                         }
                     });
 

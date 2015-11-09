@@ -9,8 +9,6 @@ import android.database.CursorIndexOutOfBoundsException;
 import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.ListPopupWindow;
 import android.text.TextUtils;
@@ -705,7 +703,7 @@ public class RichInboxFragment extends DonkyMessagingBaseListFragment<RichMessag
 
         Integer availabilityDays = DonkyDataController.getInstance().getConfigurationDAO().getMaxAvailabilityDays();
 
-        final long currentTime = System.currentTimeMillis();
+        final Date currentTime = new Date();
 
         for (int i = 0; i < getListView().getChildCount(); i++) {
 
@@ -729,17 +727,6 @@ public class RichInboxFragment extends DonkyMessagingBaseListFragment<RichMessag
                     return;
                 }
 
-                if (dateSent != null) {
-
-                    new Handler(Looper.getMainLooper()).post(new Runnable() {
-                        @Override
-                        public void run() {
-
-                        }
-                    });
-
-                }
-
                 final TextView timeStampView = (TextView) getListView().getChildAt(i).findViewById(R.id.dk_rich_message_timestamp);
 
                 final View view = getListView().getChildAt(i);
@@ -751,7 +738,7 @@ public class RichInboxFragment extends DonkyMessagingBaseListFragment<RichMessag
                     viewHolder.isExpired = true;
                 } else {
                     if (dateSent != null) {
-                        timeStampView.setText(TimestampsHelper.getShortTimestamp(appContext, dateSent.getTime(), currentTime));
+                        timeStampView.setText(TimestampsHelper.getShortTimestampForRichMessage(appContext, dateSent.getTime(), currentTime.getTime()));
                     }
                 }
             }
@@ -819,7 +806,7 @@ public class RichInboxFragment extends DonkyMessagingBaseListFragment<RichMessag
                     Date dateSent = DateAndTimeHelper.parseUtcDate(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseSQLContract.RichMessageEntry.COLUMN_NAME_sentTimestamp)));
                     final Date dateExpiry = DateAndTimeHelper.parseUtcDate(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseSQLContract.RichMessageEntry.COLUMN_NAME_expiryTimeStamp)));
 
-                    if (DateAndTimeHelper.isExpired(dateSent, dateExpiry, System.currentTimeMillis(), availabilityDays)) {
+                    if (DateAndTimeHelper.isExpired(dateSent, dateExpiry, new Date(), availabilityDays)) {
                         richMessageIdsToRemove.add(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseSQLContract.RichMessageEntry.COLUMN_NAME_internalId)));
                     }
                 }
@@ -931,6 +918,11 @@ public class RichInboxFragment extends DonkyMessagingBaseListFragment<RichMessag
     @Override
     protected void searchViewActionOpened() {
 
+    }
+
+    @Override
+    protected void checkListItem(String contentId) {
+        // No need for right fragment to check list item in left fragment for rich messages
     }
 
 }

@@ -94,7 +94,6 @@ public class DatabaseSQLHelper extends SQLiteOpenHelper {
             helper.onUpgrade(db, oldVersion, newVersion);
         }
 
-        onUpgrade(db, oldVersion, newVersion);
     }
 
     /**
@@ -110,6 +109,5 @@ public class DatabaseSQLHelper extends SQLiteOpenHelper {
             helper.onDowngrade(db, oldVersion, newVersion);
         }
 
-        onDowngrade(db, oldVersion, newVersion);
     }
 }

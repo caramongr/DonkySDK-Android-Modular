@@ -604,6 +604,8 @@ public abstract class DonkyMessagingBaseListFragment<T, GFT, CAT extends CursorA
      */
     protected abstract void searchViewActionOpened();
 
+    protected abstract void checkListItem(final String contentId);
+
     @Override
     public void onMultipleSelectionChanged() {
         if (actionMode != null) {
@@ -622,8 +624,9 @@ public abstract class DonkyMessagingBaseListFragment<T, GFT, CAT extends CursorA
     }
 
     @Override
-    public void onMessageDisplayed() {
+    public void onMessageDisplayed(String contentId) {
         refreshListView();
+        checkListItem(contentId);
     }
 
     @Override

@@ -26,6 +26,7 @@
     <color name="dk_empty_list_view_text">#A8A8A8</color>
     <color name="dk_window_popup_list_element_text_color">#000000</color>
 
+    <!-- popup list styling when list row long clicked-->
     <color name="dk_window_popup_list_element_normal_background">#FFFFFF</color>
     <color name="dk_window_popup_list_element_pressed_background">#D3D3D3</color>
     <color name="dk_window_popup_list_element_selected_background">#D3D3D3</color>
@@ -36,5 +37,8 @@
 
     <!-- Divider between fragments -->
     <color name="dk_fragments_divider">#aaa</color>
+
+    <!-- Divider between list rows -->
+    <color name="dk_conversation_list_divider">#9D9D9D</color>
 
 </resources>

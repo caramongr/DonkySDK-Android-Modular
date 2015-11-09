@@ -12,6 +12,8 @@
     <string name="dk_action_forward">Forward</string>
     <string name="dk_action_delete">Delete</string>
     <string name="dk_action_search">Search</string>
+    <string name="dk_action_new_message">New message</string>
+    <string name="dk_action_copy">Copy</string>
 
     <!-- empty content descriptions -->
     <string name="dk_empty_list">No messages</string>
@@ -23,5 +25,6 @@
     <string name="dk_number_of_hours_singular">hr ago</string>
     <string name="dk_number_of_hours_plural">hrs ago</string>
     <string name="dk_yesterday">Yesterday</string>
+    <string name="dk_today">Today</string>
 
 </resources>

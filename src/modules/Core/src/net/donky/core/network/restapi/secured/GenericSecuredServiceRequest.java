@@ -1,5 +1,8 @@
 package net.donky.core.network.restapi.secured;
 
+import android.os.Handler;
+import android.os.Looper;
+
 import net.donky.core.DonkyException;
 import net.donky.core.DonkyListener;
 import net.donky.core.DonkyResultListener;
@@ -120,6 +123,14 @@ public abstract class GenericSecuredServiceRequest<T> extends GenericServiceRequ
 
                     } else if (statusCode == 401) {
 
+                        if (retryPolicy.isWasRetriedAlready() && getRetryPolicy().retry()) {
+                            try {
+                                Thread.sleep(getRetryPolicy().getDelayBeforeNextRetry());
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        }
+
                         DonkyAccountController.getInstance().authenticate();
 
                         return performSynchronous();
@@ -191,40 +202,34 @@ public abstract class GenericSecuredServiceRequest<T> extends GenericServiceRequ
 
                                 retrofit.client.Response r = error.getResponse();
 
-                                int statusCode = r.getStatus();
-
                                 if (r != null) {
+
+                                    int statusCode = r.getStatus();
 
                                     if (getRetryPolicy().shouldRetryForStatusCode(statusCode) && getRetryPolicy().retry()) {
 
-                                        try {
-                                            Thread.sleep(getRetryPolicy().getDelayBeforeNextRetry());
-                                        } catch (InterruptedException e) {
-                                            e.printStackTrace();
-                                        }
+                                        Handler handler = new Handler(Looper.getMainLooper());
+                                        handler.postDelayed(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                performAsynchronous(listener);
+                                            }
+                                        }, getRetryPolicy().getDelayBeforeNextRetry());
 
-                                        performAsynchronous(listener);
 
                                     } else if (statusCode == 401) {
 
-                                        DonkyAccountController.getInstance().authenticate(new DonkyListener() {
-
-                                            @Override
-                                            public void success() {
-
-                                                performAsynchronous(listener);
-
-                                            }
-
-                                            @Override
-                                            public void error(DonkyException donkyException, Map<String, String> validationErrors) {
-
-                                                if (listener != null) {
-                                                    listener.error(donkyException, validationErrors);
+                                        if (retryPolicy.isWasRetriedAlready() && getRetryPolicy().retry()) {
+                                            Handler handler = new Handler(Looper.getMainLooper());
+                                            handler.postDelayed(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    performAsyncCallAgainAfterAuthentication(listener);
                                                 }
-                                            }
-
-                                        });
+                                            }, getRetryPolicy().getDelayBeforeNextRetry());
+                                        } else {
+                                            performAsyncCallAgainAfterAuthentication(listener);
+                                        }
 
                                     } else if (statusCode == 403) {
 
@@ -304,32 +309,28 @@ public abstract class GenericSecuredServiceRequest<T> extends GenericServiceRequ
 
                             if (getRetryPolicy().shouldRetryForStatusCode(statusCode) && getRetryPolicy().retry()) {
 
-                                try {
-                                    Thread.sleep(getRetryPolicy().getDelayBeforeNextRetry());
-                                } catch (InterruptedException e) {
-                                    e.printStackTrace();
-                                }
-
-                                performAsynchronous(listener);
+                                Handler handler = new Handler(Looper.getMainLooper());
+                                handler.postDelayed(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        performAsynchronous(listener);
+                                    }
+                                }, getRetryPolicy().getDelayBeforeNextRetry());
 
                             } else if (statusCode == 401) {
 
-                                DonkyAccountController.getInstance().reRegisterWithSameUserDetails(new DonkyListener() {
-                                    @Override
-                                    public void success() {
+                                if (retryPolicy.isWasRetriedAlready() && getRetryPolicy().retry()) {
 
-                                        performAsynchronous(listener);
-
-                                    }
-
-                                    @Override
-                                    public void error(DonkyException donkyException, Map<String, String> validationErrors) {
-
-                                        if (listener != null) {
-                                            listener.error(donkyException, null);
+                                    Handler handler = new Handler(Looper.getMainLooper());
+                                    handler.postDelayed(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            performAsyncCallAgainAfterAuthentication(listener);
                                         }
-                                    }
-                                });
+                                    }, getRetryPolicy().getDelayBeforeNextRetry());
+                                } else {
+                                    performAsyncCallAgainAfterAuthentication(listener);
+                                }
 
                             } else if (statusCode == 403) {
 
@@ -390,5 +391,22 @@ public abstract class GenericSecuredServiceRequest<T> extends GenericServiceRequ
             }
 
         }
+    }
+
+    private void performAsyncCallAgainAfterAuthentication(final DonkyResultListener<T> listener) {
+        DonkyAccountController.getInstance().authenticate(new DonkyListener() {
+
+            @Override
+            public void success() {
+                performAsynchronous(listener);
+            }
+
+            @Override
+            public void error(DonkyException donkyException, Map<String, String> validationErrors) {
+                if (listener != null) {
+                    listener.error(donkyException, validationErrors);
+                }
+            }
+        });
     }
 }

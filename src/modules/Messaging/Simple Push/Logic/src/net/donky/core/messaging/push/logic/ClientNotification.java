@@ -9,6 +9,7 @@ import net.donky.core.helpers.IdHelper;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.Date;
 import java.util.Map;
 
 /**
@@ -83,7 +84,7 @@ public class ClientNotification extends net.donky.core.network.ClientNotificatio
             u.contextItems = simplePushData.getContextItems();
 
             u.timeToInteractionSeconds =
-                    (System.currentTimeMillis() - DateAndTimeHelper.parseUtcDate(simplePushData.getSentTimestamp()).getTime()) / 1000;
+                    (new Date().getTime() - DateAndTimeHelper.parseUtcDate(simplePushData.getSentTimestamp()).getTime()) / 1000;
 
             if (simplePushData.getButtonSets() != null) {
 
@@ -119,12 +120,8 @@ public class ClientNotification extends net.donky.core.network.ClientNotificatio
                             u.buttonDescription = sb.toString();
 
                         }
-
                     }
-
                 }
-
-
             }
         }
 

@@ -12,6 +12,7 @@ import net.donky.core.events.OnCreateEvent;
 import net.donky.core.events.OnPauseEvent;
 import net.donky.core.events.OnResumeEvent;
 import net.donky.core.model.LifeCycleDAO;
+import net.donky.core.network.DonkyNetworkController;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -152,6 +153,8 @@ public class LifeCycleObserver {
             public void onDonkyEvent(OnResumeEvent event) {
 
                 if (LifeCycleObserver.getInstance().wasInBackground()) {
+
+                    DonkyNetworkController.getInstance().synchronise();
 
                     syncTimerHelper.startSynchronisationTimer();
 

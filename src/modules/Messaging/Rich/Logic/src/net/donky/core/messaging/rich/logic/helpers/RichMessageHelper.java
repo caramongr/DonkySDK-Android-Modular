@@ -63,7 +63,7 @@ public class RichMessageHelper {
             Date dateExpiry = DateAndTimeHelper.parseUtcDate(richMessage.getExpiryTimeStamp());
             Integer availabilityDays = DonkyDataController.getInstance().getConfigurationDAO().getMaxAvailabilityDays();
 
-            return DateAndTimeHelper.isExpired(dateSent, dateExpiry, System.currentTimeMillis(), availabilityDays);
+            return DateAndTimeHelper.isExpired(dateSent, dateExpiry, new Date(), availabilityDays);
 
         } else {
 

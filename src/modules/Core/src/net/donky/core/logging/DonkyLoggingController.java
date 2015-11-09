@@ -140,7 +140,9 @@ public class DonkyLoggingController {
             try {
 
                 if (context == null) {
-                    Log.e("DonkyLoggingController", "Application context is null! Please check if the code to initialise the Donky SDK is placed in onCreate method of Application class not Activity. Application class need to be defined in Android Manifest: <application android:name=\"MyApplicationClassName\"");
+                    Log.w("DonkyLoggingController", "Application context is null! Please check if the code to initialise the Donky SDK is placed in onCreate method of Application class not Activity. Application class need to be defined in Android Manifest: <application android:name=\"MyApplicationClassName\". Ignore if SDK resumes after this log.");
+                    sharedLock.notifyAll();
+                    return;
                 }
 
                 File dir = context.getFilesDir();

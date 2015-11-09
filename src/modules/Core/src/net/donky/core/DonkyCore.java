@@ -6,15 +6,14 @@ import android.os.Handler;
 import android.os.Looper;
 import android.text.TextUtils;
 
-import net.donky.core.account.DonkyAccountController;
 import net.donky.core.account.DeviceDetails;
+import net.donky.core.account.DonkyAccountController;
 import net.donky.core.account.NewDeviceHandler;
 import net.donky.core.account.UserDetails;
 import net.donky.core.events.CoreInitialisedSuccessfullyEvent;
 import net.donky.core.events.DonkyEventListener;
 import net.donky.core.events.EventObservable;
 import net.donky.core.events.LocalEvent;
-import net.donky.core.events.OnResumeEvent;
 import net.donky.core.gcm.DonkyGcmController;
 import net.donky.core.lifecycle.LifeCycleObserver;
 import net.donky.core.logging.DLog;
@@ -33,8 +32,9 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -77,11 +77,13 @@ public class DonkyCore {
      */
     private static List<ModuleDefinition> moduleDefinitionsToRegister = new LinkedList<>();
 
+    private ExecutorService poolExecutor;
+
     /**
      * Private constructor. Prevents instantiation from other classes.
      */
     private DonkyCore() {
-
+        this.poolExecutor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
     }
 
     /**
@@ -114,7 +116,7 @@ public class DonkyCore {
      * @param donkyListener The callback to invoke when the SDK is initialised.
      */
     public static void initialiseDonkySDK(final Application application, final String apiKey, final UserDetails userDetails, final DeviceDetails deviceDetails, final String appVersion, final DonkyListener donkyListener) {
-        SingletonHolder.INSTANCE.init(application, apiKey, userDetails, deviceDetails, appVersion, donkyListener);
+        SingletonHolder.INSTANCE.init(application, apiKey, userDetails, deviceDetails, appVersion, donkyListener, true);
     }
 
     /**
@@ -127,7 +129,7 @@ public class DonkyCore {
      * @param donkyListener The callback to invoke when the SDK is initialised.
      */
     public static void initialiseDonkySDK(final Application application, final String apiKey, final DonkyListener donkyListener) {
-        SingletonHolder.INSTANCE.init(application, apiKey, null, null, null, donkyListener);
+        SingletonHolder.INSTANCE.init(application, apiKey, null, null, null, donkyListener, false);
     }
 
     /**
@@ -140,7 +142,7 @@ public class DonkyCore {
      * @param appVersion    The app version as specified by the integrator
      * @param donkyListener The callback to invoke when the SDK is initialised.
      */
-    private void init(final Application application, final String apiKey, final UserDetails userDetails, final DeviceDetails deviceDetails, final String appVersion, final DonkyListener donkyListener) {
+    private void init(final Application application, final String apiKey, final UserDetails userDetails, final DeviceDetails deviceDetails, final String appVersion, final DonkyListener donkyListener, final boolean overrideCurrentUser) {
 
         final Handler mainThreadHandler = new Handler(Looper.getMainLooper());
 
@@ -248,7 +250,9 @@ public class DonkyCore {
                                 moduleDefinitionsToRegister.clear();
 
                                 // register user or update registration
-                                DonkyAccountController.getInstance().register(apiKey, userDetails, deviceDetails, appVersion);
+                                DonkyAccountController.getInstance().register(apiKey, userDetails, deviceDetails, appVersion, overrideCurrentUser);
+
+                                DonkyAccountController.getInstance().updateClient(null);
 
                                 // Register for Push messages in GCM
                                 DonkyGcmController.getInstance().registerPush(new DonkyListener() {
@@ -743,6 +747,12 @@ public class DonkyCore {
                     donkyListener.success();
                 }
             });
+        }
+    }
+
+    public void processInBackground(Runnable runnable) {
+        if (runnable != null) {
+            poolExecutor.execute(runnable);
         }
     }
 }

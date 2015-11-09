@@ -29,6 +29,8 @@ public class DonkyGcmIntentService extends IntentService {
 
     private static final String DONKY_TYPE_NOTIFICATIONS_PENDING = "NOTIFICATIONPENDING";
 
+    private static final String DONKY_TYPE_MSG_REJECTED = "MSGREJECTED";
+
     private static final String DONKY_TYPE_RICH_MSG = "RICHMSG";
 
     /**
@@ -82,7 +84,7 @@ public class DonkyGcmIntentService extends IntentService {
      */
     private void handleDonkyMessage(final Intent intent, String type) {
 
-        if (DONKY_TYPE_NOTIFICATIONS_PENDING.equals(type)) {
+        if (DONKY_TYPE_NOTIFICATIONS_PENDING.equals(type) || DONKY_TYPE_MSG_REJECTED.contentEquals(type)) {
 
             try {
 

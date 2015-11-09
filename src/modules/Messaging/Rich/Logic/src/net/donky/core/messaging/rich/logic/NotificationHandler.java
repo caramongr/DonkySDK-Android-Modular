@@ -7,7 +7,7 @@ import net.donky.core.DonkyCore;
 import net.donky.core.helpers.DateAndTimeHelper;
 import net.donky.core.helpers.IdHelper;
 import net.donky.core.messaging.rich.logic.model.RichMessage;
-import net.donky.core.messaging.logic.MessageReceivedDetails;
+import net.donky.core.messaging.logic.model.MessageReceivedDetails;
 import net.donky.core.messaging.logic.MessagingInternalController;
 import net.donky.core.messaging.rich.logic.model.RichMessageDataController;
 import net.donky.core.network.AcknowledgementDetail;
@@ -45,8 +45,6 @@ public class NotificationHandler {
 
                 final RichMessage richMessage = gson.fromJson(data.toString(), RichMessage.class);
 
-                RichMessageDataController.getInstance().getRichMessagesDAO().getRichMessageWithMessageId(richMessage.getMessageId());
-
                 if (RichMessageDataController.getInstance().getRichMessagesDAO().getRichMessageWithMessageId(richMessage.getMessageId()) != null) {
                     continue;
                 }
@@ -66,20 +64,8 @@ public class NotificationHandler {
                 boolean receivedExpired = false;
 
                 if (expiredTime != null) {
-
-                    Date currentTime = new Date(System.currentTimeMillis());
-
-                    receivedExpired = !currentTime.before(expiredTime);
-
-                    if (receivedExpired) {
-
-                        messageReceivedDetails.setReceivedExpired(true);
-
-                    } else {
-
-                        messageReceivedDetails.setReceivedExpired(false);
-
-                    }
+                    receivedExpired = new Date().after(expiredTime);
+                    messageReceivedDetails.setReceivedExpired(receivedExpired);
                 }
 
                 AcknowledgementDetail acknowledgementDetail = new AcknowledgementDetail();

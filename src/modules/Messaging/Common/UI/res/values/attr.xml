@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <!-- The icon to use for new message -->
+    <attr name="dk_ic_message_24dp" format="reference" />
+
+    <!-- The icon to use for send message -->
+    <attr name="dk_ic_copy_24dp" format="reference" />
+
     <!-- The icon to use for the home as up action -->
     <attr name="dk_ic_arrow_back_24dp" format="reference" />
 
@@ -30,6 +36,16 @@
 
     <!-- The icon to use for the share action -->
     <attr name="dk_ic_share_24dp" format="reference" />
+
+    <attr name="dk_ic_contacts_24dp" format="reference" />
+    <attr name="dk_ic_email_24dp" format="reference" />
+    <attr name="dk_ic_group_add_24dp" format="reference" />
+    <attr name="dk_ic_image_24dp" format="reference" />
+    <attr name="dk_ic_mode_edit_24dp" format="reference" />
+    <attr name="dk_ic_person_24dp" format="reference" />
+    <attr name="dk_ic_phone_24dp" format="reference" />
+    <attr name="dk_ic_photo_camera_24dp" format="reference" />
+    <attr name="dk_ic_save" format="reference" />
 
     <!-- The icon to use for remote notification -->
     <attr name="dk_notification_small_icon_chat" format="reference" />

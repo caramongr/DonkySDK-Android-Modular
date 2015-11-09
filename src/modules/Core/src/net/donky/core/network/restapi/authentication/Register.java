@@ -44,7 +44,9 @@ public class Register extends GenericAuthenticationServiceRequest<RegisterRespon
 
     private String apiKey;
 
-    public Register(final String apiKey, final UserDetails userDetails, final DeviceDetails deviceDetails, final String appVersion) {
+    private boolean overrideRegistration;
+
+    public Register(final String apiKey, final UserDetails userDetails, final DeviceDetails deviceDetails, final String appVersion, boolean overrideRegistration) {
         device = new UpdateDevice(deviceDetails);
         client = new UpdateClient(appVersion);
         if (userDetails != null && !TextUtils.isEmpty(userDetails.getUserId())) {
@@ -58,6 +60,8 @@ public class Register extends GenericAuthenticationServiceRequest<RegisterRespon
         this.appVersion = appVersion;
 
         this.apiKey = apiKey;
+
+        this.overrideRegistration = overrideRegistration;
 
     }
 
@@ -124,7 +128,7 @@ public class Register extends GenericAuthenticationServiceRequest<RegisterRespon
 
                 try {
 
-                    DonkyAccountController.getInstance().register(apiKey, userDetails, deviceDetails, appVersion);
+                    DonkyAccountController.getInstance().register(apiKey, userDetails, deviceDetails, appVersion, overrideRegistration);
 
                 } catch (DonkyException e) {
 

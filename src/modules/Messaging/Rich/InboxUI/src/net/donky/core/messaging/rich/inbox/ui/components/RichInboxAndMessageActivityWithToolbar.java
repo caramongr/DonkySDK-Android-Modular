@@ -1,12 +1,7 @@
 package net.donky.core.messaging.rich.inbox.ui.components;
 
-import android.content.res.TypedArray;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
-import android.util.TypedValue;
-import android.view.MenuItem;
 
 import net.donky.core.messaging.rich.inbox.ui.R;
 import net.donky.core.messaging.ui.components.DonkyActivity;
@@ -36,45 +31,12 @@ public class RichInboxAndMessageActivityWithToolbar extends DonkyActivity {
         }
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setupUI(toolbar);
 
-    }
-
-    /**
-     * Setup toolbar widget.
-     *
-     * @param toolbar Toolbar widget to set.
-     */
-    protected void setupUI(Toolbar toolbar) {
-
-        TypedValue typedValue = new TypedValue();
-        int[] attribute = new int[] { R.attr.dk_ic_arrow_back_24dp };
-        TypedArray array = obtainStyledAttributes(typedValue.resourceId, attribute);
-        int attributeResourceId = array.getResourceId(0, -1);
-
-        Drawable drawable = getResources().getDrawable(attributeResourceId);
-        array.recycle();
-
-        toolbar.setNavigationIcon(drawable);
-
-        setTitle(R.string.dk_inbox_fragment_title);
-
-        setSupportActionBar(toolbar);
-
-        ActionBar bar = getSupportActionBar();
-        if (bar != null) {
-            bar.setDisplayHomeAsUpEnabled(true);
-        }
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-
-        if (android.R.id.home == item.getItemId()) {
-            finish();
+        if (toolbar != null) {
+            setupUI(toolbar);
+            toolbar.setTitle(R.string.dk_inbox_fragment_title);
         }
 
-        return super.onOptionsItemSelected(item);
     }
 
 }

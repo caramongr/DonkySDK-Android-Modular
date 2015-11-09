@@ -8,6 +8,7 @@ import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Handler;
+import android.os.Looper;
 import android.text.TextUtils;
 import android.util.Pair;
 
@@ -18,17 +19,25 @@ import net.donky.core.DonkyResultListener;
 import net.donky.core.account.DonkyAccountController;
 import net.donky.core.events.NetworkStateChangedEvent;
 import net.donky.core.helpers.DateAndTimeHelper;
+import net.donky.core.lifecycle.LifeCycleObserver;
 import net.donky.core.logging.DLog;
 import net.donky.core.model.ConfigurationDAO;
 import net.donky.core.model.DonkyDataController;
 import net.donky.core.network.content.ContentNotification;
+import net.donky.core.network.location.GeoFence;
+import net.donky.core.network.location.Trigger;
 import net.donky.core.network.restapi.authentication.Login;
 import net.donky.core.network.restapi.authentication.LoginResponse;
 import net.donky.core.network.restapi.authentication.Register;
 import net.donky.core.network.restapi.authentication.RegisterResponse;
 import net.donky.core.network.restapi.secured.DeletePushConfigurationRequest;
+import net.donky.core.network.restapi.secured.GetAllGeoFence;
+import net.donky.core.network.restapi.secured.GetAllTriggers;
+import net.donky.core.network.restapi.secured.GetPlatformUsersRequest;
 import net.donky.core.network.restapi.secured.GetServerNotificationRequest;
 import net.donky.core.network.restapi.secured.GetTags;
+import net.donky.core.network.restapi.secured.IsValidPlatformUserRequest;
+import net.donky.core.network.restapi.secured.IsValidPlatformUserResponse;
 import net.donky.core.network.restapi.secured.Synchronise;
 import net.donky.core.network.restapi.secured.SynchroniseResponse;
 import net.donky.core.network.restapi.secured.UpdateClient;
@@ -39,6 +48,7 @@ import net.donky.core.network.restapi.secured.UpdateTags;
 import net.donky.core.network.restapi.secured.UpdateUser;
 import net.donky.core.network.restapi.secured.UploadLog;
 import net.donky.core.network.restapi.secured.UploadLogResponse;
+import net.donky.core.network.signalr.SignalRController;
 import net.donky.core.observables.SubscriptionController;
 import net.donky.core.settings.AppSettings;
 
@@ -60,6 +70,10 @@ import java.util.concurrent.atomic.AtomicLong;
  * Copyright (C) Donky Networks Ltd. All rights reserved.
  */
 public class DonkyNetworkController {
+
+    private SignalRController signalRController;
+
+    private Handler mainThreadHandler;
 
     /**
      * Indicates whether the device has network connectivity
@@ -94,6 +108,7 @@ public class DonkyNetworkController {
         reRunNotificationExchange = new AtomicBoolean(false);
         lastNotificationExchangeTimestamp = new AtomicLong(System.currentTimeMillis());
         connectionType = ConnectionType.NOT_CONNECTED;
+        mainThreadHandler = new Handler(Looper.getMainLooper());
         log = new DLog("NetworkController");
     }
 
@@ -123,6 +138,22 @@ public class DonkyNetworkController {
         this.context = application.getApplicationContext();
         this.apiKey = apiKey;
         registerForConnectivityChanges();
+        signalRController = (SignalRController) DonkyCore.getInstance().getService(SignalRController.SERVICE_NAME);
+    }
+
+    /**
+     * Should the signalR channel be used instead of REST
+     *
+     * @return True if signalR channel should be used.
+     */
+    public synchronized boolean shouldUseSignalRChannel() {
+        return signalRController != null && LifeCycleObserver.getInstance().isApplicationForegrounded();
+    }
+
+    public void startSignalR() {
+        if (signalRController != null) {
+            signalRController.startSignalR();
+        }
     }
 
     public long getLastSynchronisationTimestamp() {
@@ -158,7 +189,7 @@ public class DonkyNetworkController {
 
     /**
      * Performs a notification synchronisation. This method is blocking and cannot be called from the main thread.
-     * Mainly to be used by GCM Intent Service.
+     * Mainly to be used by GCM Intent Service. This method is using only REST synchronisation.
      */
     public void synchroniseSynchronously() {
 
@@ -217,26 +248,13 @@ public class DonkyNetworkController {
                             SubscriptionController.getInstance().notifyAboutOutboundClientNotification(notification);
                         }
 
-                        final Handler handler = new Handler();
-
-                        final SynchroniseResponse finalResult = result;
-
-                        handler.postDelayed(new Runnable() {
-
-                            @Override
-                            public void run() {
-
-                                if (DonkyDataController.getInstance().getNotificationDAO().isNotificationPending() || finalResult.isMoreNotificationsAvailable() || reRunNotificationExchange.get()) {
-
-                                    synchroniseSynchronously();
-
-                                }
-                            }
-                        }, 3000);
-
                         synchronized (sharedLock) {
                             isNotificationExchangeInProgress.set(false);
                             sharedLock.notifyAll();
+                        }
+
+                        if (DonkyDataController.getInstance().getNotificationDAO().isNotificationPending() || result.isMoreNotificationsAvailable() || reRunNotificationExchange.get()) {
+                            synchroniseSynchronously();
                         }
 
                     } else {
@@ -258,6 +276,7 @@ public class DonkyNetworkController {
 
                     log.error("Error performing synchronisation synchronously", e);
                 }
+
             }
 
         } else if (DonkyAccountController.getInstance().isUserSuspended()) {
@@ -304,118 +323,24 @@ public class DonkyNetworkController {
                     sharedLock.notifyAll();
                 }
 
-                try {
+                if (shouldUseSignalRChannel()) {
 
-                    final Synchronise synchroniseRequest = new Synchronise();
-
-                    synchroniseRequest.performAsynchronous(new DonkyResultListener<SynchroniseResponse>() {
+                    synchroniseUsingSignalR(new DonkyListener() {
 
                         @Override
-                        public void success(final SynchroniseResponse result) {
-
-                            DonkyDataController.getInstance().getNotificationDAO().removeNotifications(synchroniseRequest.getClientNotifications());
-
-                            if (result != null) {
-
-                                log.sensitive(result.toString());
-
-                                List<ClientNotification> clientNotifications = synchroniseRequest.getClientNotifications();
-
-                                //Remove sent client notifications from the database.
-                                DonkyDataController.getInstance().getNotificationDAO().removeNotifications(clientNotifications);
-
-                                try {
-
-                                    processSynchronisationResponse(result);
-
-                                } catch (JSONException e) {
-
-                                    DonkyException donkyException = new DonkyException("Error processing notification sync response.");
-                                    donkyException.initCause(e);
-                                    if (listener != null) {
-                                        listener.error(donkyException, synchroniseRequest.getValidationFailures());
-                                    }
-                                }
-
-                                for (ClientNotification notification : clientNotifications) {
-                                    SubscriptionController.getInstance().notifyAboutOutboundClientNotification(notification);
-                                }
-
-                                final Handler handler = new Handler();
-
-                                handler.postDelayed(new Runnable() {
-
-                                    @Override
-                                    public void run() {
-
-                                        if (DonkyDataController.getInstance().getNotificationDAO().isNotificationPending() || result.isMoreNotificationsAvailable() || reRunNotificationExchange.get()) {
-
-                                            synchronise(listener);
-
-                                        } else {
-
-                                            if (listener != null) {
-                                                listener.success();
-                                            }
-
-                                        }
-                                    }
-
-                                }, 3000);
-
-                                synchronized (sharedLock) {
-                                    isNotificationExchangeInProgress.set(false);
-                                    sharedLock.notifyAll();
-                                }
-
-                            } else {
-
-                                synchronized (sharedLock) {
-                                    isNotificationExchangeInProgress.set(false);
-                                    sharedLock.notifyAll();
-                                }
-
-                                log.error("Invalid synchronise response.");
-                                DonkyException donkyException = new DonkyException("Invalid synchronise response.");
-                                if (listener != null) {
-                                    listener.error(donkyException, synchroniseRequest.getValidationFailures());
-                                }
-                            }
+                        public void success() {
+                            postSuccess(listener);
                         }
 
                         @Override
                         public void error(DonkyException donkyException, Map<String, String> validationErrors) {
-
-                            if (!(donkyException instanceof ConnectionException)) {
-                                DonkyDataController.getInstance().getNotificationDAO().removeNotifications(synchroniseRequest.getClientNotifications());
-                            }
-
-                            synchronized (sharedLock) {
-                                isNotificationExchangeInProgress.set(false);
-                                sharedLock.notifyAll();
-                            }
-
-                            if (listener != null) {
-                                listener.error(donkyException, validationErrors);
-                            }
+                            synchroniseUsingRestApi(listener);
                         }
+
                     });
 
-                } catch (Exception e) {
-
-                    synchronized (sharedLock) {
-                        isNotificationExchangeInProgress.set(false);
-                        sharedLock.notifyAll();
-                    }
-
-                    DonkyException donkyException = new DonkyException("Error processing notification sync.");
-                    donkyException.initCause(e);
-
-                    if (listener != null) {
-                        listener.error(donkyException, null);
-                    }
-
-                    log.error("Error performing sync", e);
+                } else {
+                     synchroniseUsingRestApi(listener);
                 }
             }
 
@@ -442,23 +367,212 @@ public class DonkyNetworkController {
 
                     log.warning("User suspended. Re-authentication failed.");
 
-                    if (listener != null) {
-                        listener.error(donkyException, validationErrors);
-                    }
+                    postError(donkyException, validationErrors, listener);
 
                 }
             });
 
         } else {
+
             log.warning("Cancel synchronisation. User not registered.");
 
-            DonkyException donkyException = new DonkyException("Cancel synchronisation. User not registered.");
-
-            if (listener != null) {
-                listener.error(donkyException, null);
-            }
+            postError(new DonkyException("Cancel synchronisation. User not registered."), null, listener);
 
         }
+    }
+
+    /**
+     * Performs a notification synchronisation. This method is non-blocking.
+     *
+     * @param listener Callbacks are made during the Synchronise flow.
+     */
+    private void synchroniseUsingSignalR(final DonkyListener listener) {
+
+        final List<ClientNotification> clientNotificationsToSend = DonkyDataController.getInstance().getNotificationDAO().getNotifications();
+
+        signalRController.synchronise(clientNotificationsToSend, new DonkyResultListener<SynchroniseResponse>() {
+
+            @Override
+            public void success(final SynchroniseResponse result) {
+
+                if (result != null) {
+
+                    log.sensitive(result.toString());
+
+                    //Remove sent client notifications from the database.
+                    DonkyDataController.getInstance().getNotificationDAO().removeNotifications(clientNotificationsToSend);
+
+                    try {
+
+                        processSynchronisationResponse(result);
+
+                    } catch (JSONException e) {
+
+                        DonkyException donkyException = new DonkyException("Error processing notification sync response.");
+                        donkyException.initCause(e);
+                        postError(donkyException, null, listener);
+                    }
+
+                    for (ClientNotification notification : clientNotificationsToSend) {
+                        SubscriptionController.getInstance().notifyAboutOutboundClientNotification(notification);
+                    }
+
+                    final Handler handler = new Handler();
+
+                    handler.postDelayed(new Runnable() {
+
+                        @Override
+                        public void run() {
+
+                            if (DonkyDataController.getInstance().getNotificationDAO().isNotificationPending() || result.isMoreNotificationsAvailable() || reRunNotificationExchange.get()) {
+                                synchronise(listener);
+                            } else {
+                                postSuccess(listener);
+                            }
+                        }
+
+                    }, 3000);
+
+                    synchronized (sharedLock) {
+                        isNotificationExchangeInProgress.set(false);
+                        sharedLock.notifyAll();
+                    }
+
+                } else {
+
+                    synchronized (sharedLock) {
+                        isNotificationExchangeInProgress.set(false);
+                        sharedLock.notifyAll();
+                    }
+
+                    log.error("Invalid synchronise response.");
+
+                    DonkyException donkyException = new DonkyException("Invalid synchronise response.");
+                    postError(donkyException, null, listener);
+                }
+
+            }
+
+            @Override
+            public void error(DonkyException donkyException, Map<String, String> validationErrors) {
+
+                synchronized (sharedLock) {
+                    isNotificationExchangeInProgress.set(false);
+                    sharedLock.notifyAll();
+                }
+
+                postError(donkyException, validationErrors, listener);
+
+            }
+        });
+
+    }
+
+    /**
+     * Performs a notification synchronisation. This method is non-blocking.
+     *
+     * @param listener Callbacks are made during the Synchronise flow.
+     */
+    private void synchroniseUsingRestApi(final DonkyListener listener) {
+
+        try {
+
+            final Synchronise synchroniseRequest = new Synchronise();
+
+            synchroniseRequest.performAsynchronous(new DonkyResultListener<SynchroniseResponse>() {
+
+                @Override
+                public void success(final SynchroniseResponse result) {
+
+                    //DonkyDataController.getInstance().getNotificationDAO().removeNotifications(synchroniseRequest.getClientNotifications());
+
+                    if (result != null) {
+
+                        log.sensitive(result.toString());
+
+                        List<ClientNotification> clientNotifications = synchroniseRequest.getClientNotifications();
+
+                        //Remove sent client notifications from the database.
+                        DonkyDataController.getInstance().getNotificationDAO().removeNotifications(clientNotifications);
+
+                        try {
+
+                            processSynchronisationResponse(result);
+
+                        } catch (JSONException e) {
+
+                            DonkyException donkyException = new DonkyException("Error processing notification sync response.");
+                            donkyException.initCause(e);
+                            postError(donkyException, synchroniseRequest.getValidationFailures(), listener);
+                        }
+
+                        for (ClientNotification notification : clientNotifications) {
+                            SubscriptionController.getInstance().notifyAboutOutboundClientNotification(notification);
+                        }
+
+                        mainThreadHandler.postDelayed(new Runnable() {
+
+                            @Override
+                            public void run() {
+
+                                if (DonkyDataController.getInstance().getNotificationDAO().isNotificationPending() || result.isMoreNotificationsAvailable() || reRunNotificationExchange.get()) {
+                                    synchroniseUsingRestApi(listener);
+                                } else {
+                                    postSuccess(listener);
+                                }
+                            }
+
+                        }, 3000);
+
+                        synchronized (sharedLock) {
+                            isNotificationExchangeInProgress.set(false);
+                            sharedLock.notifyAll();
+                        }
+
+                    } else {
+
+                        synchronized (sharedLock) {
+                            isNotificationExchangeInProgress.set(false);
+                            sharedLock.notifyAll();
+                        }
+
+                        log.error("Invalid synchronise response.");
+                        DonkyException donkyException = new DonkyException("Invalid synchronise response.");
+                        postError(donkyException, synchroniseRequest.getValidationFailures(), listener);
+                    }
+                }
+
+                @Override
+                public void error(DonkyException donkyException, Map<String, String> validationErrors) {
+
+                    if (!(donkyException instanceof ConnectionException)) {
+                        DonkyDataController.getInstance().getNotificationDAO().removeNotifications(synchroniseRequest.getClientNotifications());
+                    }
+
+                    synchronized (sharedLock) {
+                        isNotificationExchangeInProgress.set(false);
+                        sharedLock.notifyAll();
+                    }
+
+                    postError(donkyException, validationErrors, listener);
+                }
+            });
+
+        } catch (Exception e) {
+
+            synchronized (sharedLock) {
+                isNotificationExchangeInProgress.set(false);
+                sharedLock.notifyAll();
+            }
+
+            DonkyException donkyException = new DonkyException("Error processing notification sync.");
+            donkyException.initCause(e);
+
+            postError(donkyException, null, listener);
+
+            log.error("Error performing sync", e);
+        }
+
     }
 
     /**
@@ -469,7 +583,24 @@ public class DonkyNetworkController {
      */
     public void getServerNotification(final String notificationId, final DonkyResultListener<ServerNotification> listener) {
         GetServerNotificationRequest request = new GetServerNotificationRequest(notificationId);
-        request.performAsynchronous(listener);
+        request.performAsynchronous(new DonkyResultListener<ServerNotification>() {
+            @Override
+            public void success(final ServerNotification result) {
+                if (listener != null) {
+                    mainThreadHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            listener.success(result);
+                        }
+                    });
+                }
+            }
+
+            @Override
+            public void error(DonkyException donkyException, Map<String, String> validationErrors) {
+                postError(donkyException, validationErrors, listener);
+            }
+        });
     }
 
     /**
@@ -489,7 +620,7 @@ public class DonkyNetworkController {
      * @param response Network response from sync notifications call.
      * @throws JSONException
      */
-    private void processSynchronisationResponse(SynchroniseResponse response) throws JSONException {
+    public void processSynchronisationResponse(SynchroniseResponse response) throws JSONException {
 
         if (response != null) {
 
@@ -551,9 +682,8 @@ public class DonkyNetworkController {
     /**
      * Adds content notification to the queue for submission to the network.
      *
-     * @deprecated Please use {@link DonkyNetworkController#queueContentNotification(net.donky.core.network.content.ContentNotification)} or {@link DonkyNetworkController#queueContentNotifications(java.util.List)} instead.
-     *
      * @param contentNotification Content notification to send when next notification sync.
+     * @deprecated Please use {@link DonkyNetworkController#queueContentNotification(net.donky.core.network.content.ContentNotification)} or {@link DonkyNetworkController#queueContentNotifications(java.util.List)} instead.
      */
     @Deprecated
     public void queueContentNotifications(ContentNotification contentNotification) {
@@ -570,7 +700,7 @@ public class DonkyNetworkController {
      */
     public ValidationResult<ContentNotification> queueContentNotifications(List<ContentNotification> contentNotifications) {
 
-        ValidationResult validationResult = new ValidationResult<ContentNotification>();
+        ValidationResult validationResult = new ValidationResult<>();
 
         Integer sizeLimit = getCustomContentMaxSizeBytes();
 
@@ -601,7 +731,7 @@ public class DonkyNetworkController {
      */
     public ValidationResult<ContentNotification> queueContentNotification(ContentNotification contentNotification) {
 
-        ValidationResult validationResult = new ValidationResult<ContentNotification>();
+        ValidationResult validationResult = new ValidationResult<>();
 
         if (contentNotification != null) {
 
@@ -631,13 +761,13 @@ public class DonkyNetworkController {
 
         if (!rejected.isEmpty()) {
 
-            Map validationFailures = new HashMap<String, String>();
+            HashMap<String, String> validationFailures = new HashMap<>();
 
             for (Pair<ContentNotification, String> pair : rejected) {
-                validationFailures.put(pair.first.getId(),pair.second);
+                validationFailures.put(pair.first.getId(), pair.second);
             }
 
-            listener.error(null, validationFailures);
+            postError(null, validationFailures, listener);
         }
 
         if (contentNotifications.size() - rejected.size() > 0) {
@@ -659,11 +789,11 @@ public class DonkyNetworkController {
 
             Map validationFailures = new HashMap<String, String>();
 
-            validationFailures.put(rejected.get(0).first.getId(),rejected.get(0).second);
+            validationFailures.put(rejected.get(0).first.getId(), rejected.get(0).second);
 
-            listener.error(null, validationFailures);
+            postError(null, validationFailures, listener);
+
         } else {
-
             synchronise(listener);
         }
     }
@@ -728,7 +858,24 @@ public class DonkyNetworkController {
      */
     public void loginToNetwork(final Login loginRequest, final DonkyResultListener<LoginResponse> listener) {
         log.sensitive(loginRequest.toString());
-        loginRequest.performAsynchronous(apiKey, listener);
+        loginRequest.performAsynchronous(apiKey, new DonkyResultListener<LoginResponse>() {
+            @Override
+            public void success(final LoginResponse result) {
+                if (listener != null) {
+                    mainThreadHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            listener.success(result);
+                        }
+                    });
+                }
+            }
+
+            @Override
+            public void error(DonkyException donkyException, Map<String, String> validationErrors) {
+                postError(donkyException, validationErrors, listener);
+            }
+        });
     }
 
     /**
@@ -747,7 +894,24 @@ public class DonkyNetworkController {
      * @param listener        Callback to be invoked when register finish.
      */
     public void registerToNetwork(final Register registerRequest, final DonkyResultListener<RegisterResponse> listener) {
-        registerRequest.performAsynchronous(apiKey, listener);
+        registerRequest.performAsynchronous(apiKey, new DonkyResultListener<RegisterResponse>() {
+            @Override
+            public void success(final RegisterResponse result) {
+                if (listener != null) {
+                    mainThreadHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            listener.success(result);
+                        }
+                    });
+                }
+            }
+
+            @Override
+            public void error(DonkyException donkyException, Map<String, String> validationErrors) {
+                postError(donkyException, validationErrors, listener);
+            }
+        });
     }
 
     /**
@@ -762,16 +926,12 @@ public class DonkyNetworkController {
 
             @Override
             public void success(Void result) {
-                if (listener != null) {
-                    listener.success();
-                }
+                postSuccess(listener);
             }
 
             @Override
             public void error(DonkyException donkyException, Map<String, String> validationErrors) {
-                if (listener != null) {
-                    listener.error(donkyException, validationErrors);
-                }
+                postError(donkyException, validationErrors, listener);
             }
         });
     }
@@ -788,16 +948,12 @@ public class DonkyNetworkController {
 
             @Override
             public void success(Void result) {
-                if (listener != null) {
-                    listener.success();
-                }
+                postSuccess(listener);
             }
 
             @Override
             public void error(DonkyException donkyException, Map<String, String> validationErrors) {
-                if (listener != null) {
-                    listener.error(donkyException, validationErrors);
-                }
+                postError(donkyException, validationErrors, listener);
             }
         });
     }
@@ -814,16 +970,12 @@ public class DonkyNetworkController {
 
             @Override
             public void success(Void result) {
-                if (listener != null) {
-                    listener.success();
-                }
+                postSuccess(listener);
             }
 
             @Override
             public void error(DonkyException donkyException, Map<String, String> validationErrors) {
-                if (listener != null) {
-                    listener.error(donkyException, validationErrors);
-                }
+                postError(donkyException, validationErrors, listener);
             }
         });
     }
@@ -833,20 +985,15 @@ public class DonkyNetworkController {
         request.performAsynchronous(new DonkyResultListener<Void>() {
             @Override
             public void success(Void result) {
-                if (listener != null) {
-                    listener.success();
-                }
+                postSuccess(listener);
             }
 
             @Override
             public void error(DonkyException donkyException, Map<String, String> validationErrors) {
-                if (listener != null) {
-                    listener.error(donkyException, validationErrors);
-                }
+                postError(donkyException, validationErrors, listener);
             }
         });
     }
-
 
     /**
      * Update push chanel (GCM) details on the Network.
@@ -860,16 +1007,12 @@ public class DonkyNetworkController {
 
             @Override
             public void success(Void result) {
-                if (listener != null) {
-                    listener.success();
-                }
+                postSuccess(listener);
             }
 
             @Override
             public void error(DonkyException donkyException, Map<String, String> validationErrors) {
-                if (listener != null) {
-                    listener.error(donkyException, validationErrors);
-                }
+                postError(donkyException, validationErrors, listener);
             }
         });
     }
@@ -886,16 +1029,12 @@ public class DonkyNetworkController {
 
             @Override
             public void success(Void result) {
-                if (listener != null) {
-                    listener.success();
-                }
+                postSuccess(listener);
             }
 
             @Override
             public void error(DonkyException donkyException, Map<String, String> validationErrors) {
-                if (listener != null) {
-                    listener.error(donkyException, validationErrors);
-                }
+                postError(donkyException, validationErrors, listener);
             }
         });
     }
@@ -905,12 +1044,110 @@ public class DonkyNetworkController {
      *
      * @param listener Callback to be invoked when completed.
      */
-    public void getTags(DonkyResultListener<List<TagDescription>> listener) {
+    public void getTags(final DonkyResultListener<List<TagDescription>> listener) {
 
         GetTags request = new GetTags();
+        request.performAsynchronous(new DonkyResultListener<List<TagDescription>>() {
+            @Override
+            public void success(final List<TagDescription> result) {
+                if (listener != null) {
+                    mainThreadHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            listener.success(result);
+                        }
+                    });
+                }
+            }
+
+            @Override
+            public void error(DonkyException donkyException, Map<String, String> validationErrors) {
+                postError(donkyException, validationErrors, listener);
+            }
+        });
+
+    }
+
+    /**
+     * Get the list of all geo fence trigger from Donky Network.
+     *
+     * @param listener Callback to be invoked when completed.
+     */
+    public void getAllGeoFences(DonkyResultListener<List<GeoFence>> listener) {
+
+        GetAllGeoFence request = new GetAllGeoFence();
 
         request.performAsynchronous(listener);
 
+    }
+
+    /**
+     * Get the list of all active trigger from Donky Network.
+     *
+     * @param listener Callback to be invoked when completed.
+     */
+    public void getAllTriggers(DonkyResultListener<List<Trigger>> listener) {
+
+        GetAllTriggers request = new GetAllTriggers();
+
+        request.performAsynchronous(listener);
+
+    }
+
+    /**
+     * Checks on the network is platform user id is valid.
+     *
+     * @param externalUserId External user id to check if user with that id has been registered on the same App Space.
+     */
+    public void isPlatformUserIdValid(final String externalUserId, final DonkyResultListener<IsValidPlatformUserResponse> donkyResultListener) {
+        IsValidPlatformUserRequest request = new IsValidPlatformUserRequest(externalUserId);
+        request.performAsynchronous(new DonkyResultListener<IsValidPlatformUserResponse>() {
+            @Override
+            public void success(final IsValidPlatformUserResponse result) {
+                if (donkyResultListener != null) {
+                    mainThreadHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            donkyResultListener.success(result);
+                        }
+                    });
+                }
+            }
+
+            @Override
+            public void error(DonkyException donkyException, Map<String, String> validationErrors) {
+                postError(donkyException, validationErrors, donkyResultListener);
+            }
+        });
+    }
+
+    /**
+     * Checks on the network is platform user id is valid.
+     *
+     * @param phoneNumbers Mobile phone numbers to check against users registered on the same App Space.
+     * @param emailList Emails to check against users registered on the same app space.
+     * @param donkyResultListener Callback with the result containing discovered contacts on the network.
+     */
+    public void discoverUsersOnTheNetwork(final List<String> phoneNumbers, List<String> emailList, final DonkyResultListener<List<DiscoveredContact>> donkyResultListener) {
+        GetPlatformUsersRequest request = new GetPlatformUsersRequest(phoneNumbers, emailList);
+        request.performAsynchronous(new DonkyResultListener<List<DiscoveredContact>>() {
+            @Override
+            public void success(final List<DiscoveredContact> result) {
+                if (donkyResultListener != null) {
+                    mainThreadHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            donkyResultListener.success(result);
+                        }
+                    });
+                }
+            }
+
+            @Override
+            public void error(DonkyException donkyException, Map<String, String> validationErrors) {
+                postError(donkyException, validationErrors, donkyResultListener);
+            }
+        });
     }
 
     /**
@@ -926,20 +1163,12 @@ public class DonkyNetworkController {
 
             @Override
             public void success(Void result) {
-
-                if (listener != null) {
-                    listener.success();
-                }
-
+                postSuccess(listener);
             }
 
             @Override
             public void error(DonkyException donkyException, Map<String, String> validationErrors) {
-
-                if (listener != null) {
-                    listener.error(donkyException, validationErrors);
-                }
-
+                postError(donkyException, validationErrors, listener);
             }
 
         });
@@ -953,24 +1182,27 @@ public class DonkyNetworkController {
      * @param reason   Reason for the upload.
      * @param listener The callback to invoke when the notification has been sent.
      */
-    public void submitLog(String log, UploadLog.SubmissionReason reason, final DonkyResultListener listener) {
+    public void submitLog(String log, UploadLog.SubmissionReason reason, final DonkyResultListener<UploadLogResponse> listener) {
 
         UploadLog request = new UploadLog(log, reason);
 
         request.performAsynchronous(new DonkyResultListener<UploadLogResponse>() {
 
             @Override
-            public void success(UploadLogResponse result) {
+            public void success(final UploadLogResponse result) {
                 if (listener != null) {
-                    listener.success(result);
+                    mainThreadHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            listener.success(result);
+                        }
+                    });
                 }
             }
 
             @Override
             public void error(DonkyException donkyException, Map<String, String> validationErrors) {
-                if (listener != null) {
-                    listener.error(donkyException, validationErrors);
-                }
+                postError(donkyException, validationErrors, listener);
             }
         });
     }
@@ -1052,19 +1284,6 @@ public class DonkyNetworkController {
     }
 
     /**
-     * Register receiver for internet connectivity changes.
-     * None of the {@link OnConnectionListener#onConnected()} callbacks will be invoked any more.
-     */
-    private void unRegisterForConnectivityChanges() {
-
-        if (connectivityChangesBroadcastReceiver != null && context != null) {
-
-            context.unregisterReceiver(connectivityChangesBroadcastReceiver);
-            connectivityChangesBroadcastReceiver = null;
-        }
-    }
-
-    /**
      * @return True if authentication token is still valid.
      */
     public boolean isAuthenticationTokenValid() {
@@ -1073,23 +1292,16 @@ public class DonkyNetworkController {
 
         if (tokenExpiry != null) {
 
-            Date date = DateAndTimeHelper.parseUtcDate(tokenExpiry);
+            Date expireDate = DateAndTimeHelper.parseUtcDate(tokenExpiry);
 
-            if (date != null) {
+            if (expireDate != null) {
 
-                if (date.getTime() > System.currentTimeMillis()) {
+                if (expireDate.after(new Date())) {
                     return true;
                 }
             }
         }
         return false;
-    }
-
-    @Override
-    protected void finalize() throws Throwable {
-
-        super.finalize();
-        unRegisterForConnectivityChanges();
     }
 
     /**
@@ -1107,5 +1319,38 @@ public class DonkyNetworkController {
 
     public void setReRunNotificationExchange(boolean reRun) {
         reRunNotificationExchange.set(reRun);
+    }
+
+    private void postSuccess(final DonkyListener donkyListener) {
+        if (donkyListener != null) {
+            mainThreadHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    donkyListener.success();
+                }
+            });
+        }
+    }
+
+    private void postError(final DonkyException donkyException, final Map<String, String> validationErrors, final DonkyListener donkyListener) {
+        if (donkyListener != null) {
+            mainThreadHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    donkyListener.error(donkyException, validationErrors);
+                }
+            });
+        }
+    }
+
+    private void postError(final DonkyException donkyException, final Map<String, String> validationErrors, final DonkyResultListener donkyListener) {
+        if (donkyListener != null) {
+            mainThreadHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    donkyListener.error(donkyException, validationErrors);
+                }
+            });
+        }
     }
 }

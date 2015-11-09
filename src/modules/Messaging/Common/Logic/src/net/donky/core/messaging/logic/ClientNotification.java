@@ -5,6 +5,8 @@ import com.google.gson.annotations.SerializedName;
 
 import net.donky.core.helpers.DateAndTimeHelper;
 import net.donky.core.helpers.IdHelper;
+import net.donky.core.messaging.logic.model.CommonMessage;
+import net.donky.core.messaging.logic.model.MessageReceivedDetails;
 import net.donky.core.network.AcknowledgementDetail;
 
 import org.json.JSONException;
@@ -178,13 +180,12 @@ public class ClientNotification extends net.donky.core.network.ClientNotificatio
             Date sentDate = DateAndTimeHelper.parseUtcDate(richCommonMessage.getSentTimestamp());
 
             if (sentDate != null) {
-                u.timeToReadSeconds = (int) (System.currentTimeMillis() - sentDate.getTime()) / 1000;
+                u.timeToReadSeconds = (int) (new Date().getTime() - sentDate.getTime()) / 1000;
             }
 
         }
 
         u.contextItems = richCommonMessage.getContextItems();
-
 
         return u;
     }

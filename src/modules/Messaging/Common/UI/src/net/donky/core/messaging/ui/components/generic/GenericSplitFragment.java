@@ -19,7 +19,7 @@ import net.donky.core.messaging.ui.components.DonkyFragment;
  * 21/06/15.
  * Copyright (C) Donky Networks Ltd. All rights reserved.
  */
-public abstract class GenericSplitFragment<FRAGMENT_LEFT extends Fragment & GenericBuilder<FRAGMENT_LEFT> & Selectable<T> & DualPaneLeftFragment & DeletionListener & DetailViewDisplayedListener, FRAGMENT_RIGHT extends Fragment & GenericBuilder<FRAGMENT_RIGHT> & SelectionListener<T> & DetailView, T> extends DonkyFragment implements SelectionListener<T>, OverlayVisibilityController {
+public abstract class GenericSplitFragment<FRAGMENT_LEFT extends Fragment & GenericBuilder<FRAGMENT_LEFT> & Selectable<T> & DualPaneLeftFragment & DeletionListener & DetailViewDisplayedListener, FRAGMENT_RIGHT extends Fragment & GenericBuilder<FRAGMENT_RIGHT> & SelectionListener<T> & DetailView & DualPaneModeListener, T> extends DonkyFragment implements SelectionListener<T>, OverlayVisibilityController {
 
     public enum DISPLAY_MODE {
         ALWAYS_SINGLE,
@@ -109,7 +109,18 @@ public abstract class GenericSplitFragment<FRAGMENT_LEFT extends Fragment & Gene
     @Override
     public void onSelected(T item, boolean isSplitViewMode) {
         if (dualPane) {
-            this.selectionListener.onSelected(item, isSplitViewMode);
+            this.selectionListener.onSelected(item, dualPane);
+        } else {
+            Intent intent = getDetailActivityIntent(item);
+            intent.putExtra(KEY_DISPLAY_MODE_MIXED, displayMode == DISPLAY_MODE.MIXED);
+            startActivity(intent);
+        }
+    }
+
+    @Override
+    public void onSelectedNew(T item) {
+        if (dualPane) {
+            this.selectionListener.onSelectedNew(item);
         } else {
             Intent intent = getDetailActivityIntent(item);
             intent.putExtra(KEY_DISPLAY_MODE_MIXED, displayMode == DISPLAY_MODE.MIXED);
@@ -164,6 +175,7 @@ public abstract class GenericSplitFragment<FRAGMENT_LEFT extends Fragment & Gene
         }
 
         this.selectionListener = fragmentRight;
+        fragmentRight.setIsInDualPaneDisplayMode(dualPane);
         fragmentRight.setDeletionListener(new DeletionListener() {
             @Override
             public void onContentDeleted() {
@@ -174,9 +186,9 @@ public abstract class GenericSplitFragment<FRAGMENT_LEFT extends Fragment & Gene
         });
         fragmentRight.setDetailViewPresentedListener(new DetailViewPresentedListener() {
             @Override
-            public void onDetailViewPresented() {
+            public void onDetailViewPresented(String contentId) {
                 if (detailViewDisplayedListener != null) {
-                    detailViewDisplayedListener.onMessageDisplayed();
+                    detailViewDisplayedListener.onMessageDisplayed(contentId);
                 }
             }
         });

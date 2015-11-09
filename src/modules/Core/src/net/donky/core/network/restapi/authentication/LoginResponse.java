@@ -2,6 +2,9 @@ package net.donky.core.network.restapi.authentication;
 
 import com.google.gson.annotations.SerializedName;
 
+import net.donky.core.network.ConfigurationSets;
+import net.donky.core.network.StandardContacts;
+
 import java.util.Map;
 
 /**
@@ -83,6 +86,17 @@ public class LoginResponse {
 
         if (configuration != null) {
             return configuration.getConfigurationItems();
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * @return Details about Standard Contacts.
+     */
+    public StandardContacts getStandardContacts() {
+        if (configuration != null && configuration.getConfigurationSets() != null) {
+            return configuration.getConfigurationSets().getStandardContacts();
         } else {
             return null;
         }

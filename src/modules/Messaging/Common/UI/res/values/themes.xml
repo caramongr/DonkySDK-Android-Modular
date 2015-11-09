@@ -22,6 +22,18 @@
         <item name="dk_ic_multi_select_24dp">@drawable/dk_ic_multi_select_black_24dp</item>
         <item name="dk_ic_search_24dp">@drawable/dk_ic_search_black_24dp</item>
         <item name="dk_ic_share_24dp">@drawable/dk_ic_share_black_24dp</item>
+        <item name="dk_ic_message_24dp">@drawable/dk_ic_message_black_24dp</item>
+        <item name="dk_ic_copy_24dp">@drawable/dk_ic_content_copy_black_24dp</item>
+
+        <item name="dk_ic_contacts_24dp">@drawable/dk_ic_contacts_black_24dp</item>
+        <item name="dk_ic_email_24dp">@drawable/dk_ic_email_black_24dp</item>
+        <item name="dk_ic_group_add_24dp">@drawable/dk_ic_group_add_black_24dp</item>
+        <item name="dk_ic_image_24dp">@drawable/dk_ic_image_black_24dp</item>
+        <item name="dk_ic_mode_edit_24dp">@drawable/dk_ic_mode_edit_black_24dp</item>
+        <item name="dk_ic_person_24dp">@drawable/dk_ic_person_black_24dp</item>
+        <item name="dk_ic_phone_24dp">@drawable/dk_ic_phone_black_24dp</item>
+        <item name="dk_ic_photo_camera_24dp">@drawable/dk_ic_photo_camera_black_24dp</item>
+        <item name="dk_ic_save">@drawable/dk_ic_save_black</item>
 
         <!-- Status bar -->
         <item name="colorPrimaryDark">@color/dk_status_bar_background_light_theme</item>
@@ -70,6 +82,18 @@
         <item name="dk_ic_multi_select_24dp">@drawable/dk_ic_multi_select_white_24dp</item>
         <item name="dk_ic_search_24dp">@drawable/dk_ic_search_white_24dp</item>
         <item name="dk_ic_share_24dp">@drawable/dk_ic_share_white_24dp</item>
+        <item name="dk_ic_message_24dp">@drawable/dk_ic_message_white_24dp</item>
+        <item name="dk_ic_copy_24dp">@drawable/dk_ic_content_copy_white_24dp</item>
+
+        <item name="dk_ic_contacts_24dp">@drawable/dk_ic_contacts_white_24dp</item>
+        <item name="dk_ic_email_24dp">@drawable/dk_ic_email_white_24dp</item>
+        <item name="dk_ic_group_add_24dp">@drawable/dk_ic_group_add_white_24dp</item>
+        <item name="dk_ic_image_24dp">@drawable/dk_ic_image_white_24dp</item>
+        <item name="dk_ic_mode_edit_24dp">@drawable/dk_ic_mode_edit_white_24dp</item>
+        <item name="dk_ic_person_24dp">@drawable/dk_ic_person_white_24dp</item>
+        <item name="dk_ic_phone_24dp">@drawable/dk_ic_phone_white_24dp</item>
+        <item name="dk_ic_photo_camera_24dp">@drawable/dk_ic_photo_camera_white_24dp</item>
+        <item name="dk_ic_save">@drawable/dk_ic_save_white</item>
 
         <!-- Status bar -->
         <item name="colorPrimaryDark">@color/dk_status_bar_background</item>
@@ -117,6 +141,18 @@
         <item name="dk_ic_multi_select_24dp">@drawable/dk_ic_multi_select_black_24dp</item>
         <item name="dk_ic_search_24dp">@drawable/dk_ic_search_black_24dp</item>
         <item name="dk_ic_share_24dp">@drawable/dk_ic_share_black_24dp</item>
+        <item name="dk_ic_message_24dp">@drawable/dk_ic_message_black_24dp</item>
+        <item name="dk_ic_copy_24dp">@drawable/dk_ic_content_copy_black_24dp</item>
+
+        <item name="dk_ic_contacts_24dp">@drawable/dk_ic_contacts_black_24dp</item>
+        <item name="dk_ic_email_24dp">@drawable/dk_ic_email_black_24dp</item>
+        <item name="dk_ic_group_add_24dp">@drawable/dk_ic_group_add_black_24dp</item>
+        <item name="dk_ic_image_24dp">@drawable/dk_ic_image_black_24dp</item>
+        <item name="dk_ic_mode_edit_24dp">@drawable/dk_ic_mode_edit_black_24dp</item>
+        <item name="dk_ic_person_24dp">@drawable/dk_ic_person_black_24dp</item>
+        <item name="dk_ic_phone_24dp">@drawable/dk_ic_phone_black_24dp</item>
+        <item name="dk_ic_photo_camera_24dp">@drawable/dk_ic_photo_camera_black_24dp</item>
+        <item name="dk_ic_save">@drawable/dk_ic_save_black</item>
 
         <!-- Status bar -->
         <item name="colorPrimaryDark">@color/dk_status_bar_background_light_theme</item>
@@ -167,6 +203,18 @@
         <item name="dk_ic_multi_select_24dp">@drawable/dk_ic_multi_select_white_24dp</item>
         <item name="dk_ic_search_24dp">@drawable/dk_ic_search_white_24dp</item>
         <item name="dk_ic_share_24dp">@drawable/dk_ic_share_white_24dp</item>
+        <item name="dk_ic_message_24dp">@drawable/dk_ic_message_white_24dp</item>
+        <item name="dk_ic_copy_24dp">@drawable/dk_ic_content_copy_white_24dp</item>
+
+        <item name="dk_ic_contacts_24dp">@drawable/dk_ic_contacts_white_24dp</item>
+        <item name="dk_ic_email_24dp">@drawable/dk_ic_email_white_24dp</item>
+        <item name="dk_ic_group_add_24dp">@drawable/dk_ic_group_add_white_24dp</item>
+        <item name="dk_ic_image_24dp">@drawable/dk_ic_image_white_24dp</item>
+        <item name="dk_ic_mode_edit_24dp">@drawable/dk_ic_mode_edit_white_24dp</item>
+        <item name="dk_ic_person_24dp">@drawable/dk_ic_person_white_24dp</item>
+        <item name="dk_ic_phone_24dp">@drawable/dk_ic_phone_white_24dp</item>
+        <item name="dk_ic_photo_camera_24dp">@drawable/dk_ic_photo_camera_white_24dp</item>
+        <item name="dk_ic_save">@drawable/dk_ic_save_white</item>
 
         <!-- Status bar -->
         <item name="colorPrimaryDark">@color/dk_status_bar_background</item>
@@ -218,6 +266,18 @@
         <item name="dk_ic_multi_select_24dp">@drawable/dk_ic_multi_select_white_24dp</item>
         <item name="dk_ic_search_24dp">@drawable/dk_ic_search_white_24dp</item>
         <item name="dk_ic_share_24dp">@drawable/dk_ic_share_white_24dp</item>
+        <item name="dk_ic_message_24dp">@drawable/dk_ic_message_white_24dp</item>
+        <item name="dk_ic_copy_24dp">@drawable/dk_ic_content_copy_white_24dp</item>
+
+        <item name="dk_ic_contacts_24dp">@drawable/dk_ic_contacts_white_24dp</item>
+        <item name="dk_ic_email_24dp">@drawable/dk_ic_email_white_24dp</item>
+        <item name="dk_ic_group_add_24dp">@drawable/dk_ic_group_add_white_24dp</item>
+        <item name="dk_ic_image_24dp">@drawable/dk_ic_image_white_24dp</item>
+        <item name="dk_ic_mode_edit_24dp">@drawable/dk_ic_mode_edit_white_24dp</item>
+        <item name="dk_ic_person_24dp">@drawable/dk_ic_person_white_24dp</item>
+        <item name="dk_ic_phone_24dp">@drawable/dk_ic_phone_white_24dp</item>
+        <item name="dk_ic_photo_camera_24dp">@drawable/dk_ic_photo_camera_white_24dp</item>
+        <item name="dk_ic_save">@drawable/dk_ic_save_white</item>
 
         <!-- Status bar -->
         <item name="colorPrimaryDark">@color/dk_status_bar_background</item>

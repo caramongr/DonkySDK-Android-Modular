@@ -2,6 +2,9 @@ package net.donky.core.network.restapi.authentication;
 
 import com.google.gson.annotations.SerializedName;
 
+import net.donky.core.network.ConfigurationSets;
+import net.donky.core.network.StandardContacts;
+
 import java.util.Map;
 
 /**
@@ -89,6 +92,17 @@ public class RegisterResponse {
             }
         }
 
+        /**
+         * @return Details about Standard Contacts.
+         */
+        public StandardContacts getStandardContacts() {
+            if (configuration != null && configuration.getConfigurationSets() != null) {
+                return configuration.getConfigurationSets().getStandardContacts();
+            } else {
+                return null;
+            }
+        }
+
     }
 
     /**
@@ -126,4 +140,5 @@ public class RegisterResponse {
 
         return "REGISTER RESPONSE: " + " networkId: " + networkId + divider + " deviceId : " + deviceId + divider + " userId : " + userId + divider + " accessDetails : " + accessDetails;
     }
+
 }

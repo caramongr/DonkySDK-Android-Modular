@@ -20,6 +20,8 @@ import java.lang.ref.WeakReference;
  */
 public abstract class CursorAdapterWithImageCache extends CursorAdapter {
 
+    public static final String DISK_CACHE_UNIQUE_NAME_USER_AVATARS = "DNUsersAvatars";
+
     private LruCache<String, Bitmap> mMemoryCache;
 
     private String diskCacheUniqueName;

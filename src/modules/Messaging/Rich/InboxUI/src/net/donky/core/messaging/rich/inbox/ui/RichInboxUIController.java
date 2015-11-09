@@ -20,6 +20,7 @@ import net.donky.core.messaging.ui.notifications.RichMessagePushUIConfiguration;
 import net.donky.core.network.assets.DonkyAssetController;
 import net.donky.core.network.assets.NotificationImageLoader;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.CopyOnWriteArraySet;
@@ -125,7 +126,7 @@ public class RichInboxUIController {
 
             for (final RichMessage richMessage : richMessages) {
 
-                if (richMessage != null && richMessage.getMessageId() != null && !richMessage.isSilentNotification()) {
+                if (richMessage != null && richMessage.getMessageId() != null && !richMessage.isSilentNotification() && !richMessage.isReceivedExpired()) {
 
                     if (!TextUtils.isEmpty(richMessage.getAvatarAssetId())) {
 
@@ -157,6 +158,8 @@ public class RichInboxUIController {
 
         } else if (richMessages != null && richMessages.size() > 1){
 
+            List<RichMessage> nonExpiredRichMessages = new ArrayList<>();
+
             boolean isSilent = true;
 
             for (RichMessage richMessage : richMessages) {
@@ -164,10 +167,13 @@ public class RichInboxUIController {
                     isSilent = false;
                     break;
                 }
+                if (!richMessage.isReceivedExpired()) {
+                    nonExpiredRichMessages.add(richMessage);
+                }
             }
 
-            if (!isSilent) {
-                displayNotification(context, notificationManager, richMessages, createRichInboxPendingIntent(), null, null);
+            if (!isSilent && !nonExpiredRichMessages.isEmpty()) {
+                displayNotification(context, notificationManager, nonExpiredRichMessages, createRichInboxPendingIntent(), null, null);
             }
 
         }

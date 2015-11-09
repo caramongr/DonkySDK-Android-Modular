@@ -4,6 +4,7 @@ import android.annotation.TargetApi;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothManager;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Build;
@@ -44,7 +45,10 @@ public class IdHelper {
             if (bluetoothManager != null) {
                 BluetoothAdapter bluetoothAdapter = bluetoothManager.getAdapter();
                 if (bluetoothAdapter != null) {
-                    deviceId = bluetoothAdapter.getAddress();
+                    if (checkBluetoothPermission(context)) {
+                        //noinspection ResourceType
+                        deviceId = bluetoothAdapter.getAddress();
+                    }
                 }
             }
         }
@@ -65,5 +69,12 @@ public class IdHelper {
      */
     public static String generateId() {
         return UUID.randomUUID().toString();
+    }
+
+    private static boolean checkBluetoothPermission(Context context)
+    {
+        String permission = "android.permission.BLUETOOTH";
+        int res = context.checkCallingOrSelfPermission(permission);
+        return (res == PackageManager.PERMISSION_GRANTED);
     }
 }

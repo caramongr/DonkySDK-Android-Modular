@@ -34,15 +34,17 @@ import java.util.TreeMap;
  */
 public class SequencingTest extends ApplicationTestCase<Application> {
 
-    private static int TIME_OUT = 5000;
+    private static int TIME_OUT = 15000;
 
-    private static String apiKey = "PUT_YOUR_API_KEY_HERE";
+    private static String apiKey = ">>PUT_YOUR_API_KEY_HERE<<";
 
-    private static String initialUserId = "quick_updates_test";//"test_"+new Integer(Math.abs(new Random().nextInt(Integer.MAX_VALUE)));
+    private static String initialUserId = "quick_updates_test_3";//"test_"+new Integer(Math.abs(new Random().nextInt(Integer.MAX_VALUE)));
 
     Random r = new Random();
 
     DLog log = new DLog("SequencingTest");
+
+    private static boolean setUpIsDone = false;
 
     public SequencingTest() {
         super(Application.class);
@@ -93,6 +95,7 @@ public class SequencingTest extends ApplicationTestCase<Application> {
 
         validationErrors = listenerB.getValidationErrors();
         assertNull(validationErrors);
+
     }
 
     @Test

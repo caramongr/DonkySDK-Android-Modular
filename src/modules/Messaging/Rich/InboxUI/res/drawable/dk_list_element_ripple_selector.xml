@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ripple xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:color="@color/dk_rich_message_list_element_pressed_background"
-    tools:targetApi="lollipop"> <!-- ripple color -->
+    android:color="@color/dk_rich_message_list_element_pressed_background"> <!-- ripple color -->
 
     <item>
     <selector>

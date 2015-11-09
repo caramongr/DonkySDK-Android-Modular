@@ -14,6 +14,8 @@ import net.donky.core.messaging.logic.mock.MockDonkyListener;
 import net.donky.core.messaging.logic.mock.MockMessageReceivedDetails;
 import net.donky.core.messaging.logic.mock.MockOutboundNotificationBatchListener;
 import net.donky.core.messaging.logic.mock.MockServerNotification;
+import net.donky.core.messaging.logic.model.MessageReceivedDetails;
+import net.donky.core.messaging.logic.model.mock.MockCommonMessage;
 import net.donky.core.model.DonkyDataController;
 import net.donky.core.network.DonkyNetworkController;
 import net.donky.core.network.ServerNotification;
@@ -36,7 +38,7 @@ public class MessagingLogicTest extends ApplicationTestCase<Application> {
 
     private static int TIME_OUT = 5000;
 
-    private static String apiKey = ">>ENTER API KEY HERE<<";
+    private static String apiKey = ">>PUT_YOUR_API_KEY_HERE<<";
 
     private static String initialUserId = "test_"+new Integer(Math.abs(new Random().nextInt(Integer.MAX_VALUE)));
 

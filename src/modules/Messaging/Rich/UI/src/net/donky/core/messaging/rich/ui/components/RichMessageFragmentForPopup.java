@@ -146,7 +146,7 @@ public class RichMessageFragmentForPopup extends DonkyFragment implements Generi
             webView.setBackgroundColor(Color.WHITE);
 
             if (detailViewPresentedListener != null) {
-                detailViewPresentedListener.onDetailViewPresented();
+                detailViewPresentedListener.onDetailViewPresented(null);
             }
         }
 
@@ -191,7 +191,7 @@ public class RichMessageFragmentForPopup extends DonkyFragment implements Generi
 
             Date expireDate = DateAndTimeHelper.parseUtcDate(richMessage.getExpiryTimeStamp());
 
-            if ((expireDate != null && new Date(System.currentTimeMillis()).before(expireDate)) || expireDate == null) {
+            if ((expireDate != null && new Date().before(expireDate)) || expireDate == null) {
 
                 return richMessage.getURLEncodedBody();
 
@@ -238,6 +238,11 @@ public class RichMessageFragmentForPopup extends DonkyFragment implements Generi
         if (activity != null) {
             activity.invalidateOptionsMenu();
         }
+    }
+
+    @Override
+    public void onSelectedNew(RichMessage selected) {
+
     }
 
     @Override

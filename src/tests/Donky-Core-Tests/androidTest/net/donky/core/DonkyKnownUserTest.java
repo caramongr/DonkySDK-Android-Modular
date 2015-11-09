@@ -63,15 +63,15 @@ public class DonkyKnownUserTest extends ApplicationTestCase<Application> {
 
     private static int TIME_OUT = 30000;
 
-    private static String apiKey = ">>ENTER API KEY HERE<<";
+    private static String apiKey = ">>PUT_YOUR_API_KEY_HERE<<";
 
-    private static String initialUserId = "test_"+new Integer(Math.abs(new Random().nextInt(Integer.MAX_VALUE)));
+    private static String initialUserId = "test_"+Integer.valueOf(Math.abs(new Random().nextInt(Integer.MAX_VALUE)));
 
-    private static String userIdForTestInitialiseAgainWithDifferentRegistrationDetails = "test_"+new Integer(Math.abs(new Random().nextInt(Integer.MAX_VALUE)));
+    private static String userIdForTestInitialiseAgainWithDifferentRegistrationDetails = "test_"+Integer.valueOf(Math.abs(new Random().nextInt(Integer.MAX_VALUE)));
 
-    private static String userIdForTestUpdateRegistration = "test_"+new Integer(Math.abs(new Random().nextInt(Integer.MAX_VALUE)));
+    private static String userIdForTestUpdateRegistration = "test_"+Integer.valueOf(Math.abs(new Random().nextInt(Integer.MAX_VALUE)));
 
-    private static String userIdForTestUpdateUser = "test_"+new Integer(Math.abs(new Random().nextInt(Integer.MAX_VALUE)));
+    private static String userIdForTestUpdateUser = "test_"+Integer.valueOf(Math.abs(new Random().nextInt(Integer.MAX_VALUE)));
 
     public DonkyKnownUserTest() {
         super(Application.class);
@@ -92,7 +92,7 @@ public class DonkyKnownUserTest extends ApplicationTestCase<Application> {
         userAdditionalProperties.put("key1", "value1");
         userAdditionalProperties.put("key2", "value2");
 
-        TreeMap<String, String> deviceAdditionalProperties = new TreeMap();
+        TreeMap<String, String> deviceAdditionalProperties = new TreeMap<>();
         userAdditionalProperties.put("key1", "value1");
         userAdditionalProperties.put("key2", "value2");
 

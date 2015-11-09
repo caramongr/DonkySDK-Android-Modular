@@ -57,4 +57,16 @@ public abstract class DonkyFragmentDialog extends DialogFragment {
      * @param alertDialogBuilder Alert dialog builder to create alert dialog
      */
     protected abstract void prepareDialogBuilder(AlertDialog.Builder alertDialogBuilder);
+
+    @Override
+    public void onDestroyView()
+    {
+        Dialog dialog = getDialog();
+
+        // Work around bug: http://code.google.com/p/android/issues/detail?id=17423
+        if ((dialog != null) && getRetainInstance())
+            dialog.setDismissMessage(null);
+
+        super.onDestroyView();
+    }
 }

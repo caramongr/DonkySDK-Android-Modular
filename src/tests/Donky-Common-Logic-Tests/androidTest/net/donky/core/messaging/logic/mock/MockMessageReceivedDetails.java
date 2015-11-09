@@ -1,7 +1,7 @@
 package net.donky.core.messaging.logic.mock;
 
 import net.donky.core.helpers.IdHelper;
-import net.donky.core.messaging.logic.MessageReceivedDetails;
+import net.donky.core.messaging.logic.model.MessageReceivedDetails;
 import net.donky.core.network.AcknowledgementDetail;
 import net.donky.core.network.ServerNotification;
 

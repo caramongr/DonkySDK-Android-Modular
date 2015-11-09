@@ -5,9 +5,8 @@ import com.google.gson.JsonObject;
 
 import net.donky.core.DonkyCore;
 import net.donky.core.helpers.DateAndTimeHelper;
-import net.donky.core.logging.DLog;
-import net.donky.core.messaging.logic.MessageReceivedDetails;
 import net.donky.core.messaging.logic.MessagingInternalController;
+import net.donky.core.messaging.logic.model.MessageReceivedDetails;
 import net.donky.core.messaging.push.logic.events.SimplePushMessageEvent;
 import net.donky.core.network.AcknowledgementDetail;
 import net.donky.core.network.ServerNotification;
@@ -26,17 +25,9 @@ import java.util.List;
 public class SimplePushHandler {
 
     /**
-     * Logging helper
-     */
-    private DLog log;
-
-    /**
      * Private constructor. Prevents instantiation from other classes.
      */
     SimplePushHandler() {
-
-        log = new DLog("PushLogicController");
-
     }
 
     /**
@@ -74,7 +65,7 @@ public class SimplePushHandler {
 
                 if (expiredTime != null) {
 
-                    receivedExpired = expiredTime.getTime() > System.currentTimeMillis();
+                    receivedExpired = expiredTime.before(new Date());
 
                     if (receivedExpired) {
 

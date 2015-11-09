@@ -38,6 +38,7 @@ dependencies {
     compile 'com.android.support:appcompat-v7:22.2.1'
     compile project(':core')
     testCompile 'junit:junit:4.12'
+    androidTestCompile 'junit:junit:4.12'
 }
 
 // Release part

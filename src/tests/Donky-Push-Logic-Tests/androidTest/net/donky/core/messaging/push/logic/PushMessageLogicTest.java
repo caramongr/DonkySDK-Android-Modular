@@ -42,7 +42,7 @@ public class PushMessageLogicTest extends ApplicationTestCase<Application> {
 
     private static int TIME_OUT = 5000;
 
-    private static String apiKey = ">>ENTER API KEY HERE<<";
+    private static String apiKey = ">>PUT_YOUR_API_KEY_HERE<<";
 
     private static String initialUserId = "test_"+new Integer(Math.abs(new Random().nextInt(Integer.MAX_VALUE)));
 
@@ -151,6 +151,61 @@ public class PushMessageLogicTest extends ApplicationTestCase<Application> {
 
         assertEquals("InteractionResult", outboundNotification.getJsonData().getString("type"));
         assertEquals(mockSimplePushData.getMessageId(), outboundNotification.getJsonData().getString("messageId"));
+    }
+
+    @Test
+    public void testHandleServerNotificationInDifferentTimezones() throws InterruptedException, DonkyException {
+
+        //Since below code doesn't change the system setting
+//        PackageManager pm = getApplication().getPackageManager();
+//        if (pm.checkPermission("android.permission.SET_TIME_ZONE", getApplication().getPackageName()) != PackageManager.PERMISSION_GRANTED) {
+//            throw new DonkyException("This test requires SET_TIME_ZONE permission");
+//        }
+//        AlarmManager am = (AlarmManager) getContext().getSystemService(Context.ALARM_SERVICE);
+//        String[] timeZones = TimeZone.getAvailableIDs();
+//        am.setTimeZone(timeZones[i]);
+        //this test will require manual TimeZone change in Settings/Date&Time
+
+        for (int i=0; i<5; i++) {
+            doTheTimeZoneTest();
+            //Put a breakpoint above and change TimeZone manually (see comment above) e.g. Pacific/Midway, Europe/Sarajevo, Atlantic/Azores, Australia/Sydney
+        }
+
+    }
+
+    private void doTheTimeZoneTest() throws InterruptedException, DonkyException {
+
+        String expiredMessageId = "expiredMessageId";
+        String notExpiredMessageId = "notExpiredMessageId";
+
+        List<ServerNotification> serverNotifications = new LinkedList<>();
+        MockServerNotification serverNotificationExpired = new MockServerNotification(expiredMessageId, true);
+        MockServerNotification serverNotificationNotExpired = new MockServerNotification(notExpiredMessageId, false);
+        serverNotifications.add(serverNotificationExpired);
+        serverNotifications.add(serverNotificationNotExpired);
+
+        MockDonkyEventListener mockDonkyEventListener = new MockDonkyEventListener<>(SimplePushMessageEvent.class);
+        DonkyCore.subscribeToLocalEvent(mockDonkyEventListener);
+
+        new SimplePushHandler().handleSimplePushMessage(serverNotifications);
+        synchronized (mockDonkyEventListener) {
+            mockDonkyEventListener.wait(TIME_OUT);
+        }
+
+        SimplePushMessageEvent messageEvent = (SimplePushMessageEvent) mockDonkyEventListener.getEvent();
+        List<SimplePushData> messages = messageEvent.getBatchSimplePushData();
+        assertNotNull(messages);
+        assertEquals(messages.size(), 2);
+        for (SimplePushData msg : messages) {
+            if (msg.getMessageId().equals(expiredMessageId)) {
+                assertEquals(msg.isReceivedExpired(), true);
+            } else if (msg.getMessageId().equals(notExpiredMessageId)) {
+                assertEquals(msg.isReceivedExpired(), false);
+            } else {
+                throw new DonkyException("Wrong push msg states, assertion failed");
+            }
+        }
+
     }
 
 }

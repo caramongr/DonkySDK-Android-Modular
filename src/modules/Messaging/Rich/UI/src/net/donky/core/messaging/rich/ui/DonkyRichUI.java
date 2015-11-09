@@ -126,6 +126,10 @@ public class DonkyRichUI {
                                     @Override
                                     public void error(DonkyException donkyException, Map<String, String> validationErrors) {
 
+                                        if (donkyListener != null) {
+                                            donkyListener.error(donkyException, validationErrors);
+                                        }
+
                                     }
                                 }
                         );

@@ -11,6 +11,7 @@ import net.donky.core.DonkyListener;
 import net.donky.core.DonkyResultListener;
 import net.donky.core.ModuleDefinition;
 import net.donky.core.events.RegistrationChangedEvent;
+import net.donky.core.events.StandardContactsUpdateEvent;
 import net.donky.core.helpers.IdHelper;
 import net.donky.core.lifecycle.LifeCycleObserver;
 import net.donky.core.logging.DLog;
@@ -66,7 +67,7 @@ public class DonkyAccountController {
     private final AtomicBoolean isSuspended;
 
     /**
-     * True if user has been suspended on the Network.
+     * True if login call is in progress.
      */
     private final AtomicBoolean isLoginInProgress;
 
@@ -528,7 +529,6 @@ public class DonkyAccountController {
             }
 
         } else {
-
             throw new DonkyException("Account is not ready. Please register first.");
         }
     }
@@ -650,6 +650,19 @@ public class DonkyAccountController {
     }
 
     /**
+     * Register device on the donky Network and save all registration details on the device. If user is already registered the old registriation details will be kept.
+     *
+     * @param apiKey        Donky Network identifier for application space
+     * @param userDetails   User details to use for the registration.
+     * @param deviceDetails Device details to use for the registration.
+     * @param appVersion    Application version.
+     * @throws DonkyException
+     */
+    public void register(final String apiKey, final UserDetails userDetails, final DeviceDetails deviceDetails, String appVersion) throws DonkyException {
+        register(apiKey,userDetails, deviceDetails, appVersion, false);
+    }
+
+    /**
      * Register device on the donky Network and save all registration details on the device. If user is already registered update registration data.
      * This method will also authenticate user and perform initial synchronisation.
      *
@@ -659,7 +672,7 @@ public class DonkyAccountController {
      * @param appVersion    Application version.
      * @throws DonkyException
      */
-    public void register(final String apiKey, final UserDetails userDetails, final DeviceDetails deviceDetails, String appVersion) throws DonkyException {
+    public void register(final String apiKey, final UserDetails userDetails, final DeviceDetails deviceDetails, String appVersion, boolean overrideCurrentUser) throws DonkyException {
 
         if (DonkyCore.isInitialised() && !TextUtils.isEmpty(apiKey) && context != null) {
 
@@ -679,7 +692,7 @@ public class DonkyAccountController {
                     DonkyDataController.getInstance().getDeviceDAO().setDeviceSecret(deviceSecret);
                 }
 
-                Register registerRequest = new Register(apiKey, userDetails, deviceDetails, appVersion);
+                Register registerRequest = new Register(apiKey, userDetails, deviceDetails, appVersion, overrideCurrentUser);
 
                 log.sensitive(registerRequest.toString());
 
@@ -722,7 +735,7 @@ public class DonkyAccountController {
 
                 }
 
-            } else {
+            } else if (overrideCurrentUser) {
 
                 synchronized (sharedLock) {
                     isRegistered.set(true);
@@ -732,7 +745,16 @@ public class DonkyAccountController {
                 updateRegistrationDetailsIfChanged(userDetails, deviceDetails, appVersion);
 
                 DonkyNetworkController.getInstance().synchronise();
+
+            } else {
+
+                synchronized (sharedLock) {
+                    isRegistered.set(true);
+                    sharedLock.notifyAll();
+                }
+
             }
+
         } else {
 
             throw new DonkyException("Cannot register - check provided API key.");
@@ -774,7 +796,7 @@ public class DonkyAccountController {
                                 DonkyDataController.getInstance().getConfigurationDAO().getDonkyNetworkApiKey(),
                                 userDetails,
                                 deviceDetails,
-                                DonkyDataController.getInstance().getConfigurationDAO().getAppVersion());
+                                DonkyDataController.getInstance().getConfigurationDAO().getAppVersion(), true);
 
                         log.sensitive(registerRequest.toString());
 
@@ -861,7 +883,8 @@ public class DonkyAccountController {
                     DonkyDataController.getInstance().getConfigurationDAO().getDonkyNetworkApiKey(),
                     userDetails,
                     deviceDetails,
-                    DonkyDataController.getInstance().getConfigurationDAO().getAppVersion());
+                    DonkyDataController.getInstance().getConfigurationDAO().getAppVersion(),
+                    true);
 
             log.sensitive(registerRequest.toString());
 
@@ -903,7 +926,7 @@ public class DonkyAccountController {
 
                 final String appVersion = DonkyDataController.getInstance().getConfigurationDAO().getAppVersion();
 
-                Register registerRequest = new Register(DonkyDataController.getInstance().getConfigurationDAO().getDonkyNetworkApiKey(), userDetails, deviceDetails, appVersion);
+                Register registerRequest = new Register(DonkyDataController.getInstance().getConfigurationDAO().getDonkyNetworkApiKey(), userDetails, deviceDetails, appVersion, true);
 
                 DonkyNetworkController.getInstance().registerToNetwork(registerRequest, new DonkyResultListener<RegisterResponse>() {
 
@@ -913,6 +936,8 @@ public class DonkyAccountController {
                         log.sensitive(response.toString());
 
                         if (processRegistrationResponse(response)) {
+
+                            DonkyDataController.getInstance().getConfigurationDAO().setAuthorisationToken(null);
 
                             final boolean isAnonymousRegistration = ((userDetails == null || TextUtils.isEmpty(userDetails.getUserId())));
 
@@ -925,11 +950,24 @@ public class DonkyAccountController {
 
                             log.info("Successfully replaced registration.");
 
-                            DonkyCore.publishLocalEvent(new RegistrationChangedEvent(userDetails, deviceDetails, true));
+                            DonkyNetworkController.getInstance().synchronise(new DonkyListener() {
+                                @Override
+                                public void success() {
 
-                            if (listener != null) {
-                                listener.success();
-                            }
+                                    DonkyCore.publishLocalEvent(new RegistrationChangedEvent(userDetails, deviceDetails, true));
+
+                                    if (listener != null) {
+                                        listener.success();
+                                    }
+                                }
+
+                                @Override
+                                public void error(DonkyException donkyException, Map<String, String> validationErrors) {
+                                    if (listener != null) {
+                                        listener.error(new DonkyException("Error synchronising after replacing registration."), null);
+                                    }
+                                }
+                            });
 
                         } else {
 
@@ -993,7 +1031,7 @@ public class DonkyAccountController {
         DonkyNetworkController.getInstance().synchroniseSynchronously();
 
         final String appVersion = DonkyDataController.getInstance().getConfigurationDAO().getAppVersion();
-        Register registerRequest = new Register(DonkyDataController.getInstance().getConfigurationDAO().getDonkyNetworkApiKey(), userDetails, deviceDetails, appVersion);
+        Register registerRequest = new Register(DonkyDataController.getInstance().getConfigurationDAO().getDonkyNetworkApiKey(), userDetails, deviceDetails, appVersion, true);
 
         RegisterResponse registerResponse = DonkyNetworkController.getInstance().registerToNetwork(registerRequest);
 
@@ -1096,6 +1134,11 @@ public class DonkyAccountController {
                     }
 
                     updateConfigurationItems(response.getAccessDetails().getConfigurationItems());
+
+                    if (response.getAccessDetails().getStandardContacts() != null && response.getAccessDetails().getStandardContacts().getStandardContactsList() != null && !response.getAccessDetails().getStandardContacts().getStandardContactsList().isEmpty()) {
+                        DonkyCore.publishLocalEvent(new StandardContactsUpdateEvent(response.getAccessDetails().getStandardContacts()));
+                    }
+
                 }
 
                 return true;
@@ -1134,7 +1177,14 @@ public class DonkyAccountController {
 
             updateConfigurationItems(response.getConfigurationItems());
 
+            DonkyNetworkController.getInstance().startSignalR();
+
+            if (response.getStandardContacts() != null && response.getStandardContacts().getStandardContactsList() != null && !response.getStandardContacts().getStandardContactsList().isEmpty()) {
+                DonkyCore.publishLocalEvent(new StandardContactsUpdateEvent(response.getStandardContacts()));
+            }
+
             return true;
+
         } else {
 
             log.warning("No access toke from authenticate response.");

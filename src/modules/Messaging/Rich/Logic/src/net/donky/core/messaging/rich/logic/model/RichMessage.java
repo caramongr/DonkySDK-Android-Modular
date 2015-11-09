@@ -2,7 +2,7 @@ package net.donky.core.messaging.rich.logic.model;
 
 import com.google.gson.annotations.SerializedName;
 
-import net.donky.core.messaging.logic.CommonMessage;
+import net.donky.core.messaging.logic.model.CommonMessage;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;

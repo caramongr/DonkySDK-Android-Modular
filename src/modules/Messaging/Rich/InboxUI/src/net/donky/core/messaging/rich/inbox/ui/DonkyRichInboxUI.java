@@ -8,7 +8,6 @@ import net.donky.core.DonkyListener;
 import net.donky.core.ModuleDefinition;
 import net.donky.core.events.DonkyEventListener;
 import net.donky.core.logging.DLog;
-import net.donky.core.messaging.ui.cache.DonkyDiskCacheManager;
 import net.donky.core.messaging.rich.logic.DonkyRichLogic;
 import net.donky.core.messaging.rich.logic.RichMessageEvent;
 import net.donky.core.messaging.ui.DonkyMessagingUI;
@@ -123,8 +122,6 @@ public class DonkyRichInboxUI {
                                             }
 
                                         });
-
-                                        DonkyDiskCacheManager.getInstance().init(application.getApplicationContext());
 
                                         initialised.set(true);
 

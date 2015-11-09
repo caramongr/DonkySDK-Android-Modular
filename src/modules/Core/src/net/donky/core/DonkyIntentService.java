@@ -32,7 +32,9 @@ public class DonkyIntentService extends IntentService {
 
             } catch (Exception e) {
 
-                log.error("Error synchronising with network triggered by the intent.",e);
+                if (DonkyCore.isInitialised()) {
+                    log.error("Error synchronising with network triggered by the intent.", e);
+                }
 
             }
 

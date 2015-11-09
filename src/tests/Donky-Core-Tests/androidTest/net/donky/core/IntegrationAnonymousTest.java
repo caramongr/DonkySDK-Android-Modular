@@ -25,7 +25,7 @@ public class IntegrationAnonymousTest extends ApplicationTestCase<Application> {
         /*
         MockDonkyListener listener = new MockDonkyListener();
 
-        DonkyCore.initialiseDonkySDK(getApplication(), ">>ENTER API KEY HERE<<", listener);
+        DonkyCore.initialiseDonkySDK(getApplication(), "vMBC8SHsILtV1g+UVnozZ0QmMKM4mcpNbNLfwUQnKq8P2z1XPMhhuHThwszJorUv32epCXMSjq3kwq0KM35w", listener);
 
         synchronized (listener) {
             listener.wait(2000);

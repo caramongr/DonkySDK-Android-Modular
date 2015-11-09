@@ -1,5 +1,8 @@
 package net.donky.core.network.restapi.authentication;
 
+import android.os.Handler;
+import android.os.Looper;
+
 import net.donky.core.DonkyException;
 import net.donky.core.DonkyListener;
 import net.donky.core.DonkyResultListener;
@@ -199,13 +202,14 @@ public abstract class GenericAuthenticationServiceRequest<T> extends GenericServ
 
                         if (getRetryPolicy().shouldRetryForStatusCode(statusCode) && getRetryPolicy().retry()) {
 
-                            try {
-                                Thread.sleep(getRetryPolicy().getDelayBeforeNextRetry());
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                            }
+                            Handler handler = new Handler(Looper.getMainLooper());
+                            handler.postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    performAsynchronous(apiKey, listener);
+                                }
+                            }, getRetryPolicy().getDelayBeforeNextRetry());
 
-                            performAsynchronous(apiKey, listener);
 
                         } else if (statusCode == 401) {
 

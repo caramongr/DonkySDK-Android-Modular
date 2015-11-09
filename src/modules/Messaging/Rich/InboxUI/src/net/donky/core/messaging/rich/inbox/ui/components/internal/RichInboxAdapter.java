@@ -151,13 +151,13 @@ public class RichInboxAdapter extends CursorAdapterWithImageCache {
 
         final Date dateExpiry = DateAndTimeHelper.parseUtcDate(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseSQLContract.RichMessageEntry.COLUMN_NAME_expiryTimeStamp)));
 
-        if (DateAndTimeHelper.isExpired(dateSent, dateExpiry, System.currentTimeMillis(), availabilityDays) && !holder.hasExpiredBody) {
+        if (DateAndTimeHelper.isExpired(dateSent, dateExpiry, new Date(), availabilityDays) && !holder.hasExpiredBody) {
             holder.timestamp.setText(context.getResources().getString(R.string.dk_expired_tag));
             setAlphaForListElementContent(holder, 0.5f, 0.75f);
             holder.isExpired = true;
         } else {
             if (dateSent != null) {
-                holder.timestamp.setText(TimestampsHelper.getShortTimestamp(context, dateSent.getTime(), System.currentTimeMillis()));
+                holder.timestamp.setText(TimestampsHelper.getShortTimestampForRichMessage(context, dateSent.getTime(), new Date().getTime()));
             }
             setAlphaForListElementContent(holder, 1.0f, 1.0f);
             holder.isExpired = false;

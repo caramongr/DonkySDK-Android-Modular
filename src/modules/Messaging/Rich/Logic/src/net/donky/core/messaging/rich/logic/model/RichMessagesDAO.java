@@ -8,16 +8,14 @@ import android.text.TextUtils;
 
 import net.donky.core.helpers.DateAndTimeHelper;
 import net.donky.core.logging.DLog;
-import net.donky.core.model.*;
+import net.donky.core.messaging.logic.database.BaseDAO;
+import net.donky.core.model.DatabaseSQLHelper;
+import net.donky.core.model.DonkyDataController;
 
 import org.json.JSONException;
-import org.json.JSONObject;
 
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -27,7 +25,7 @@ import java.util.concurrent.TimeUnit;
  * 21/02/2015.
  * Copyright (C) Donky Networks Ltd. All rights reserved.
  */
-public class RichMessagesDAO {
+public class RichMessagesDAO extends BaseDAO {
 
     private final DLog log;
 
@@ -140,9 +138,9 @@ public class RichMessagesDAO {
         SQLiteDatabase db = databaseSQLHelper.getReadableDatabase();
 
         String[] projection = {
+
                 DatabaseSQLContract.RichMessageEntry.COLUMN_NAME_internalId,
                 DatabaseSQLContract.RichMessageEntry.COLUMN_NAME_messageRead,
-
                 DatabaseSQLContract.RichMessageEntry.COLUMN_NAME_messageType,
                 DatabaseSQLContract.RichMessageEntry.COLUMN_NAME_senderExternalUserId,
                 DatabaseSQLContract.RichMessageEntry.COLUMN_NAME_description,
@@ -301,45 +299,6 @@ public class RichMessagesDAO {
     }
 
     /**
-     * Translate int to boolean.
-     */
-    private boolean toBoolean(int i) {
-        return i > 0;
-    }
-
-    /**
-     * Translate Map of Strings to json string.
-     */
-    private String toJson(Map<String, String> map) {
-
-        JSONObject jsonObject = new JSONObject(map);
-
-        return jsonObject.toString();
-    }
-
-    /**
-     * Translate json string to Map of Strings.
-     */
-    private Map<String, String> toMap(String json) throws JSONException {
-
-        HashMap<String, String> map = new HashMap<String, String>();
-
-        JSONObject jObject = new JSONObject(json);
-
-        Iterator<?> keys = jObject.keys();
-
-        while (keys.hasNext()) {
-
-            String key = (String) keys.next();
-            String value = jObject.getString(key);
-            map.put(key, value);
-
-        }
-
-        return map;
-    }
-
-    /**
      * Add Rich Messages to database.
      *
      * @param richMessageList Rich Message list to be saved.
@@ -478,10 +437,10 @@ public class RichMessagesDAO {
 
         Integer availabilityDays = DonkyDataController.getInstance().getConfigurationDAO().getMaxAvailabilityDays();
 
-        final long currentTime = System.currentTimeMillis();
-        final long acceptableSentTimeMillis;
+        final long currentTimeUTC = System.currentTimeMillis();
+        final long acceptableSentTimeMillisUTC;
 
-        acceptableSentTimeMillis = currentTime - TimeUnit.DAYS.toMillis(availabilityDays);
+        acceptableSentTimeMillisUTC = currentTimeUTC - TimeUnit.DAYS.toMillis(availabilityDays);
 
         String[] projection = {
                 DatabaseSQLContract.RichMessageEntry._ID,
@@ -512,7 +471,6 @@ public class RichMessagesDAO {
                 DatabaseSQLContract.RichMessageEntry.COLUMN_NAME_avatarAssetId,
                 DatabaseSQLContract.RichMessageEntry.COLUMN_NAME_sentTimestamp,
                 DatabaseSQLContract.RichMessageEntry.COLUMN_NAME_expiryTimeStamp,
-
                 DatabaseSQLContract.RichMessageEntry.COLUMN_NAME_sentTimestampLong
 
         };
@@ -524,7 +482,7 @@ public class RichMessagesDAO {
         if (!TextUtils.isEmpty(filter)) {
             selection = DatabaseSQLContract.RichMessageEntry.COLUMN_NAME_description + " LIKE ? OR " + DatabaseSQLContract.RichMessageEntry.COLUMN_NAME_senderDisplayName + " LIKE ? AND " + DatabaseSQLContract.RichMessageEntry.COLUMN_NAME_sentTimestampLong + " > ?";
             arg = "%" + filter + "%";
-            selectionArgs = new String[]{arg, arg, String.valueOf(acceptableSentTimeMillis)};
+            selectionArgs = new String[]{arg, arg, String.valueOf(acceptableSentTimeMillisUTC)};
         }
 
         Cursor cursor = null;
@@ -553,12 +511,12 @@ public class RichMessagesDAO {
 
         Integer availabilityDays = DonkyDataController.getInstance().getConfigurationDAO().getMaxAvailabilityDays();
 
-        final long currentTime = System.currentTimeMillis();
-        final long acceptableSentTimeMillis = currentTime - TimeUnit.DAYS.toMillis(availabilityDays);
+        final long currentTimeUTC = System.currentTimeMillis();
+        final long acceptableSentTimeMillisUTC = currentTimeUTC - TimeUnit.DAYS.toMillis(availabilityDays);
 
         SQLiteDatabase db = databaseSQLHelper.getWritableDatabase();
 
-        String arg = String.valueOf(acceptableSentTimeMillis);
+        String arg = String.valueOf(acceptableSentTimeMillisUTC);
 
         String command = String.format(new StringBuilder().append("DELETE FROM ").append(DatabaseSQLContract.RichMessageEntry.TABLE_NAME).append(" WHERE ").append(DatabaseSQLContract.RichMessageEntry.COLUMN_NAME_sentTimestampLong).append(" < %s").toString(), arg);
 
@@ -608,7 +566,7 @@ public class RichMessagesDAO {
             values.put(DatabaseSQLContract.RichMessageEntry.COLUMN_NAME_contextItems, toJson(richMessage.getContextItems()));
             values.put(DatabaseSQLContract.RichMessageEntry.COLUMN_NAME_avatarAssetId, richMessage.getAvatarAssetId());
             values.put(DatabaseSQLContract.RichMessageEntry.COLUMN_NAME_sentTimestamp, richMessage.getSentTimestamp());
-            values.put(DatabaseSQLContract.RichMessageEntry.COLUMN_NAME_sentTimestampLong, DateAndTimeHelper.parseUtcDate(richMessage.getSentTimestamp()).getTime());
+            values.put(DatabaseSQLContract.RichMessageEntry.COLUMN_NAME_sentTimestampLong, DateAndTimeHelper.parseUTCStringToUTCLong(richMessage.getSentTimestamp()));
             values.put(DatabaseSQLContract.RichMessageEntry.COLUMN_NAME_expiryTimeStamp, richMessage.getExpiryTimeStamp());
             values.put(DatabaseSQLContract.RichMessageEntry.COLUMN_NAME_messageRead, richMessage.isMessageRead());
 

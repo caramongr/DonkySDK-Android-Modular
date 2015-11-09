@@ -18,11 +18,6 @@ public class RichMessagingSQLiteHelper extends AbstractDonkySQLiteHelper {
      */
     public static final int DATABASE_VERSION = 2;
 
-    private static final String TEXT_TYPE = " TEXT";
-    private static final String INT_TYPE = " INT";
-    private static final String LONG_TYPE = " LONG";
-    private static final String COMMA_SEP = ",";
-
     private static final String SQL_CREATE_RICH_MESSAGES_TABLE =
             "CREATE TABLE " + DatabaseSQLContract.RichMessageEntry.TABLE_NAME + "(" +
                     DatabaseSQLContract.RichMessageEntry._ID + " INTEGER PRIMARY KEY," +

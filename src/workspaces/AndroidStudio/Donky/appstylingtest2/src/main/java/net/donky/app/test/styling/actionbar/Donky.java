@@ -80,7 +80,7 @@ public class Donky extends Application {
         DeviceDetails deviceDetails = new DeviceDetails("John's phone", "Smartphone", null);
 
         // Put your Donky API key here
-        String apiKey ="ye7MDvQQVUKwR2DgMhHC89gy76HOFVtYq3PLKiOyYvDyQwFKzusUCBAphwDvMNGvlDfK2WhRFo41sF0fD4sf1Q";
+        String apiKey =">>PUT_YOUR_API_KEY_HERE<<";
 
         // Initialise Donky Core SDK
         DonkyCore.initialiseDonkySDK(this, apiKey, userDetails, deviceDetails, "v2", new DonkyListener() {

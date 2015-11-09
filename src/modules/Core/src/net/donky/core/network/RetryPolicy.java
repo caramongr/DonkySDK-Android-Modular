@@ -30,6 +30,8 @@ public class RetryPolicy {
 
     private List<RetryDescription> retryDescriptions;
 
+    private boolean wasRetriedAlready = false;
+
     public RetryPolicy() {
 
         // Parse String describing retries to list of RetryDescription objects
@@ -62,6 +64,8 @@ public class RetryPolicy {
      * @return True if operation should be retried again.
      */
     public boolean retry() {
+
+        wasRetriedAlready = true;
 
         retryCountForCurrentRetryDescription += 1;
 
@@ -192,5 +196,9 @@ public class RetryPolicy {
             }
             delayMS = (long) (seconds * 1000);
         }
+    }
+
+    public boolean isWasRetriedAlready() {
+        return wasRetriedAlready;
     }
 }

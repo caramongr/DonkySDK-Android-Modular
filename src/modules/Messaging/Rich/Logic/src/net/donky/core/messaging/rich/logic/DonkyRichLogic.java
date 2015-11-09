@@ -36,7 +36,7 @@ public class DonkyRichLogic {
     // 2 - Minor version number, increment when adding new functionality.
     // 3 - Major bug fix number, increment every 100 bugs.
     // 4 - Minor bug fix number, increment every bug fix, roll back when reaching 99.
-    private final String version = "2.2.0.0";
+    private final String version = "2.2.0.1";
 
     public final static String PLATFORM = "Mobile";
 
@@ -94,6 +94,8 @@ public class DonkyRichLogic {
 
                     @Override
                     public void success() {
+
+                        DonkyCore.registerModule(new ModuleDefinition(DonkyRichLogic.class.getSimpleName(), version));
 
                         DonkyCore.getInstance().registerService(RICH_MESSAGES_SQLITE_HELPER, AbstractDonkySQLiteHelper.SERVICE_CATEGORY_SQLITE_HELPER, new RichMessagingSQLiteHelper());
 

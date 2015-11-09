@@ -7,6 +7,7 @@ import net.donky.core.DonkyException;
 import net.donky.core.DonkyListener;
 import net.donky.core.ModuleDefinition;
 import net.donky.core.messaging.logic.DonkyMessaging;
+import net.donky.core.messaging.ui.cache.DonkyDiskCacheManager;
 
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -82,6 +83,8 @@ public class DonkyMessagingUI {
 
                         DonkyCore.registerModule(new ModuleDefinition(DonkyMessagingUI.class.getSimpleName(), version));
 
+                        DonkyDiskCacheManager.getInstance().init(application.getApplicationContext());
+
                         initialised.set(true);
 
                         if (donkyListener != null) {
@@ -120,4 +123,5 @@ public class DonkyMessagingUI {
 
         }
     }
+
 }

@@ -35,7 +35,7 @@ public class AutomationTest extends ApplicationTestCase<Application> {
 
     private static int TIME_OUT = 5000;
 
-    private static String apiKey = ">>ENTER API KEY HERE<<";
+    private static String apiKey = ">>PUT_YOUR_API_KEY_HERE<<";
 
     private static String initialUserId = "test_"+new Integer(Math.abs(new Random().nextInt(Integer.MAX_VALUE)));
 

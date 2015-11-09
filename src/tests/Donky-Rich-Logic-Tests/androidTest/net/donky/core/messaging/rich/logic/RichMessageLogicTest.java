@@ -39,7 +39,7 @@ public class RichMessageLogicTest extends ApplicationTestCase<Application> {
 
     private static int TIME_OUT = 5000;
 
-    private static String apiKey = ">>ENTER API KEY HERE<<";
+    private static String apiKey = ">>PUT_YOUR_API_KEY_HERE<<";
 
     private static String initialUserId = "test_"+new Integer(Math.abs(new Random().nextInt(Integer.MAX_VALUE)));
 
@@ -394,6 +394,73 @@ public class RichMessageLogicTest extends ApplicationTestCase<Application> {
         RichMessageEvent richMessageEvent = (RichMessageEvent) mockDonkyEventListener.getEvent();
 
         assertEquals(messageId, richMessageEvent.getRichMessages().get(0).getMessageId());
+
+    }
+
+    @Test
+    public void testHandleServerNotificationInDifferentTimezones() throws InterruptedException, DonkyException {
+
+        //Since below code doesn't change the system setting
+//        PackageManager pm = getApplication().getPackageManager();
+//        if (pm.checkPermission("android.permission.SET_TIME_ZONE", getApplication().getPackageName()) != PackageManager.PERMISSION_GRANTED) {
+//            throw new DonkyException("This test requires SET_TIME_ZONE permission");
+//        }
+//        AlarmManager am = (AlarmManager) getContext().getSystemService(Context.ALARM_SERVICE);
+//        String[] timeZones = TimeZone.getAvailableIDs();
+//        am.setTimeZone(timeZones[i]);
+        //this test will require manual TimeZone change in Settings/Date&Time
+
+        for (int i=0; i<5; i++) {
+            doTheTimeZoneTest();
+            //Put a breakpoint above and change TimeZone manually (see comment above) e.g. Pacific/Midway, Europe/Sarajevo, Atlantic/Azores, Australia/Sydney
+        }
+
+    }
+
+    private void doTheTimeZoneTest() throws InterruptedException, DonkyException {
+
+        String expiredMessageId = "expiredMessageId";
+        String notExpiredMessageId = "notExpiredMessageId";
+
+        RichMessagesDAO richMessagesDAO = RichMessageDataController.getInstance().getRichMessagesDAO();
+        assertNotNull(richMessagesDAO);
+        richMessagesDAO.removeAllRichMessages();
+        assertEquals(true, richMessagesDAO.getAllRichMessages().isEmpty());
+
+        List<ServerNotification> serverNotifications = new LinkedList<>();
+        MockServerNotification serverNotificationExpired = new MockServerNotification(expiredMessageId, true);
+        MockServerNotification serverNotificationNotExpired = new MockServerNotification(notExpiredMessageId, false);
+        serverNotifications.add(serverNotificationExpired);
+        serverNotifications.add(serverNotificationNotExpired);
+
+        MockDonkyEventListener mockDonkyEventListener = new MockDonkyEventListener<>(RichMessageEvent.class);
+        DonkyCore.subscribeToLocalEvent(mockDonkyEventListener);
+
+        new NotificationHandler().handleRichMessageNotification(serverNotifications);
+        synchronized (mockDonkyEventListener) {
+            mockDonkyEventListener.wait(TIME_OUT);
+        }
+
+        RichMessage expiredMessage = richMessagesDAO.getRichMessageWithMessageId(expiredMessageId);
+        assertNull(expiredMessage);
+
+        RichMessage notExpiredMessage = richMessagesDAO.getRichMessageWithMessageId(notExpiredMessageId);
+        assertNotNull(notExpiredMessage);
+        assertEquals(notExpiredMessage.isReceivedExpired(), false);
+
+        RichMessageEvent richMessageEvent = (RichMessageEvent) mockDonkyEventListener.getEvent();
+        List<RichMessage> richMessages = richMessageEvent.getRichMessages();
+        assertNotNull(richMessages);
+        assertEquals(richMessages.size(), 2);
+        for (RichMessage richMessage : richMessages) {
+            if (richMessage.getMessageId().equals(expiredMessageId)) {
+                assertEquals(richMessage.isReceivedExpired(), true);
+            } else if (richMessage.getMessageId().equals(notExpiredMessageId)) {
+                assertEquals(richMessage.isReceivedExpired(), false);
+            } else {
+                throw new DonkyException("Wrong richMessage states, assertion failed");
+            }
+        }
 
     }
 }

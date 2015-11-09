@@ -39,6 +39,7 @@ import net.donky.core.messaging.ui.components.DonkyFragment;
 import net.donky.core.messaging.ui.components.generic.DeletionListener;
 import net.donky.core.messaging.ui.components.generic.DetailView;
 import net.donky.core.messaging.ui.components.generic.DetailViewPresentedListener;
+import net.donky.core.messaging.ui.components.generic.DualPaneModeListener;
 import net.donky.core.messaging.ui.components.generic.GenericBuilder;
 import net.donky.core.messaging.ui.components.generic.SelectionListener;
 import net.donky.core.messaging.rich.inbox.ui.R;
@@ -54,7 +55,7 @@ import java.util.Map;
  * 15/04/2015.
  * Copyright (C) Donky Networks Ltd. All rights reserved.
  */
-public class RichMessageFragment extends DonkyFragment implements GenericBuilder<RichMessageFragment>, SelectionListener<RichMessage>, DetailView {
+public class RichMessageFragment extends DonkyFragment implements GenericBuilder<RichMessageFragment>, SelectionListener<RichMessage>, DetailView, DualPaneModeListener {
 
     private WebView webView;
 
@@ -145,7 +146,7 @@ public class RichMessageFragment extends DonkyFragment implements GenericBuilder
             webView.setBackgroundColor(Color.WHITE);
 
             if (detailViewPresentedListener != null) {
-                detailViewPresentedListener.onDetailViewPresented();
+                detailViewPresentedListener.onDetailViewPresented(null);
             }
         }
 
@@ -190,7 +191,7 @@ public class RichMessageFragment extends DonkyFragment implements GenericBuilder
 
             Date expireDate = DateAndTimeHelper.parseUtcDate(richMessage.getExpiryTimeStamp());
 
-            if ((expireDate != null && new Date(System.currentTimeMillis()).before(expireDate)) || expireDate == null) {
+            if ((expireDate != null && new Date().before(expireDate)) || expireDate == null) {
 
                 return richMessage.getURLEncodedBody();
 
@@ -240,6 +241,11 @@ public class RichMessageFragment extends DonkyFragment implements GenericBuilder
     }
 
     @Override
+    public void onSelectedNew(RichMessage selected) {
+
+    }
+
+    @Override
     public void setDeletionListener(DeletionListener deletionListener) {
         this.deletionListener = deletionListener;
     }
@@ -247,6 +253,11 @@ public class RichMessageFragment extends DonkyFragment implements GenericBuilder
     @Override
     public void setDetailViewPresentedListener(DetailViewPresentedListener detailViewPresentedListener) {
         this.detailViewPresentedListener = detailViewPresentedListener;
+    }
+
+    @Override
+    public void setIsInDualPaneDisplayMode(boolean dualPane) {
+
     }
 
     private class DonkyWebChromeClient extends WebChromeClient {

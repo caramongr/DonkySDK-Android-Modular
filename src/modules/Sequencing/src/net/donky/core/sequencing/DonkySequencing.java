@@ -24,7 +24,7 @@ public class DonkySequencing {
     // 2 - Minor version number, increment when adding new functionality.
     // 3 - Major bug fix number, increment every 100 bugs.
     // 4 - Minor bug fix number, increment every bug fix, roll back when reaching 99.
-    private final String version = "2.0.0.0";
+    private final String version = "2.0.0.1";
 
     /**
      * Flag set to true after init() method call is completed

@@ -19,7 +19,7 @@ public class Audience {
      *
      * @param type Type of audience.
      */
-    Audience(String type) {
+    protected Audience(String type) {
         this.type = type;
     }
 

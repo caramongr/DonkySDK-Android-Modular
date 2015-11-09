@@ -1,5 +1,8 @@
 package net.donky.core.sequencing.internal.tasks;
 
+import android.os.Handler;
+import android.os.Looper;
+
 import net.donky.core.DonkyException;
 import net.donky.core.DonkyListener;
 import net.donky.core.account.DonkyAccountController;
@@ -44,7 +47,14 @@ public abstract class UpdateTask {
                 @Override
                 public void error(DonkyException donkyException, Map<String, String> validationErrors) {
                     listener.error(donkyException, validationErrors, taskCreatedTimestamp, taskStartedTimestamp, System.currentTimeMillis());
-                    donkySequenceController.forceExecuteNext();
+                    Handler handler = new Handler(Looper.getMainLooper());
+                    handler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            donkySequenceController.forceExecuteNext();
+                        }
+                    }, 2000);
+
                 }
 
             };

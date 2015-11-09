@@ -29,7 +29,6 @@ public class UploadLog extends GenericSecuredServiceRequest<UploadLogResponse> {
      */
     public enum SubmissionReason {
 
-        NotDefined,
         AutomaticByDevice,
         ManualRequest;
 
@@ -57,6 +56,10 @@ public class UploadLog extends GenericSecuredServiceRequest<UploadLogResponse> {
         this.data = data;
         if (submissionReason != null){
             this.submissionReason = submissionReason.toString();
+            this.reason = submissionReason;
+        } else {
+            this.submissionReason = SubmissionReason.AutomaticByDevice.toString();
+            this.reason = SubmissionReason.AutomaticByDevice;
         }
     }
 

@@ -17,4 +17,5 @@ public interface SelectionListener<T> {
      */
     void onSelected(T selected, boolean isSplitViewMode);
 
+    void onSelectedNew(T selected);
 }

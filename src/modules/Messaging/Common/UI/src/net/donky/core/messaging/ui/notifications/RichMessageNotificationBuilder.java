@@ -8,7 +8,7 @@ import android.support.v4.app.NotificationCompat;
 import android.text.Html;
 import android.text.TextUtils;
 
-import net.donky.core.messaging.logic.CommonMessage;
+import net.donky.core.messaging.logic.model.CommonMessage;
 
 import java.util.LinkedList;
 import java.util.List;

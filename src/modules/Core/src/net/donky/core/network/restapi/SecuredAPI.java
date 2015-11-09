@@ -1,8 +1,13 @@
 package net.donky.core.network.restapi;
 
 import net.donky.core.account.RegistrationDetails;
+import net.donky.core.network.location.GeoFence;
+import net.donky.core.network.DiscoveredContact;
 import net.donky.core.network.ServerNotification;
 import net.donky.core.network.TagDescription;
+import net.donky.core.network.location.Trigger;
+import net.donky.core.network.restapi.secured.GetPlatformUsersRequest;
+import net.donky.core.network.restapi.secured.IsValidPlatformUserResponse;
 import net.donky.core.network.restapi.secured.SynchroniseResponse;
 import net.donky.core.network.restapi.secured.UpdateClient;
 import net.donky.core.network.restapi.secured.UpdateDevice;
@@ -90,6 +95,22 @@ public interface SecuredAPI {
     @PUT("/api/registration/user/tags")
     Void updateTags(@Header("Authorization") String authorization,  @Body List<TagDescription> updateTags);
 
+    @Headers({"Accept: application/json", "DonkyClientSystemIdentifier : DonkyAndroidModularSdk"})
+    @GET("/api/locationservices/geofence/active")
+    List<GeoFence> getAllGeoFences(@Header("Authorization") String authorization);
+
+    @Headers({"Accept: application/json", "DonkyClientSystemIdentifier : DonkyAndroidModularSdk"})
+    @GET("/api/trigger/active")
+    List<Trigger> getAllTriggers(@Header("Authorization") String authorizationr);
+
+    @Headers({"Accept: application/json", "DonkyClientSystemIdentifier : DonkyAndroidModularSdk"})
+    @GET("/api/contact/{externaluserid}")
+    IsValidPlatformUserResponse isValidPlatformUser(@Header("Authorization") String authorization, @Path("externaluserid") String externaluserid);
+
+    @Headers({"Accept: application/json", "DonkyClientSystemIdentifier : DonkyAndroidModularSdk"})
+    @POST("/api/contact/search")
+    List<DiscoveredContact> getPlatformUsers(@Header("Authorization") String authorization, @Body GetPlatformUsersRequest getPlatformUsersRequest);
+
     /*
      * Asynchronous REST calls
      */
@@ -150,4 +171,18 @@ public interface SecuredAPI {
     @PUT("/api/registration/user/tags")
     void updateTags(@Header("Authorization") String authorization, @Body List<TagDescription> updateTags, Callback<Void> cb);
 
+    @Headers({"Accept: application/json", "DonkyClientSystemIdentifier : DonkyAndroidModularSdk"})
+    @GET("/api/registration/user/tags")
+    void getAllGeoFences(@Header("Authorization") String authorization, Callback<List<GeoFence>> cb);
+
+    @Headers({"Accept: application/json", "DonkyClientSystemIdentifier : DonkyAndroidModularSdk"})
+    @GET("/api/registration/user/tags")
+    void getAllTriggers(@Header("Authorization") String authorization, Callback<List<Trigger>> cb);
+    @Headers({"Accept: application/json", "DonkyClientSystemIdentifier : DonkyAndroidModularSdk"})
+    @GET("/api/contact/{externaluserid}")
+    void isValidPlatformUser(@Header("Authorization") String authorization, @Path("externaluserid") String externaluserid, Callback<IsValidPlatformUserResponse> cb);
+
+    @Headers({"Accept: application/json", "DonkyClientSystemIdentifier : DonkyAndroidModularSdk"})
+    @POST("/api/contact/search")
+    void getPlatformUsers(@Header("Authorization") String authorization, @Body GetPlatformUsersRequest getPlatformUsersRequest, Callback<List<DiscoveredContact>> cb);
 }

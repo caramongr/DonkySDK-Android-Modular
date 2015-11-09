@@ -1,10 +1,14 @@
 package net.donky.core.network;
 
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.google.gson.annotations.SerializedName;
+import com.google.gson.internal.LinkedTreeMap;
 
 import net.donky.core.Notification;
 import net.donky.core.helpers.IdHelper;
+
+import org.json.JSONObject;
 
 /**
  * Notification received form server in synchronisation call.
@@ -40,7 +44,48 @@ public class ServerNotification extends Notification {
      */
     public static final String NOTIFICATION_TYPE_SimplePushMessage = "SimplePushMessage";
 
-    public static String NOTIFICATION_TYPE_RichMessage = "RichMessage";
+    /**
+     * Notification with Rich Message details.
+     */
+    public static final String NOTIFICATION_TYPE_RichMessage = "RichMessage";
+
+    /**
+     * Notification with Chat Message details.
+     */
+    public static final String NOTIFICATION_TYPE_ChatMessage = "Message";
+
+    /**
+     * Notification with chat message status
+     */
+    public static final String NOTIFICATION_TYPE_MsgSent = "MessageSent";
+
+    /**
+     * Notification with chat message status
+     */
+    public static final String NOTIFICATION_TYPE_MsgDelivered = "MessageDelivered";
+
+    /**
+     * Notification with chat message status
+     */
+    public static final String NOTIFICATION_TYPE_MsgRead = "MessageRead";
+
+    /**
+     * Notification with chat message status
+     */
+    public static final String NOTIFICATION_TYPE_MsgRejected = "MessageRejected";
+
+    /**
+     * Notification with user is typing chat message
+     */
+    public static final String NOTIFICATION_TYPE_UserIsTyping = "UserIsTyping";
+
+    public static final String NOTIFICATION_START_TRACKING_LOCATION = "StartTrackingLocation";
+
+    public static final String NOTIFICATION_STOP_TRACKING_LOCATION = "StopTrackingLocation";
+
+    public static final String NOTIFICATION_TRIGGER_CONFIGURATION = "TriggerConfiguration";
+
+    public static final String NOTIFICATION_TRIGGER_DELETED = "TriggerDeleted";
 
     @SerializedName("type")
     private String type;
@@ -58,6 +103,29 @@ public class ServerNotification extends Notification {
 
     protected ServerNotification() {
         super(null, IdHelper.generateId());
+    }
+
+    /**
+     * Constructor initialised with json string parsed to tree map.
+     *
+     * @param notificationTreeMap Json string parsed to tree map.
+     */
+    public ServerNotification(LinkedTreeMap<?, ?> notificationTreeMap) {
+        super(null, IdHelper.generateId());
+
+        if (notificationTreeMap != null) {
+            id = (String) notificationTreeMap.get("id");
+            createdOn = (String) notificationTreeMap.get("createdOn");
+            type = (String) notificationTreeMap.get("type");
+            LinkedTreeMap<?, ?> strData = (LinkedTreeMap<?,?>) notificationTreeMap.get("data");
+            if (strData != null) {
+                JSONObject jObj = new JSONObject(strData);
+                if (jObj != null) {
+                    data = new JsonParser().parse(jObj.toString()).getAsJsonObject();
+                }
+            }
+        }
+
     }
 
     /**
@@ -108,7 +176,7 @@ public class ServerNotification extends Notification {
 
         String divider = " | ";
 
-        return "ServerNotification: " + " type: " + type + divider + " serverNotificationId : " + id + divider + " data : " + data.toString() + divider + " createdOn : " + createdOn;
+        return "ServerNotification: " + " type: " + type + divider + " serverNotificationId : " + id + divider + " data : " + data + divider + " createdOn : " + createdOn;
     }
 
     /*
@@ -121,4 +189,5 @@ public class ServerNotification extends Notification {
         this.data = data;
         this.createdOn = createdOn;
     }
+
 }

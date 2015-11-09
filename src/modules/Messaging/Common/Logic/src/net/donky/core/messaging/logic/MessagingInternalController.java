@@ -1,6 +1,8 @@
 package net.donky.core.messaging.logic;
 
 import net.donky.core.DonkyListener;
+import net.donky.core.messaging.logic.model.CommonMessage;
+import net.donky.core.messaging.logic.model.MessageReceivedDetails;
 import net.donky.core.network.DonkyNetworkController;
 
 /**
@@ -34,13 +36,22 @@ public class MessagingInternalController {
     }
 
     /**
-     * Send 'Message Received' client notification.
+     * Send 'Message Read' client notification.
      *
      * @param listener Callback to be invoked when completed.
      */
     public void sendMessageReadNotification(CommonMessage commonMessage, DonkyListener listener) {
 
         DonkyNetworkController.getInstance().sendClientNotification(ClientNotification.createMessageReadNotification(commonMessage), listener);
+
+    }
+
+    /**
+     * Queue 'Message Read' client notification.
+     */
+    public void queueMessageReadNotification(CommonMessage commonMessage) {
+
+        DonkyNetworkController.getInstance().queueClientNotification(ClientNotification.createMessageReadNotification(commonMessage));
 
     }
 

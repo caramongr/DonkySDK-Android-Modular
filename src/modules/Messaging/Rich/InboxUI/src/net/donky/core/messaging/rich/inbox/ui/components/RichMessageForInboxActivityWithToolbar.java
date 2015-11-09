@@ -1,20 +1,14 @@
 package net.donky.core.messaging.rich.inbox.ui.components;
 
 import android.content.res.Configuration;
-import android.content.res.TypedArray;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
-import android.util.TypedValue;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.WindowManager;
 
 import net.donky.core.logging.DLog;
 import net.donky.core.messaging.logic.DonkyMessaging;
-import net.donky.core.messaging.rich.logic.model.RichMessage;
 import net.donky.core.messaging.rich.inbox.ui.R;
+import net.donky.core.messaging.rich.logic.model.RichMessage;
 import net.donky.core.messaging.ui.components.DonkyActivity;
 import net.donky.core.messaging.ui.components.generic.GenericSplitFragment;
 
@@ -68,50 +62,11 @@ public class RichMessageForInboxActivityWithToolbar extends DonkyActivity {
         richMessageDetailFragment.setRichMessage(richMessage);
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
-        toolbar.setTitle(richMessage.getSenderDisplayName());
-        setupUI(toolbar);
 
-        setSupportActionBar(toolbar);
-
-    }
-
-    /**
-     * Setup toolbar widget.
-     * @param toolbar Toolbar widget to set.
-     */
-    protected void setupUI(Toolbar toolbar) {
-
-        TypedValue typedValue = new TypedValue();
-        int[] attribute = new int[] { R.attr.dk_ic_arrow_back_24dp };
-        TypedArray array = obtainStyledAttributes(typedValue.resourceId, attribute);
-        int attributeResourceId = array.getResourceId(0, -1);
-
-        Drawable drawable = getResources().getDrawable(attributeResourceId);
-        array.recycle();
-
-        toolbar.setNavigationIcon(drawable);
-
-        setSupportActionBar(toolbar);
-
-        ActionBar bar = getSupportActionBar();
-        if (bar != null) {
-            bar.setDisplayHomeAsUpEnabled(true);
+        if (toolbar != null) {
+            toolbar.setTitle(richMessage.getSenderDisplayName());
+            setupUI(toolbar);
+            setSupportActionBar(toolbar);
         }
-
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        return super.onCreateOptionsMenu(menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-
-        if (android.R.id.home == item.getItemId()) {
-            finish();
-        }
-
-        return super.onOptionsItemSelected(item);
     }
 }

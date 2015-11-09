@@ -7,14 +7,7 @@ package net.donky.core.messaging.ui.components.generic;
  * 18/06/2015.
  * Copyright (C) Donky Networks Ltd. All rights reserved.
  */
-public interface DualPaneLeftFragment {
-
-    /**
-     * Sets the display mode
-     *
-     * @param dualPane True if two fragments are visible.
-     */
-    void setIsInDualPaneDisplayMode(boolean dualPane);
+public interface DualPaneLeftFragment extends DualPaneModeListener {
 
     /**
      * Set the interface to change overlay visibility

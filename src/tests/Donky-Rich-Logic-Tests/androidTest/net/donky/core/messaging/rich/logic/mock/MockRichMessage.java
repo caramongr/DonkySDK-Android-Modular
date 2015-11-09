@@ -3,6 +3,7 @@ package net.donky.core.messaging.rich.logic.mock;
 import net.donky.core.helpers.IdHelper;
 import net.donky.core.messaging.rich.logic.model.RichMessage;
 
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,8 +24,13 @@ public class MockRichMessage extends RichMessage {
             setExpiryTimeStamp("2050-01-01T10:00:00.000Z");
         }
 
+        Calendar calendar = Calendar.getInstance();
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
+        int month = calendar.get(Calendar.MONTH)+1;
+        int year = calendar.get(Calendar.YEAR);
+
         if (!isAvailabilityPeriodExceeded) {
-            setSentTimestamp("2015-07-19T10:00:00.000Z");
+            setSentTimestamp(year+"-"+month+"-"+day+"T10:00:00.000Z");
         } else {
             setSentTimestamp("2000-07-19T10:00:00.000Z");
         }

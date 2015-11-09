@@ -5,7 +5,6 @@ import com.google.gson.annotations.SerializedName;
 
 import net.donky.core.helpers.DateAndTimeHelper;
 import net.donky.core.helpers.IdHelper;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -95,9 +94,8 @@ class ClientNotification extends net.donky.core.network.ClientNotification {
 
         u.type = Type.AppLaunch.toString();
         u.launchTimeUtc = DateAndTimeHelper.getUTCTimeFormated(time);
-        u.sessionTrigger = trigger.getValue();
+        u.sessionTrigger = trigger.toString();
         u.operatingSystem = "Android";
-
         return u;
     }
 
@@ -111,7 +109,7 @@ class ClientNotification extends net.donky.core.network.ClientNotification {
         u.type = Type.AppSession.toString();
         u.startTimeUtc = DateAndTimeHelper.getUTCTimeFormated(timeStart);
         u.endTimeUtc = DateAndTimeHelper.getUTCTimeFormated(timeStop);
-        u.sessionTrigger = trigger.getValue();
+        u.sessionTrigger = trigger.toString();
         u.operatingSystem = "Android";
 
         return u;
@@ -129,7 +127,7 @@ class ClientNotification extends net.donky.core.network.ClientNotification {
         private String launchTimeUtc;
 
         @SerializedName("sessionTrigger")
-        private int sessionTrigger;
+        private String sessionTrigger;
 
         @SerializedName("operatingSystem")
         private String operatingSystem;
@@ -151,7 +149,7 @@ class ClientNotification extends net.donky.core.network.ClientNotification {
         private String endTimeUtc;
 
         @SerializedName("sessionTrigger")
-        private int sessionTrigger;
+        private String sessionTrigger;
 
         @SerializedName("operatingSystem")
         private String operatingSystem;

@@ -7,6 +7,6 @@ package net.donky.core.messaging.ui.components.generic;
  */
 public interface DetailViewPresentedListener {
 
-    void onDetailViewPresented();
+    void onDetailViewPresented(String contentId);
 
 }

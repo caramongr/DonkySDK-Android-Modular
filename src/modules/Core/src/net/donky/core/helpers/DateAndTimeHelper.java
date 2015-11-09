@@ -1,5 +1,7 @@
 package net.donky.core.helpers;
 
+import android.text.TextUtils;
+
 import net.donky.core.logging.DLog;
 
 import java.text.DateFormat;
@@ -89,14 +91,14 @@ public class DateAndTimeHelper {
      * @param availabilityDays Number of days any message should be available.
      * @return True if message can be seen.
      */
-    public static boolean isExpired(Date sentTime, Date expiryTime, long currentTime, Integer availabilityDays) {
+    public static boolean isExpired(Date sentTime, Date expiryTime, Date currentTime, Integer availabilityDays) {
 
         if (isExceededMaxAvailabilityDays(sentTime, currentTime, availabilityDays)) {
             return true;
         }
 
-        if (expiryTime != null) {
-            if (currentTime > expiryTime.getTime()) {
+        if (currentTime != null && expiryTime != null) {
+            if (currentTime.after(expiryTime)) {
                 return true;
             }
         }
@@ -112,14 +114,67 @@ public class DateAndTimeHelper {
      * @param availabilityDays Number of days any message should be available.
      * @return True if message can be seen.
      */
-    public static boolean isExceededMaxAvailabilityDays(Date sentTime, long currentTime, Integer availabilityDays) {
+    public static boolean isExceededMaxAvailabilityDays(Date sentTime, Date currentTime, Integer availabilityDays) {
 
-        if (sentTime != null && availabilityDays != null) {
-            if (currentTime - sentTime.getTime() > TimeUnit.DAYS.toMillis(availabilityDays)) {
+        if (sentTime != null && currentTime != null && availabilityDays != null) {
+            if (currentTime.getTime() - sentTime.getTime() > TimeUnit.DAYS.toMillis(availabilityDays)) {
                 return true;
             }
         }
 
         return false;
+    }
+
+    /**
+     * Return a timestamp for a json date() string value.
+     *
+     * @param val The date() value.
+     * @return The timestamp.
+     */
+    public static Long parseJsonTimestamp(String val) {
+
+        if (TextUtils.isEmpty(val))
+            return null;
+
+        int start = val.indexOf("(") + 1;
+        if (start == -1)
+            return null;
+        int end = val.indexOf(")", start);
+        if (end == -1)
+            return null;
+
+        String timestamp = val.substring(start, end);
+
+        int zonePos = timestamp.indexOf("+");
+        if (zonePos == -1)
+            zonePos = timestamp.indexOf("-");
+        if (zonePos > -1)
+            timestamp = timestamp.substring(0, zonePos);
+
+        try {
+            return Long.parseLong(timestamp);
+        } catch (NumberFormatException e) {
+            return null;
+        }
+
+    }
+
+    public static long getUTCFromGMT(long gmtTimeMilliseconds) {
+
+        Calendar cal= Calendar.getInstance();
+        int offset = cal.get(Calendar.ZONE_OFFSET)
+                + cal.get(Calendar.DST_OFFSET);
+
+        return gmtTimeMilliseconds - offset;
+    }
+
+    public static long parseUTCStringToUTCLong(String dateStr) {
+
+        Date date = parseUtcDate(dateStr);
+        if (date != null) {
+            return getUTCFromGMT(date.getTime());
+        }
+
+        return 0;
     }
 }
