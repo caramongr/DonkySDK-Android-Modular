@@ -10,7 +10,7 @@
         layout="@layout/dk_toolbar">
     </include>
 
-    <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <FrameLayout
         android:id="@+id/dk_rich_inbox_fragment_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
