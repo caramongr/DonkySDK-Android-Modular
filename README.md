@@ -2,7 +2,7 @@
   <img src="https://avatars2.githubusercontent.com/u/11334935?v=3&s=200" alt="Donky Networks LTD" title="Donky Network SDK">
 </p>
 
-# DonkySDK-Android-Modular (V2.2.0.2)
+# DonkySDK-Android-Modular (V2.2.0.3)
 
 The modular SDK exposes all of the network functionality in a way that means developers can consume only the pieces they need in order to:
 <ul>
@@ -79,7 +79,7 @@ To read more about how to get started please see [here](http://docs.mobiledonky.
 If you are using Gradle just add the following dependancy (jCenter repo)
 
 ```shell
-    compile 'net.donky:donky-core:2.2.0.2'
+    compile 'net.donky:donky-core:2.2.0.3'
 ```
 
 Initialise this module in onCreate method of your application class.
@@ -139,7 +139,7 @@ To read more about how to get started please see [here](http://docs.mobiledonky.
 If you are using Gradle just add the following dependancies (jCenter repo)
 
 ```shell
-    compile 'net.donky:donky-module-push-logic:2.2.0.2'
+    compile 'net.donky:donky-module-push-logic:2.2.0.3'
 ```
 
 Initialise this module module before initailising Donky Core in onCreate method of your application class.
@@ -173,7 +173,7 @@ To read more about how to get started please see [here](http://docs.mobiledonky.
 If you are using Gradle just add the following dependancies (jCenter repo)
 
 ```shell
-    compile 'net.donky:donky-module-push-ui:2.2.0.2'
+    compile 'net.donky:donky-module-push-ui:2.2.0.3'
 ```
 
 Initialise this module module before initailising Donky Core in onCreate method of your application class.
@@ -208,7 +208,7 @@ To read more about how to get started please see [here](http://docs.mobiledonky.
 If you are using Gradle just add the following dependancy (jCenter repo)
 
 ```shell
-    compile 'net.donky:donky-module-rich-logic:2.2.0.2'
+    compile 'net.donky:donky-module-rich-logic:2.2.0.3'
 ```
 
 Initialise this module module before initailising Donky Core in onCreate method of your application class.
@@ -242,7 +242,7 @@ To read more about how to get started please see [here](http://docs.mobiledonky.
 If you are using Gradle just add the following dependancy (jCenter repo)
 
 ```shell
-    compile 'net.donky:donky-module-rich-ui-inbox:2.2.0.2'
+    compile 'net.donky:donky-module-rich-ui-inbox:2.2.0.3'
 ```
 
 Initialise this module module before initailising Donky Core in onCreate method of your application class.
@@ -276,7 +276,7 @@ To read more about how to get started please see [here](http://docs.mobiledonky.
 If you are using Gradle just add the following dependancy (jCenter repo)
 
 ```shell
-    compile 'net.donky:donky-module-rich-ui-popup:2.2.0.2'
+    compile 'net.donky:donky-module-rich-ui-popup:2.2.0.3'
 ```
 
 Initialise this module module before initailising Donky Core in onCreate method of your application class.
@@ -310,7 +310,7 @@ To read more about how to get started please see [here](http://docs.mobiledonky.
 If you are using Gradle just add the following dependancy (jCenter repo)
 
 ```shell
-    compile 'net.donky:donky-module-analytics:2.2.0.2'
+    compile 'net.donky:donky-module-analytics:2.2.0.3'
 ```
 
 Initialise this module module before initailising Donky Core in onCreate method of your application class.
@@ -344,7 +344,7 @@ To read more about how to get started please see [here](http://docs.mobiledonky.
 If you are using Gradle just add the following dependancy (jCenter repo)
 
 ```shell
-    compile 'net.donky:donky-module-automation:2.2.0.2'
+    compile 'net.donky:donky-module-automation:2.2.0.3'
 ```
 
 Initialise this module module before initailising Donky Core in onCreate method of your application class.
@@ -376,7 +376,7 @@ Use of this module allows you to perform multiple calls to some account controll
 If you are using Gradle just add the following dependancy (jCenter repo)
 
 ```shell
-    compile 'net.donky:donky-module-sequencing:2.2.0.2'
+    compile 'net.donky:donky-module-sequencing:2.2.0.3'
 ```
 
 Initialise this module module before initailising Donky Core in onCreate method of your application class.
