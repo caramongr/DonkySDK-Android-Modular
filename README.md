@@ -403,7 +403,7 @@ public class MyApplication extends Application {
 
 # Donky-Common-Messaging-UI
 
-This module provides common functionalities for other messaging UI modules and is automatically initialised by them. You could use that module to reuse some UI elemnts building your own UI.
+This module provides common functionalities for other messaging UI modules and is automatically initialised by them. You could use that module to reuse some UI elements building your own UI.
 
 ## Usage
 
