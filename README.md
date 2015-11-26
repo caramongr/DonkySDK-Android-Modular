@@ -128,177 +128,6 @@ public class MyApplication extends Application {
 }
 ```
 
-# Donky-SimplePush-Logic
-
-Use the Simple Push module to enable your application to receive Simple Push messages.
-
-## Usage
-
-To read more about how to get started please see [here](http://docs.mobiledonky.com/docs/start-here).
-
-If you are using Gradle just add the following dependancies (jCenter repo)
-
-```shell
-    compile 'net.donky:donky-module-push-logic:2.2.0.3'
-```
-
-Initialise this module module before initailising Donky Core in onCreate method of your application class.
-
-```java
-public class MyApplication extends Application {
-
-    @Override
-    public void onCreate()
-    {
-        super.onCreate();
-      
-		DonkyPushLogic.initialiseDonkyPush(this,
-			new DonkyListener() /*set callback handlers*/);
-      
-		DonkyCore.initialiseDonkySDK(this,">>ENTER API KEY HERE<<", 
-			new DonkyListener() /*set callback handlers*/);
-    		
-	}
-}
-```
-
-# Donky-SimplePush-UI
-
-Use the Simple Push module to enable your application to display Simple Push messages.
-
-## Usage
-
-To read more about how to get started please see [here](http://docs.mobiledonky.com/docs/start-here).
-
-If you are using Gradle just add the following dependancies (jCenter repo)
-
-```shell
-    compile 'net.donky:donky-module-push-ui:2.2.0.3'
-```
-
-Initialise this module module before initailising Donky Core in onCreate method of your application class.
-
-```java
-public class MyApplication extends Application {
-
-    @Override
-    public void onCreate()
-    {
-        super.onCreate();
-      
-      	DonkyPushUI.initialiseDonkyPush(this,
-        	new DonkyListener() /*set callback handlers*/);
-      
-		DonkyCore.initialiseDonkySDK(this,">>ENTER API KEY HERE<<", 
-        	new DonkyListener() /*set callback handlers*/);
-			
-    }
-		
-}
-```
-
-# Donky-RichMessage-Logic
-
-Use the Rich Message  module to enable your application to receive rich content messages.
-
-## Usage
-
-To read more about how to get started please see [here](http://docs.mobiledonky.com/docs/start-here).
-
-If you are using Gradle just add the following dependancy (jCenter repo)
-
-```shell
-    compile 'net.donky:donky-module-rich-logic:2.2.0.3'
-```
-
-Initialise this module module before initailising Donky Core in onCreate method of your application class.
-
-```java
-public class MyApplication extends Application {
-
-    @Override
-    public void onCreate()
-    {
-        super.onCreate();
-      
-        DonkyRichLogic.initialiseDonkyRich(this,
-			new DonkyListener() /*set callback handlers*/);
-      
-		DonkyCore.initialiseDonkySDK(this,">>ENTER API KEY HERE<<", 
-        	new DonkyListener() /*set callback handlers*/);
-    		
-	}
-}
-```
-
-# Donky-RichMessage-Inbox
-
-Use the Rich Messaging Inbox module to enable your application to disply rich messaging inbox and rich messages.
-
-## Usage
-
-To read more about how to get started please see [here](http://docs.mobiledonky.com/docs/start-here).
-
-If you are using Gradle just add the following dependancy (jCenter repo)
-
-```shell
-    compile 'net.donky:donky-module-rich-ui-inbox:2.2.0.3'
-```
-
-Initialise this module module before initailising Donky Core in onCreate method of your application class.
-
-```java
-public class MyApplication extends Application {
-
-    @Override
-    public void onCreate()
-    {
-        super.onCreate();
-      
-        DonkyRichInboxUI.initialiseDonkyRich(this,
-      		new DonkyListener() /*set callback handlers*/);
-      
-		DonkyCore.initialiseDonkySDK(this,">>ENTER API KEY HERE<<", 
-        	new DonkyListener() /*set callback handlers*/);
-    		
-	}
-}
-```
-
-# Donky-RichMessage-PopUp
-
-Use the Rich Message module to enable your application to disply rich content messages.
-
-## Usage
-
-To read more about how to get started please see [here](http://docs.mobiledonky.com/docs/start-here).
-
-If you are using Gradle just add the following dependancy (jCenter repo)
-
-```shell
-    compile 'net.donky:donky-module-rich-ui-popup:2.2.0.3'
-```
-
-Initialise this module module before initailising Donky Core in onCreate method of your application class.
-
-```java
-public class MyApplication extends Application {
-
-    @Override
-    public void onCreate()
-    {
-        super.onCreate();
-      
-        DonkyRichUI.initialiseDonkyRich(this,
-			new DonkyListener() /*set callback handlers*/);
-      
-		DonkyCore.initialiseDonkySDK(this,">>ENTER API KEY HERE<<", 
-        	new DonkyListener() /*set callback handlers*/);
-    		
-	}
-}
-```
-
 # Donky-Analytics
 
 The analytics module provides key metrics around app launches, app session times.
@@ -333,7 +162,178 @@ public class MyApplication extends Application {
 }
 ```
 
-# Donky-Automation
+# Donky-Push-Logic
+
+Use the Simple Push module to enable your application to receive Simple Push messages.
+
+## Usage
+
+To read more about how to get started please see [here](http://docs.mobiledonky.com/docs/start-here).
+
+If you are using Gradle just add the following dependancies (jCenter repo)
+
+```shell
+    compile 'net.donky:donky-module-push-logic:2.2.0.3'
+```
+
+Initialise this module module before initailising Donky Core in onCreate method of your application class.
+
+```java
+public class MyApplication extends Application {
+
+    @Override
+    public void onCreate()
+    {
+        super.onCreate();
+      
+		DonkyPushLogic.initialiseDonkyPush(this,
+			new DonkyListener() /*set callback handlers*/);
+      
+		DonkyCore.initialiseDonkySDK(this,">>ENTER API KEY HERE<<", 
+			new DonkyListener() /*set callback handlers*/);
+    		
+	}
+}
+```
+
+# Donky-Push-UI
+
+Use the Simple Push module to enable your application to display Simple Push messages.
+
+## Usage
+
+To read more about how to get started please see [here](http://docs.mobiledonky.com/docs/start-here).
+
+If you are using Gradle just add the following dependancies (jCenter repo)
+
+```shell
+    compile 'net.donky:donky-module-push-ui:2.2.0.3'
+```
+
+Initialise this module module before initailising Donky Core in onCreate method of your application class.
+
+```java
+public class MyApplication extends Application {
+
+    @Override
+    public void onCreate()
+    {
+        super.onCreate();
+      
+      	DonkyPushUI.initialiseDonkyPush(this,
+        	new DonkyListener() /*set callback handlers*/);
+      
+		DonkyCore.initialiseDonkySDK(this,">>ENTER API KEY HERE<<", 
+        	new DonkyListener() /*set callback handlers*/);
+			
+    }
+		
+}
+```
+
+# Donky-Rich-Logic
+
+Use the Rich Message  module to enable your application to receive rich content messages.
+
+## Usage
+
+To read more about how to get started please see [here](http://docs.mobiledonky.com/docs/start-here).
+
+If you are using Gradle just add the following dependancy (jCenter repo)
+
+```shell
+    compile 'net.donky:donky-module-rich-logic:2.2.0.3'
+```
+
+Initialise this module module before initailising Donky Core in onCreate method of your application class.
+
+```java
+public class MyApplication extends Application {
+
+    @Override
+    public void onCreate()
+    {
+        super.onCreate();
+      
+        DonkyRichLogic.initialiseDonkyRich(this,
+			new DonkyListener() /*set callback handlers*/);
+      
+		DonkyCore.initialiseDonkySDK(this,">>ENTER API KEY HERE<<", 
+        	new DonkyListener() /*set callback handlers*/);
+    		
+	}
+}
+```
+
+# Donky-Rich-View
+
+Use the Rich Message module to enable your application to disply rich content messages.
+
+## Usage
+
+To read more about how to get started please see [here](http://docs.mobiledonky.com/docs/start-here).
+
+If you are using Gradle just add the following dependancy (jCenter repo)
+
+```shell
+    compile 'net.donky:donky-module-rich-ui-popup:2.2.0.3'
+```
+
+Initialise this module module before initailising Donky Core in onCreate method of your application class.
+
+```java
+public class MyApplication extends Application {
+
+    @Override
+    public void onCreate()
+    {
+        super.onCreate();
+      
+        DonkyRichUI.initialiseDonkyRich(this,
+			new DonkyListener() /*set callback handlers*/);
+      
+		DonkyCore.initialiseDonkySDK(this,">>ENTER API KEY HERE<<", 
+        	new DonkyListener() /*set callback handlers*/);
+    		
+	}
+}
+```
+
+# Donky-Rich-Inbox
+
+Use the Rich Messaging Inbox module to enable your application to disply rich messaging inbox and rich messages.
+
+## Usage
+
+To read more about how to get started please see [here](http://docs.mobiledonky.com/docs/start-here).
+
+If you are using Gradle just add the following dependancy (jCenter repo)
+
+```shell
+    compile 'net.donky:donky-module-rich-ui-inbox:2.2.0.3'
+```
+
+Initialise this module module before initailising Donky Core in onCreate method of your application class.
+
+```java
+public class MyApplication extends Application {
+
+    @Override
+    public void onCreate()
+    {
+        super.onCreate();
+      
+        DonkyRichInboxUI.initialiseDonkyRich(this,
+      		new DonkyListener() /*set callback handlers*/);
+      
+		DonkyCore.initialiseDonkySDK(this,">>ENTER API KEY HERE<<", 
+        	new DonkyListener() /*set callback handlers*/);
+    		
+	}
+}
+```
+
+# Donky-Automation-Logic
 
 The automation layer adds the ability to invoke server defined behaviours.
 
@@ -367,7 +367,75 @@ public class MyApplication extends Application {
 }
 ```
 
-# Donky-Sequencing
+# Donky-Common-Messaging-Logic
+
+This module provides common functionalities for other messaging logic modules and is automatically initialised by them. You would need this module if you would like to rewrite another messaging logic module.
+
+## Usage
+
+To read more about how to get started please see [here](http://docs.mobiledonky.com/docs/start-here).
+
+If you are using Gradle just add the following dependancy (jCenter repo)
+
+```shell
+    compile 'net.donky:donky-module-messaging-logic:2.2.0.3'
+```
+
+Initialise this module module before initailising Donky Core in onCreate method of your application class.
+
+```java
+public class MyApplication extends Application {
+
+    @Override
+    public void onCreate()
+    {
+        super.onCreate();
+      
+        DonkyMessaging.initialiseDonkyMessaging(this, 
+			new DonkyListener() /*set callback handlers*/);
+      
+		DonkyCore.initialiseDonkySDK(this,">>ENTER API KEY HERE<<", 
+        	new DonkyListener() /*set callback handlers*/);
+    		
+	}
+}
+```
+
+# Donky-Common-Messaging-UI
+
+This module provides common functionalities for other messaging UI modules and is automatically initialised by them. You could use that module to reuse some UI elemnts building your own UI.
+
+## Usage
+
+To read more about how to get started please see [here](http://docs.mobiledonky.com/docs/start-here).
+
+If you are using Gradle just add the following dependancy (jCenter repo)
+
+```shell
+    compile 'net.donky:donky-module-messaging-ui:2.2.0.3'
+```
+
+Initialise this module module before initailising Donky Core in onCreate method of your application class.
+
+```java
+public class MyApplication extends Application {
+
+    @Override
+    public void onCreate()
+    {
+        super.onCreate();
+      
+        DonkyMessagingUI.initialiseDonkyMessaging(this, 
+			new DonkyListener() /*set callback handlers*/);
+      
+		DonkyCore.initialiseDonkySDK(this,">>ENTER API KEY HERE<<", 
+        	new DonkyListener() /*set callback handlers*/);
+    		
+	}
+}
+```
+
+# Donky-Core-Sequencing
 
 Use of this module allows you to perform multiple calls to some account controller methods without needing to implement call backs or worry about sequencing when changing local and network state.
 
