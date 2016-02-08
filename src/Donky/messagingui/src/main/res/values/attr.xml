@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- The icon to use for new message -->
+    <attr name="dk_ic_message_24dp" format="reference" />
+
+    <!-- The icon to use for send message -->
+    <attr name="dk_ic_copy_24dp" format="reference" />
+
+    <!-- The icon to use for the home as up action -->
+    <attr name="dk_ic_arrow_back_24dp" format="reference" />
+
+    <!-- The icon to use for the forward action -->
+    <attr name="dk_ic_arrow_forward_24dp" format="reference" />
+
+    <!-- The icon to use for the checkboxes (checked)-->
+    <attr name="dk_ic_check_box_24dp" format="reference" />
+
+    <!-- The icon to use for the checkboxes (unchecked)-->
+    <attr name="dk_ic_check_box_outline_blank_24dp" format="reference" />
+
+    <!-- The icon to use for the close search view action -->
+    <attr name="dk_ic_close_24dp" format="reference" />
+
+    <!-- The icon to use for the delete action -->
+    <attr name="dk_ic_delete_24dp" format="reference" />
+
+    <!-- The icon to use for the menu drawer action -->
+    <attr name="dk_ic_more_vert_24dp" format="reference" />
+
+    <!-- The icon to use for the multi select action mode -->
+    <attr name="dk_ic_multi_select_24dp" format="reference" />
+
+    <!-- The icon to use for the filter action -->
+    <attr name="dk_ic_search_24dp" format="reference" />
+
+    <!-- The icon to use for the share action -->
+    <attr name="dk_ic_share_24dp" format="reference" />
+
+    <attr name="dk_ic_contacts_24dp" format="reference" />
+    <attr name="dk_ic_email_24dp" format="reference" />
+    <attr name="dk_ic_group_add_24dp" format="reference" />
+    <attr name="dk_ic_image_24dp" format="reference" />
+    <attr name="dk_ic_mode_edit_24dp" format="reference" />
+    <attr name="dk_ic_person_24dp" format="reference" />
+    <attr name="dk_ic_phone_24dp" format="reference" />
+    <attr name="dk_ic_photo_camera_24dp" format="reference" />
+    <attr name="dk_ic_save" format="reference" />
+
+    <!-- The icon to use for remote notification -->
+    <attr name="dk_notification_small_icon_chat" format="reference" />
+
+    <!-- The icon to use for remote notification -->
+    <attr name="dk_notification_small_icon_rich" format="reference" />
+
+    <!-- The icon to use for remote notification -->
+    <attr name="dk_notification_small_icon_simple_push" format="reference" />
+
+    <!-- Alert Dialog style -->
+    <attr name="dk_dialog_style" format="reference" />
+
+    <!-- Color of action bar -->
+    <attr name="dk_color_primary" format="reference" />
+
+    <!-- Color of notification bar -->
+    <attr name="dk_color_primary_dark" format="reference" />
+
+    <!-- Text color in action bar -->
+    <attr name="dk_text_color_primary" format="reference" />
+
+    <!-- Popup list window style -->
+    <attr name="dk_toolbar_popup_menu_style" format="reference" />
+
+    <!-- Overflow menu button style in action mode -->
+    <attr name="dk_overflow_menu_button_style" format="reference" />
+
+    <!-- Action mode style e.g. action mode bar text style -->
+    <attr name="dk_action_mode_style" format="reference" />
+
+    <!-- Split view divider style -->
+    <attr name="dk_divider_between_inbox_and_detail_fragments_style" format="reference" />
+
+    <!-- Style of empty message placeholder text view -->
+    <attr name="dk_message_empty_text_style" format="reference" />
+
+    <!-- Toolbar style -->
+    <attr name="dk_toolbar_style" format="reference" />
+
+    <!-- Toolbar title style-->
+    <attr name="dk_toolbar_title_style" format="reference" />
+
+    <!-- Window list popup row style -->
+    <attr name="dk_window_popup_list_element_style" format="reference" />
+
+</resources>

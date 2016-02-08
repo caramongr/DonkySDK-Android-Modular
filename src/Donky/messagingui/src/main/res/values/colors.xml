@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Remote notifications -->
+    <color name="donky_notification_led">@android:color/white</color>
+    <color name="donky_notification_icon_background_rich">@android:color/holo_purple</color>
+
+    <!-- Toolbar/ActionBar -->
+
+    <!-- themes with white icons-->
+    <color name="dk_action_bar_tool_bar_background">#652882</color>
+    <color name="dk_status_bar_background">#432668</color>
+    <color name="dk_action_bar_tool_bar_text">#ffffff</color>
+    <color name="dk_action_mode_background">#a555cb</color>
+
+    <!-- themes with black icons -->
+    <color name="dk_action_bar_tool_bar_background_light_theme">#ffffff</color>
+    <color name="dk_status_bar_background_light_theme">#7A7A79</color>
+    <color name="dk_action_bar_tool_bar_text_light_theme">#000000</color>
+    <color name="dk_action_mode_background_light_theme">#D3D3D3</color>
+
+    <color name="dk_popup_option_menu_text_color">#000000</color>
+    <color name="dk_popup_option_menu_bg_color">#ffffff</color>
+
+    <!-- List View -->
+    <color name="dk_empty_list_view_text">#A8A8A8</color>
+    <color name="dk_window_popup_list_element_text_color">#000000</color>
+
+    <!-- popup list styling when list row long clicked-->
+    <color name="dk_window_popup_list_element_normal_background">#FFFFFF</color>
+    <color name="dk_window_popup_list_element_pressed_background">#D3D3D3</color>
+    <color name="dk_window_popup_list_element_selected_background">#D3D3D3</color>
+    <color name="dk_window_popup_list_element_focused_background">#A8A8A8</color>
+
+    <!-- Inactive detail fragment overlay -->
+    <color name="dk_semi_transparent_overlay">#4DA8A8A8</color>
+
+    <!-- Divider between fragments -->
+    <color name="dk_fragments_divider">#aaa</color>
+
+    <!-- Divider between list rows -->
+    <color name="dk_conversation_list_divider">#9D9D9D</color>
+
+</resources>

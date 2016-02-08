@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- ACTION BAR STYLING -->
+    <color name="dk_action_bar_tool_bar_background_light_theme">#99b4ff</color>
+    <color name="dk_status_bar_background_light_theme">#195f77</color>
+    <color name="dk_action_bar_tool_bar_text_light_theme">#FFff33</color>
+    <color name="dk_action_mode_background_light_theme">#99FFCC</color>
+
+    <!-- INBOX LIST VIEW ROW COLORS -->
+    <color name="dk_rich_message_new_tag_background">#FF99CC</color>
+    <color name="dk_rich_message_new_tag_background_stroke">#FFFF99</color>
+    <color name="dk_rich_message_new_tag_text">#669900</color>
+    <color name="dk_rich_message_display_name">#FF3399</color>
+    <color name="dk_rich_message_timestamp">#CC9900</color>
+    <color name="dk_rich_message_timestamp_read">#FF9933</color>
+    <color name="dk_rich_message_new_timestamp">#CC99FF</color>
+    <color name="dk_rich_message_description">#00CC66</color>
+
+    <!-- INBOX LIST VIEW SELECTOR COLORS -->
+    <color name="dk_rich_message_list_element_normal_background">#FFFF99</color>
+    <color name="dk_rich_message_list_element_pressed_background">#FF3300</color>
+    <color name="dk_rich_message_list_element_selected_background">#FFCC99</color>
+    <color name="dk_rich_message_list_element_focused_background">#FFCC99</color>
+
+    <!-- INBOX LIST VIEW COLORS -->
+    <color name="dk_empty_list_view_text">#A82342</color>
+    <color name="dk_rich_message_list_view_element_ripple">#ff0000</color>
+    <color name="dk_rich_message_list_view_background">#99FF99</color>
+    <color name="dk_rich_message_inbox_activity_background">#FFFFFF</color>
+
+    <!-- LIST VIEW POPUP WINDOW COLORS - OPTIONS LIST FOR SINGLE MESSAGE -->
+    <color name="dk_window_popup_list_element_text_color">#0000FF</color>
+    <color name="dk_window_popup_list_element_normal_background">#00FFFF</color>
+    <color name="dk_window_popup_list_element_pressed_background">#D3FFD3</color>
+    <color name="dk_window_popup_list_element_selected_background">#D3FFD3</color>
+    <color name="dk_window_popup_list_element_focused_background">#A8FFA8</color>
+
+    <!-- ACTION BAR OPTION LIST -->
+    <color name="dk_popup_option_menu_text_color">#923403</color>
+    <color name="dk_popup_option_menu_bg_color">#056977</color>
+
+    <!-- TRANSPARENT OVERLAY FOR INACTIVE RICH MESSAGE VIEW -->
+    <color name="dk_semi_transparent">#4D00FFA8</color>
+
+    <!-- DEMO APP STYLING - ACTIVITY BORDERS COLORS -->
+    <color name="app_top">#800080</color>
+    <color name="app_bottom">#ffa500</color>
+    <color name="app_left">#f98009</color>
+    <color name="app_right">#a9144c</color>
+
+</resources>

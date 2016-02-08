@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Memory cache will be limited to 1/N of max memory available -->
+    <integer name="dk_part_of_memory_to_use_as_cache">8</integer>
+
+    <!-- Power of 2 that gives limit of disk cache storage in bits. 27 gives about 16 Megabytes. Number of bits cannot exceed max integer value -->
+    <integer name="dk_disk_cache_limit_as_power_of_2_in_bits">27</integer>
+
+    <integer name="dk_multi_choice_animation_time_millis">200</integer>
+
+    <!-- Timestamps and expiry check will be performed every N milliseconds when list view is visible -->
+    <integer name="dk_list_view_timestamps_update_frequency">60000</integer>
+
+    <!-- delay between animating list elements and changing internal state. This should be longer than dk_multi_choice_animation_time_millis -->
+    <integer name="dk_list_row_selection_delay">500</integer>
+
+</resources>

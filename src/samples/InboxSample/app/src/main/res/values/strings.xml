@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">InboxSample</string>
+    <string name="ServiceURL">https://dev-client-api.mobiledonky.com</string>
+</resources>

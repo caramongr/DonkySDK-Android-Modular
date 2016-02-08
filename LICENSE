@@ -17,3 +17,6 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
+
+
+NOTE: signalr-client-sdk and signalr-client-sdk-android modules in Donky folder are distributed under a different license (http://www.apache.org/licenses/LICENSE-2.0). See license.txt inside these folders for details.

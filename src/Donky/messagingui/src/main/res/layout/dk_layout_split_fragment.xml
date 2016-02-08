@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/main_split_container"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="horizontal">
+
+    <FrameLayout
+        android:id="@+id/dk_left_container"
+        android:layout_width="0dp"
+        android:layout_height="fill_parent"
+        android:layout_weight="4"
+        android:animateLayoutChanges="true">
+
+    </FrameLayout>
+
+    <View
+        style="?attr/dk_divider_between_inbox_and_detail_fragments_style"
+        android:layout_width="1dp"
+        android:layout_height="fill_parent"
+        android:background="@android:color/darker_gray" />
+
+    <RelativeLayout
+        android:layout_width="0dp"
+        android:layout_height="fill_parent"
+        android:layout_weight="6">
+
+        <FrameLayout
+            android:id="@+id/dk_right_container"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:animateLayoutChanges="true">
+
+            <TextView
+                android:id="@+id/empty_list"
+                style="?attr/dk_message_empty_text_style"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:text="@string/dk_empty_message" />
+
+        </FrameLayout>
+
+        <View
+            android:id="@+id/dk_overlay"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:background="@color/dk_semi_transparent_overlay"
+            android:visibility="gone"
+            android:clickable="true" />
+
+    </RelativeLayout>
+
+</LinearLayout>

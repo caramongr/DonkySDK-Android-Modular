@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Small text size -->
+    <dimen name="dk_text_small">14sp</dimen>
+    <!-- Medium text size -->
+    <dimen name="dk_text_medium">15sp</dimen>
+    <!-- Large text size -->
+    <dimen name="dk_text_large">17sp</dimen>
+
+    <!-- Small padding size -->
+    <dimen name="dk_padding_small">5dp</dimen>
+    <!-- Medium padding size -->
+    <dimen name="dk_padding_medium">10dp</dimen>
+    <!-- Large padding size -->
+    <dimen name="dk_padding_large">15dp</dimen>
+    <!-- Larger padding size -->
+    <dimen name="dk_padding_medium_large">20dp</dimen>
+    <!-- Extra large padding size -->
+    <dimen name="dk_padding_extra_large">35dp</dimen>
+    <!-- Largest padding size -->
+    <dimen name="dk_padding_double_extra_large">45dp</dimen>
+
+    <integer name="dk_checkbox_image_dp_width">24</integer>
+
+    <dimen name="dk_list_popup_width_portrait">224dp</dimen>
+    <dimen name="dk_list_popup_width_landscape">280dp</dimen>
+
+    <dimen name="dk_list_popup_left_offset">16dp</dimen>
+
+</resources>

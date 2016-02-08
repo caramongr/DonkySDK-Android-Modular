@@ -1,0 +1,1 @@
+include ':signalr', ':signalr-client-sdk', ':signalr-client-sdk-android', ':analytics', ':app', ':automation', ':core', ':messaging', ':messagingui', ':richinboxui', ':richlogic', ':sequencing', ':location', ':assets', ':push'

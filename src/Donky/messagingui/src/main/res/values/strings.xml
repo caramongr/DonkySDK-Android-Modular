@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- toolbar share message option item -->
+    <string name="dk_toolbar_option_share">Share</string>
+
+    <!-- title for share message picker -->
+    <string name="dk_rich_message_share_title">Share</string>
+
+    <!-- action menu items -->
+    <string name="dk_action_share">Share</string>
+    <string name="dk_action_forward">Forward</string>
+    <string name="dk_action_delete">Delete</string>
+    <string name="dk_action_search">Search</string>
+    <string name="dk_action_new_message">New message</string>
+    <string name="dk_action_copy">Copy</string>
+
+    <!-- empty content descriptions -->
+    <string name="dk_empty_list">No messages</string>
+    <string name="dk_empty_message">No message selected</string>
+
+    <!-- timestamps -->
+    <string name="dk_just_now">Just now</string>
+    <string name="dk_number_of_minutes">mins ago</string>
+    <string name="dk_number_of_hours_singular">hr ago</string>
+    <string name="dk_number_of_hours_plural">hrs ago</string>
+    <string name="dk_yesterday">Yesterday</string>
+    <string name="dk_today">Today</string>
+
+</resources>
