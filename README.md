@@ -4,7 +4,7 @@
 
 # DonkySDK-Android-Modular (V2.3.0.0)
 
-The Android Modular SDK is a kit for adding push notifications and rich content services to your application. For detailed documentation, tutorials and guides, visit our [online documentation](http://docs.mobiledonky.com/docs/start-here).
+The Android Modular SDK is a kit for adding push notifications and rich content services to your application. For detailed documentation, tutorials and guides, visit our [online documentation](http://docs.mobiledonky.com/docs/set-up-guide).
 
 ## Requirements
 
@@ -77,7 +77,7 @@ You can use 'File->New->Import Module' option to easily include the source code 
 
 ## Usage
 
-To read more about how to get started please see [here](http://docs.mobiledonky.com/docs/start-here) and for details how to use this module [here](http://docs.mobiledonky.com/docs/start-here).
+To read more about how to get started please see [here](http://docs.mobiledonky.com/docs/set-up-guide) and for details how to use this module [here](http://docs.mobiledonky.com/docs/register-users-android).
 
 Download via Gradle
 
@@ -114,7 +114,7 @@ You can use 'File->New->Import Module' option to easily include the source code 
 
 ## Usage
 
-To read more about how to get started please see [here](http://docs.mobiledonky.com/docs/start-here) and for details how to use this module [here](http://docs.mobiledonky.com/docs/start-here).
+To read more about how to get started please see [here](http://docs.mobiledonky.com/docs/set-up-guide) and for details how to use this module [here](http://docs.mobiledonky.com/docs/android-push).
 
 Download via Gradle
 
@@ -153,7 +153,7 @@ You can use 'File->New->Import Module' option to easily include the source code 
 
 ## Usage
 
-To read more about how to get started please see [here](http://docs.mobiledonky.com/docs/start-here) and for details how to use this module [here](http://docs.mobiledonky.com/docs/start-here).
+To read more about how to get started please see [here](http://docs.mobiledonky.com/docs/set-up-guide) and for details how to use this module [here](http://docs.mobiledonky.com/docs/android-rich).
 
 Download via Gradle
 
@@ -192,7 +192,7 @@ You can use 'File->New->Import Module' option to easily include the source code 
 
 ## Usage
 
-To read more about how to get started please see [here](http://docs.mobiledonky.com/docs/start-here) and for details how to use this module [here](http://docs.mobiledonky.com/docs/start-here).
+To read more about how to get started please see [here](http://docs.mobiledonky.com/docs/set-up-guide) and for details how to use this module [here](http://docs.mobiledonky.com/docs/rich-prebuilt-inbox).
 
 Download via Gradle
 
@@ -237,7 +237,7 @@ You can use 'File->New->Import Module' option to easily include the source code 
 
 ## Usage
 
-To read more about how to get started please see [here](http://docs.mobiledonky.com/docs/start-here) and for details how to use this module [here](http://docs.mobiledonky.com/docs/start-here).
+To read more about how to get started please see [here](http://docs.mobiledonky.com/docs/set-up-guide) and for details how to use this module [here](http://docs.mobiledonky.com/docs/android-analytics-automation).
 
 Download via Gradle
 
@@ -276,7 +276,7 @@ You can use 'File->New->Import Module' option to easily include the source code 
 
 ## Usage
 
-To read more about how to get started please see [here](http://docs.mobiledonky.com/docs/start-here) and for details how to use this module [here](http://docs.mobiledonky.com/docs/start-here).
+To read more about how to get started please see [here](http://docs.mobiledonky.com/docs/set-up-guide) and for details how to use this module [here](http://docs.mobiledonky.com/docs/android-analytics-automation).
 
 Download via Gradle
 
@@ -315,7 +315,7 @@ You can use 'File->New->Import Module' option to easily include the source code 
 
 ## Usage
 
-To read more about how to get started please see [here](http://docs.mobiledonky.com/docs/start-here) and for details how to use this module [here](http://docs.mobiledonky.com/docs/start-here).
+To read more about how to get started please see [here](http://docs.mobiledonky.com/docs/set-up-guide) and for details how to use this module [here](http://docs.mobiledonky.com/docs/android-assets).
 
 Download via Gradle
 
@@ -354,7 +354,7 @@ You can use 'File->New->Import Module' option to easily include the source code 
 
 ## Usage
 
-To read more about how to get started please see [here](http://docs.mobiledonky.com/docs/start-here) and for details how to use this module [here](http://docs.mobiledonky.com/docs/start-here).
+To read more about how to get started please see [here](http://docs.mobiledonky.com/docs/set-up-guide) and for details how to use this module [here](http://docs.mobiledonky.com/docs/android-core-location).
 
 Download via Gradle
 
@@ -392,18 +392,18 @@ You can find the source code of Donky SignalR in [*Donky/signalr*](https://githu
 
 You can use 'File->New->Import Module' option to easily include the source code to your project.
 This will automatcally add sources for following libraries:
-
-- Customised version of [TooTallNate/Java-WebSocket](https://github.com/TooTallNate/Java-WebSocket) Android library which you can find [here](https://github.com/Donky-Network/DonkySDK-Android-Modular-EarlyAccess/tree/master/src/websockets/)
   
-- Customised version of [SignalR](https://github.com/SignalR/java-client) Java client library which you can find [here](https://github.com/Donky-Network/DonkySDK-Android-Modular-EarlyAccess/tree/master/src/signalr-client-sdk/)
-  Depends on the first one
+- Customised version of [SignalR](https://github.com/SignalR/java-client) Java client library which you can find [here](https://github.com/Donky-Network/DonkySDK-Android-Modular/tree/master/src/Donky/signalr-client-sdk)
   
-- Customised version of [SignalR](https://github.com/SignalR/java-client) Android library which you can find [here](https://github.com/Donky-Network/DonkySDK-Android-Modular-EarlyAccess/tree/master/src/signalr-client-sdk-android/)
-  Depends on other two
+- Customised version of [SignalR](https://github.com/SignalR/java-client) Android library which you can find [here](https://github.com/Donky-Network/DonkySDK-Android-Modular/tree/master/src/Donky/signalr-client-sdk-android)
 
+Additional maven dependency is 
+
+- [TooTallNate/Java-WebSocket](https://github.com/TooTallNate/Java-WebSocket) library.
+  
 ## Usage
 
-To read more about how to get started please see [here](http://docs.mobiledonky.com/docs/start-here) and for details how to use this module [here](http://docs.mobiledonky.com/docs/start-here).
+To read more about how to get started please see [here](http://docs.mobiledonky.com/docs/set-up-guide) and for details how to use this module [here](http://docs.mobiledonky.com/docs/set-up-guide).
 
 Initialise this module before initailising Donky Core in onCreate method of your application class.
 
@@ -411,6 +411,17 @@ Add the following to gradle.build dependencies
 
 ```shell
     compile 'net.donky:donky-module-signalr:2.3.0.0'
+```
+
+You will also need to include for TooTallNate/Java-WebSocket library:
+
+```shell
+repositories {
+        jcenter()
+        maven {
+            url 'http://clojars.org/repo'
+        }
+    }
 ```
 
 Initialise this module before initailising Donky Core in onCreate method of your application class.
@@ -444,7 +455,7 @@ You can use 'File->New->Import Module' option to easily include the source code 
 
 ## Usage
 
-To read more about how to get started please see [here](http://docs.mobiledonky.com/docs/start-here) and for details how to use this module [here](http://docs.mobiledonky.com/docs/start-here).
+To read more about how to get started please see [here](http://docs.mobiledonky.com/docs/set-up-guide).
 
 Download via Gradle
 
