@@ -1,5 +1,7 @@
 package net.donky.core.account;
 
+import android.text.TextUtils;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.SerializedName;
@@ -74,8 +76,12 @@ public class UserUpdatedHandler {
                 userDetails.setUserLastName(userUpdated.lastName);
                 userDetails.setCountryCode(userUpdated.countryIsoCode);
                 userDetails.setLastUpdated(System.currentTimeMillis());
+                if (!TextUtils.isEmpty(userUpdated.newExternalUserId)) {
+                    userDetails.setUserId(userUpdated.newExternalUserId);
+                } else {
+                    userDetails.setUserId(userUpdated.externalUserId);
+                }
                 DonkyDataController.getInstance().getUserDAO().setUserDetails(userDetails);
-
                 DonkyCore.publishLocalEvent(new RegistrationChangedEvent(userDetails, DonkyAccountController.getInstance().getDeviceDetails(), false));
             }
         }
@@ -91,6 +97,9 @@ public class UserUpdatedHandler {
 
         @SerializedName("externalUserId")
         private String externalUserId;
+
+        @SerializedName("newExternalUserId")
+        private String newExternalUserId;
 
         @SerializedName("displayName")
         private String displayName;

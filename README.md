@@ -2,7 +2,7 @@
   <img src="https://avatars2.githubusercontent.com/u/11334935?v=3&s=200" alt="Donky Networks LTD" title="Donky Network SDK">
 </p>
 
-# DonkySDK-Android-Modular (V2.3.0.0)
+# DonkySDK-Android-Modular (V2.3.0.1)
 
 The Android Modular SDK is a kit for adding push notifications and rich content services to your application. For detailed documentation, tutorials and guides, visit our [online documentation](http://docs.mobiledonky.com/docs/set-up-guide).
 
@@ -82,7 +82,7 @@ To read more about how to get started please see [here](http://docs.mobiledonky.
 Download via Gradle
 
 ```shell
-    compile 'net.donky:donky-core:2.3.0.0'
+    compile 'net.donky:donky-core:2.3.0.1'
 ```
 
 Initialise this module in onCreate method of your application class.
@@ -119,7 +119,7 @@ To read more about how to get started please see [here](http://docs.mobiledonky.
 Download via Gradle
 
 ```shell
-    compile 'net.donky:donky-module-push:2.3.0.0'
+    compile 'net.donky:donky-module-push:2.3.0.1'
 ```
 
 Initialise this module before initailising Donky Core in onCreate method of your application class.
@@ -158,7 +158,7 @@ To read more about how to get started please see [here](http://docs.mobiledonky.
 Download via Gradle
 
 ```shell
-    compile 'net.donky:donky-module-rich-logic:2.3.0.0'
+    compile 'net.donky:donky-module-rich-logic:2.3.0.1'
 ```
 
 Initialise this module before initailising Donky Core in onCreate method of your application class.
@@ -197,7 +197,7 @@ To read more about how to get started please see [here](http://docs.mobiledonky.
 Download via Gradle
 
 ```shell
-    compile 'net.donky:donky-module-rich-ui-inbox:2.3.0.0'
+    compile 'net.donky:donky-module-rich-ui-inbox:2.3.0.1'
 ```
 
 Initialise this module before initailising Donky Core in onCreate method of your application class.
@@ -242,7 +242,7 @@ To read more about how to get started please see [here](http://docs.mobiledonky.
 Download via Gradle
 
 ```shell
-    compile 'net.donky:donky-module-analytics:2.3.0.0'
+    compile 'net.donky:donky-module-analytics:2.3.0.1'
 ```
 
 Initialise this module before initailising Donky Core in onCreate method of your application class.
@@ -281,7 +281,7 @@ To read more about how to get started please see [here](http://docs.mobiledonky.
 Download via Gradle
 
 ```shell
-    compile 'net.donky:donky-module-automation:2.3.0.0'
+    compile 'net.donky:donky-module-automation:2.3.0.1'
 ```
 
 Initialise this module before initailising Donky Core in onCreate method of your application class.
@@ -320,7 +320,7 @@ To read more about how to get started please see [here](http://docs.mobiledonky.
 Download via Gradle
 
 ```shell
-    compile 'net.donky:donky-module-automation:2.3.0.0'
+    compile 'net.donky:donky-module-automation:2.3.0.1'
 ```
 
 Initialise this module before initailising Donky Core in onCreate method of your application class.
@@ -359,7 +359,7 @@ To read more about how to get started please see [here](http://docs.mobiledonky.
 Download via Gradle
 
 ```shell
-    compile 'net.donky:donky-module-location:2.3.0.0'
+    compile 'net.donky:donky-module-location:2.3.0.1'
 ```
 
 Initialise this module before initailising Donky Core in onCreate method of your application class.
@@ -410,7 +410,7 @@ Initialise this module before initailising Donky Core in onCreate method of your
 Add the following to gradle.build dependencies
 
 ```shell
-    compile 'net.donky:donky-module-signalr:2.3.0.0'
+    compile 'net.donky:donky-module-signalr:2.3.0.1'
 ```
 
 You will also need to include for TooTallNate/Java-WebSocket library:
@@ -460,7 +460,7 @@ To read more about how to get started please see [here](http://docs.mobiledonky.
 Download via Gradle
 
 ```shell
-    compile 'net.donky:donky-module-sequencing:2.3.0.0'
+    compile 'net.donky:donky-module-sequencing:2.3.0.1'
 ```
 
 Initialise this module before initailising Donky Core in onCreate method of your application class.
