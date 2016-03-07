@@ -23,6 +23,8 @@ public class ConfigurationDAO extends SharedPreferencesBaseDAO {
     /**
      * Key names for Shared Preferences storage.
      */
+    private static final String KEY_INSTANCE_ID= "instanceId";
+    private static final String KEY_IS_AUTHENTICATING_USER = "isAuthenticating";
     private static final String KEY_GCM_REGISTRATION_ID = "registrationId";
     private static final String KEY_GCM_SENDER_ID = "senderId";
     private static final String KEY_DONKY_API_KEY = "apiKey";
@@ -65,6 +67,35 @@ public class ConfigurationDAO extends SharedPreferencesBaseDAO {
 
     public ConfigurationDAO(Context context) {
         super(context, SHARED_PREFERENCES_FILENAME_INTERNAL);
+    }
+
+    /**
+     * @return Is Donky SDK require user authentication.
+     */
+    public boolean getIsAuthenticatingUser() {
+        return getBoolean(KEY_IS_AUTHENTICATING_USER, false);
+    }
+
+    /**
+     * Make Donky SDK require an user authentication.
+     * @param authenticated
+     */
+    public void setIsAuthenticatingUser(boolean authenticated) {
+        setBoolean(KEY_IS_AUTHENTICATING_USER, authenticated);
+    }
+
+    /**
+     * @return Gets the timestamp of instance id being created.
+     */
+    public String getInstanceId() {
+        return getString(KEY_INSTANCE_ID, null);
+    }
+
+    /**
+     * Sets the timestamp of instance id being created.
+     */
+    public void setInstanceId(String id) {
+        setString(KEY_INSTANCE_ID, id);
     }
 
     /**

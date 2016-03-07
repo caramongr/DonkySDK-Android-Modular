@@ -30,9 +30,13 @@ import net.donky.core.network.content.ContentNotification;
 import net.donky.core.network.location.GeoFence;
 import net.donky.core.network.location.Trigger;
 import net.donky.core.network.restapi.authentication.Login;
+import net.donky.core.network.restapi.authentication.LoginAuth;
 import net.donky.core.network.restapi.authentication.LoginResponse;
 import net.donky.core.network.restapi.authentication.Register;
+import net.donky.core.network.restapi.authentication.RegisterAuth;
 import net.donky.core.network.restapi.authentication.RegisterResponse;
+import net.donky.core.network.restapi.authentication.StartAuth;
+import net.donky.core.network.restapi.authentication.StartAuthResponse;
 import net.donky.core.network.restapi.secured.DeletePushConfigurationRequest;
 import net.donky.core.network.restapi.secured.GetAllGeoFence;
 import net.donky.core.network.restapi.secured.GetAllTriggers;
@@ -280,13 +284,17 @@ public class DonkyNetworkController {
 
         if (sizeLimit != null) {
 
-            for (ContentNotification notification : contentNotifications) {
+            if (DonkyAccountController.getInstance().isRegistered()) {
+                for (ContentNotification notification : contentNotifications) {
 
-                if (isContentNotificationRespectingSizeLimit(sizeLimit, notification)) {
-                    DonkyDataController.getInstance().getNotificationDAO().addContentNotification(notification);
-                } else {
-                    validationResult.addFailure(notification, ValidationResult.REASON_SIZE_LIMIT_EXCEEDED);
+                    if (isContentNotificationRespectingSizeLimit(sizeLimit, notification)) {
+                        DonkyDataController.getInstance().getNotificationDAO().addContentNotification(notification);
+                    } else {
+                        validationResult.addFailure(notification, ValidationResult.REASON_SIZE_LIMIT_EXCEEDED);
+                    }
                 }
+            } else {
+                log.warning("User not registered. Content notifications will not be queued.");
             }
 
         } else {
@@ -311,7 +319,11 @@ public class DonkyNetworkController {
 
             if (isContentNotificationRespectingSizeLimit(getCustomContentMaxSizeBytes(), contentNotification)) {
 
-                DonkyDataController.getInstance().getNotificationDAO().addContentNotification(contentNotification);
+                if (DonkyAccountController.getInstance().isRegistered()) {
+                    DonkyDataController.getInstance().getNotificationDAO().addContentNotification(contentNotification);
+                } else {
+                    log.warning("User not registered. Content notifications will not be queued.");
+                }
 
             } else {
 
@@ -378,7 +390,11 @@ public class DonkyNetworkController {
      * @param clientNotifications Client notifications to send when next notification sync.
      */
     public void queueClientNotifications(List<ClientNotification> clientNotifications) {
-        DonkyDataController.getInstance().getNotificationDAO().addNotifications(clientNotifications);
+        if (DonkyAccountController.getInstance().isRegistered()) {
+            DonkyDataController.getInstance().getNotificationDAO().addNotifications(clientNotifications);
+        } else {
+            log.warning("User not registered. Client notifications will not be queued.");
+        }
     }
 
     /**
@@ -387,7 +403,12 @@ public class DonkyNetworkController {
      * @param clientNotification Client notification to send when next notification sync.
      */
     public void queueClientNotification(ClientNotification clientNotification) {
-        DonkyDataController.getInstance().getNotificationDAO().addNotification(clientNotification);
+        if (DonkyAccountController.getInstance().isRegistered()) {
+            DonkyDataController.getInstance().getNotificationDAO().addNotification(clientNotification);
+        } else {
+            log.warning("User not registered. Client notification will not be queued.");
+        }
+
     }
 
     /**
@@ -421,7 +442,14 @@ public class DonkyNetworkController {
      */
     public LoginResponse loginToNetwork(Login loginRequest) throws DonkyException {
         log.sensitive(loginRequest.toString());
-        return loginRequest.performSynchronous(apiKey);
+        try {
+            return loginRequest.performSynchronous(apiKey);
+        } catch (DonkyException donkyException) {
+            if (signalRController != null) {
+                signalRController.stopSignalR();
+            }
+            throw donkyException;
+        }
     }
 
     /**
@@ -447,6 +475,40 @@ public class DonkyNetworkController {
 
             @Override
             public void error(DonkyException donkyException, Map<String, String> validationErrors) {
+                if (signalRController != null) {
+                    signalRController.stopSignalR();
+                }
+                postError(donkyException, validationErrors, listener);
+            }
+        });
+    }
+
+    /**
+     * Login to Donky Network. This is non-blocking method.
+     *
+     * @param loginRequest Login request to be send to Donky Network.
+     * @param listener     Callback to be invoked when authenticate finish.
+     */
+    public void loginToNetwork(final LoginAuth loginRequest, final DonkyResultListener<LoginResponse> listener) {
+        log.sensitive(loginRequest.toString());
+        loginRequest.performAsynchronous(apiKey, new DonkyResultListener<LoginResponse>() {
+            @Override
+            public void success(final LoginResponse result) {
+                if (listener != null) {
+                    mainThreadHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            listener.success(result);
+                        }
+                    });
+                }
+            }
+
+            @Override
+            public void error(DonkyException donkyException, Map<String, String> validationErrors) {
+                if (signalRController != null) {
+                    signalRController.stopSignalR();
+                }
                 postError(donkyException, validationErrors, listener);
             }
         });
@@ -458,6 +520,15 @@ public class DonkyNetworkController {
      * @param registerRequest Register request to be send to Donky Network.
      */
     public RegisterResponse registerToNetwork(final Register registerRequest) throws DonkyException {
+        return registerRequest.performSynchronous(apiKey);
+    }
+
+    /**
+     * Register to Donky Network. This is blocking method.
+     *
+     * @param registerRequest Register request to be send to Donky Network.
+     */
+    public RegisterResponse registerToNetwork(final RegisterAuth registerRequest) throws DonkyException {
         return registerRequest.performSynchronous(apiKey);
     }
 
@@ -486,6 +557,49 @@ public class DonkyNetworkController {
                 postError(donkyException, validationErrors, listener);
             }
         });
+    }
+
+    /**
+     * Register to Donky Network with authenticated user. This is non-blocking method.
+     *
+     * @param registerRequest Register request to be send to Donky Network.
+     * @param listener        Callback to be invoked when register finish.
+     */
+    public void registerToNetwork(final RegisterAuth registerRequest, final DonkyResultListener<RegisterResponse> listener) {
+        registerRequest.performAsynchronous(apiKey, new DonkyResultListener<RegisterResponse>() {
+            @Override
+            public void success(final RegisterResponse result) {
+                if (listener != null) {
+                    mainThreadHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            listener.success(result);
+                        }
+                    });
+                }
+            }
+
+            @Override
+            public void error(DonkyException donkyException, Map<String, String> validationErrors) {
+                postError(donkyException, validationErrors, listener);
+            }
+        });
+    }
+
+    /**
+     * Get the nonce and correlationId from the network.
+     *
+     * @param donkyResultListener Callback with authentication challenge details.
+     */
+    public void startAuthentication(final StartAuth startAuth, final DonkyResultListener<StartAuthResponse> donkyResultListener) {
+        startAuth.performAsynchronous(apiKey, donkyResultListener);
+    }
+
+    /**
+     * Get the nonce and correlationId from the network.
+     */
+    public StartAuthResponse startAuthentication(final StartAuth startAuth) throws DonkyException {
+        return startAuth.performSynchronous(apiKey);
     }
 
     /**
@@ -592,6 +706,15 @@ public class DonkyNetworkController {
     }
 
     /**
+     * Update push chanel (GCM) details on the Network. Blocking version.
+     *
+     * @param updatePushConfiguration Network request to be executed.
+     */
+    public void updatePushConfigurationOnNetwork(final UpdatePushConfiguration updatePushConfiguration) throws DonkyException {
+        updatePushConfiguration.performSynchronous();
+    }
+
+    /**
      * Delete the push chanel (GCM) details on the network.
      *
      * @param listener The callback to invoke when the command has executed. Registration errors will be fed back through this.
@@ -611,6 +734,14 @@ public class DonkyNetworkController {
                 postError(donkyException, validationErrors, listener);
             }
         });
+    }
+
+    /**
+     * Delete the push chanel (GCM) details on the network. Blocking version.
+     */
+    public void deletePushConfigurationOnNetwork() throws DonkyException {
+        DeletePushConfigurationRequest request = new DeletePushConfigurationRequest();
+        request.performSynchronous();
     }
 
     /**
@@ -695,15 +826,7 @@ public class DonkyNetworkController {
         });
     }
 
-    /**
-     * Gets the messages for given conversation from the network.
-     *
-     * @param conversationId The conversation ID for the messages to obtain.
-     * @param direction Sets if the messages should be sent after given timestamp or before.
-     * @param dateTime Starting date for message query
-     * @param count Maximum number of messages to be downloaded.
-     * @param donkyResultListener Callback with the list of found messages.
-     */
+    @Deprecated
     public void getMessagesHistory(final String conversationId, String direction, String dateTime, int count, final DonkyResultListener<List<JsonObject>> donkyResultListener) {
 
         if (TextUtils.isEmpty(conversationId) || TextUtils.isEmpty(direction) || TextUtils.isEmpty(dateTime) || count < 0) {
@@ -735,21 +858,12 @@ public class DonkyNetworkController {
         });
     }
 
-    /**
-     * Gets the full list of conversations for current user from the network.
-     *
-     * @param donkyResultListener List of json objects containing details of existing chat conversations.
-     */
+    @Deprecated
     public void getConversationsHistory(final DonkyResultListener<List<JsonObject>> donkyResultListener) {
         getConversationsHistory(null, donkyResultListener);
     }
 
-    /**
-     * Gets the conversation list for current user from the network.
-     *
-     * @param conversationIds List of IDs of conversations to request details about.
-     * @param donkyResultListener List of json objects containing details of existing chat conversations.
-     */
+    @Deprecated
     public void getConversationsHistory(final List<String> conversationIds, final DonkyResultListener<List<JsonObject>> donkyResultListener) {
 
         String query = "conversation";
@@ -782,6 +896,7 @@ public class DonkyNetworkController {
         });
     }
 
+    @Deprecated
     public void getContacts(final List<String> profileIds, final DonkyResultListener<List<JsonObject>> donkyResultListener) {
 
         String query = "contact";
@@ -814,6 +929,7 @@ public class DonkyNetworkController {
         });
     }
 
+    @Deprecated
     public List<JsonObject> getContacts(final List<String> profileIds) {
 
         String query = "contact";
@@ -836,6 +952,7 @@ public class DonkyNetworkController {
         }
     }
 
+    @Deprecated
     public List<JsonObject> getContact(final String profileId) {
 
         String query;
@@ -860,6 +977,7 @@ public class DonkyNetworkController {
      * @param emailList           Emails to check against users registered on the same app space.
      * @param donkyResultListener Callback with the result containing discovered contacts on the network.
      */
+    @Deprecated
     public void discoverUsersOnTheNetwork(final List<String> phoneNumbers, List<String> emailList, final DonkyResultListener<List<DiscoveredContact>> donkyResultListener) {
         GetPlatformUsersRequest request = new GetPlatformUsersRequest(phoneNumbers, emailList);
         request.performAsynchronous(new DonkyResultListener<List<DiscoveredContact>>() {
@@ -1276,6 +1394,8 @@ public class DonkyNetworkController {
                             }
                         });
                     }
+                } else {
+                    postError(new DonkyException("Synchronisation canceled"), null);
                 }
 
             } catch (Exception exception) {

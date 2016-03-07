@@ -27,10 +27,10 @@ import retrofit.RetrofitError;
 public class Login extends GenericAuthenticationServiceRequest<LoginResponse> {
 
     @SerializedName("networkId")
-    private String networkId;
+    protected String networkId;
 
     @SerializedName("deviceSecret")
-    private String deviceSecret;
+    protected String deviceSecret;
 
     @SerializedName("operatingSystem")
     private final String operatingSystem;

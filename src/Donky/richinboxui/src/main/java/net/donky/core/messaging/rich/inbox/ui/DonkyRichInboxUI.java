@@ -10,6 +10,7 @@ import net.donky.core.assets.DonkyAssets;
 import net.donky.core.events.DonkyEventListener;
 import net.donky.core.logging.DLog;
 import net.donky.core.messaging.rich.logic.DonkyRichLogic;
+import net.donky.core.messaging.rich.logic.SyncRichMessageEvent;
 import net.donky.core.messaging.rich.logic.RichMessageEvent;
 import net.donky.core.messaging.ui.DonkyMessagingUI;
 
@@ -122,6 +123,14 @@ public class DonkyRichInboxUI {
                                                         } else {
                                                             new DLog("handleRichMessageEvent").info("RichMessage received expired.");
                                                         }
+                                                    }
+                                                });
+
+                                                DonkyCore.subscribeToLocalEvent(new DonkyEventListener<SyncRichMessageEvent>(SyncRichMessageEvent.class) {
+
+                                                    @Override
+                                                    public void onDonkyEvent(SyncRichMessageEvent event) {
+                                                        RichInboxUIController.getInstance().notifyListeners(null);
                                                     }
                                                 });
 

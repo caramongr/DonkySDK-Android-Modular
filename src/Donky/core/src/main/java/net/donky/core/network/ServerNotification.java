@@ -55,22 +55,32 @@ public class ServerNotification extends Notification {
     public static final String NOTIFICATION_TYPE_ChatMessage = "Message";
 
     /**
-     * Notification with chat message status
+     * Notification with message status
      */
     public static final String NOTIFICATION_TYPE_MsgSent = "MessageSent";
 
     /**
-     * Notification with chat message status
+     * Notification with message status
      */
     public static final String NOTIFICATION_TYPE_MsgDelivered = "MessageDelivered";
 
     /**
-     * Notification with chat message status
+     * Notification with message status
      */
     public static final String NOTIFICATION_TYPE_MsgRead = "MessageRead";
 
     /**
-     * Notification with chat message status
+     * Notification for message read on another device
+     */
+    public static final String NOTIFICATION_TYPE_SyncMsgRead = "SyncMessageRead";
+
+    /**
+     * Notification for message deleted on another device
+     */
+    public static final String NOTIFICATION_TYPE_SyncMsgDeleted = "SyncMessageDeleted";
+
+    /**
+     * Notification with message status
      */
     public static final String NOTIFICATION_TYPE_MsgRejected = "MessageRejected";
 

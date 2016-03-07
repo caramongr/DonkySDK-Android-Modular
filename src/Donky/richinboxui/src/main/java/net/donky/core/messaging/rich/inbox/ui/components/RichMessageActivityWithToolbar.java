@@ -47,21 +47,24 @@ public class RichMessageActivityWithToolbar extends DonkyActivity {
 
             finish();
 
-        }
-
-        RichMessage richMessage = (RichMessage) extras.get(DonkyMessaging.KEY_INTENT_BUNDLE_RICH_MESSAGE);
-
-        if (richMessage == null) {
-
-            new DLog("RichMessageActivity").error("Intent must contain the rich message.");
-
-            finish();
-
         } else {
-            richMessageDetailFragment.setRichMessage(richMessage);
-            toolbar.setTitle(richMessage.getDescription());
-        }
 
+            RichMessage richMessage = (RichMessage) extras.get(DonkyMessaging.KEY_INTENT_BUNDLE_RICH_MESSAGE);
+
+            if (richMessage == null) {
+
+                new DLog("RichMessageActivity").error("Intent must contain the rich message.");
+
+                finish();
+
+            } else {
+                richMessageDetailFragment.setRichMessage(richMessage);
+                if (getSupportActionBar() != null) {
+                    getSupportActionBar().setTitle(richMessage.getDescription());
+                }
+            }
+
+        }
     }
 
 }

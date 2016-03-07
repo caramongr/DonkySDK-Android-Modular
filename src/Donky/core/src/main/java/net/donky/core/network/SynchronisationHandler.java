@@ -89,10 +89,13 @@ public class SynchronisationHandler {
 
                 }
 
+                serverNotification.setBaseNotificationType(type);
+
                 if (!DonkyNetworkController.getInstance().shouldIgnoreServerNotification(serverNotification.getId())) {
-                    serverNotification.setBaseNotificationType(type);
                     addNotificationToTheMap(type, serverNotification, customNotificationsByType);
                     contentNotifications.add(serverNotification);
+                } else {
+                    ackOnly(serverNotification, type);
                 }
 
             } else {
@@ -101,10 +104,13 @@ public class SynchronisationHandler {
 
                 type = serverNotification.getType();
 
+                serverNotification.setBaseNotificationType(type);
+
                 if (!DonkyNetworkController.getInstance().shouldIgnoreServerNotification(serverNotification.getId())) {
-                    serverNotification.setBaseNotificationType(type);
                     addNotificationToTheMap(type, serverNotification, donkyNotificationsByType);
                     donkyNotifications.add(serverNotification);
+                } else {
+                    ackOnly(serverNotification, type);
                 }
             }
         }
@@ -125,6 +131,11 @@ public class SynchronisationHandler {
             processNotificationOfGivenCategoryForMultipleTypeSubscribers(ServerNotification.NOTIFICATION_CATEGORY_CUSTOM, contentNotifications, shouldNotifyInMainThread);
         }
 
+    }
+
+    private void ackOnly(ServerNotification serverNotification, String type) {
+        ClientNotification clientNotification = ClientNotification.createAcknowledgment(serverNotification, type, false);
+        DonkyDataController.getInstance().getNotificationDAO().addNotification(clientNotification);
     }
 
     private void addNotificationToTheMap(String type, ServerNotification serverNotification, Map<String, List<ServerNotification>> notificationsByType) {

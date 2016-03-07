@@ -1,5 +1,6 @@
 package net.donky.core.analytics;
 
+import net.donky.core.account.DonkyAccountController;
 import net.donky.core.events.ApplicationStartEvent;
 import net.donky.core.events.ApplicationStopEvent;
 import net.donky.core.logging.DLog;
@@ -65,9 +66,12 @@ public class AnalyticsInternalController {
 
         }
 
-        DonkyNetworkController.getInstance().queueClientNotification(ClientNotification.createAppStopNotification(applicationStopEvent.getStartTime(), applicationStopEvent.getStartTime(), trigger));
-
-        log.info("A stopped notification queued.");
+        if (DonkyAccountController.getInstance().isRegistered()) {
+            DonkyNetworkController.getInstance().queueClientNotification(ClientNotification.createAppStopNotification(applicationStopEvent.getStartTime(), applicationStopEvent.getStartTime(), trigger));
+            log.info("A stopped notification queued.");
+        } else {
+            log.debug("A stopped notification want be queued. User not registered");
+        }
     }
 
     /**
@@ -83,9 +87,11 @@ public class AnalyticsInternalController {
 
         }
 
-        DonkyNetworkController.getInstance().queueClientNotification(ClientNotification.createAppStartNotification(applicationStartEvent.getStartTime(), trigger));
-
-        log.info("A started notification queued.");
-
+        if (DonkyAccountController.getInstance().isRegistered()) {
+            DonkyNetworkController.getInstance().queueClientNotification(ClientNotification.createAppStartNotification(applicationStartEvent.getStartTime(), trigger));
+            log.info("A started notification queued.");
+        } else {
+            log.debug("A started notification want be queued. User not registered");
+        }
     }
 }

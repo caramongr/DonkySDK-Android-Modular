@@ -5,13 +5,17 @@ import android.app.Application;
 import net.donky.core.DonkyCore;
 import net.donky.core.DonkyException;
 import net.donky.core.DonkyListener;
+import net.donky.core.DonkyResultListener;
 import net.donky.core.ModuleDefinition;
 import net.donky.core.NotificationBatchListener;
 import net.donky.core.Subscription;
 import net.donky.core.events.CoreInitialisedSuccessfullyEvent;
 import net.donky.core.events.DonkyEventListener;
 import net.donky.core.events.RegistrationChangedEvent;
+import net.donky.core.logging.DLog;
 import net.donky.core.messaging.logic.DonkyMessaging;
+import net.donky.core.messaging.logic.events.SyncMessageDeletedEvent;
+import net.donky.core.messaging.logic.events.SyncMessageReadEvent;
 import net.donky.core.messaging.rich.logic.database.migration.DBMigrationController;
 import net.donky.core.messaging.rich.logic.model.RichMessageDataController;
 import net.donky.core.messaging.rich.logic.model.RichMessagingSQLiteHelper;
@@ -144,6 +148,22 @@ public class DonkyRichLogic {
                             }
                         });
 
+                        DonkyCore.subscribeToLocalEvent(new DonkyEventListener<SyncMessageDeletedEvent>(SyncMessageDeletedEvent.class) {
+                            @Override
+                            public void onDonkyEvent(SyncMessageDeletedEvent event) {
+                                if (event != null) {
+                                    handleDeletedEvent(event);
+                                }
+                            }
+                        });
+
+                        DonkyCore.subscribeToLocalEvent(new DonkyEventListener<SyncMessageReadEvent>(SyncMessageReadEvent.class) {
+                            @Override
+                            public void onDonkyEvent(SyncMessageReadEvent event) {
+                                handleReadEvent(event);
+                            }
+                        });
+
                         initialised.set(true);
 
                         if (donkyListener != null) {
@@ -180,6 +200,40 @@ public class DonkyRichLogic {
             }
 
         }
+    }
+
+    /**
+     * Handle local event for inbox state synchronisation across devices
+     * @param event Local event for messages deleted on another device
+     */
+    private void handleDeletedEvent(final SyncMessageDeletedEvent event) {
+        RichMessageDataController.getInstance().getRichMessagesDAO().removeRichMessagesToSyncState(event.getIds(), new DonkyResultListener<Integer>() {
+            @Override
+            public void success(Integer result) {
+                DonkyCore.publishLocalEvent(new SyncRichMessageEvent());
+            }
+
+            @Override
+            public void error(DonkyException donkyException, Map<String, String> validationErrors) {
+                new DLog("DonkyRichLogic").error("Sync deleted messages error", donkyException);
+            }
+        });
+    }
+
+    /**
+     * Handle local event for inbox state synchronisation across devices
+     * @param event Local event for messages read on another device
+     */
+    private void handleReadEvent(final SyncMessageReadEvent event) {
+        DonkyCore.getInstance().processInBackground(new Runnable() {
+            @Override
+            public void run() {
+                for (String id : event.getIds()) {
+                    RichMessageDataController.getInstance().getRichMessagesDAO().markAsRead(id);
+                    DonkyCore.publishLocalEvent(new SyncRichMessageEvent());
+                }
+            }
+        });
     }
 
     /**

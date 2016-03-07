@@ -9,6 +9,7 @@ import com.google.gson.annotations.SerializedName;
 import net.donky.core.DonkyCore;
 import net.donky.core.events.RegistrationChangedEvent;
 import net.donky.core.helpers.DateAndTimeHelper;
+import net.donky.core.logging.DLog;
 import net.donky.core.model.DonkyDataController;
 import net.donky.core.network.ServerNotification;
 
@@ -58,7 +59,13 @@ public class UserUpdatedHandler {
 
         Gson gson = new GsonBuilder().create();
 
-        UserUpdated userUpdated = gson.fromJson(notification.getData(), UserUpdated.class);
+        UserUpdated userUpdated = null;
+
+        try {
+            userUpdated = gson.fromJson(notification.getData(), UserUpdated.class);
+        } catch (Exception exception) {
+            new DLog("UserUpdatedHandler").error("Error parsing user updated notification.", exception);
+        }
 
         if (userUpdated != null) {
 

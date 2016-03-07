@@ -34,7 +34,7 @@ dependencies {
 
 def groupId = 'net.donky'
 def artifactId = 'donky-module-automation'
-def version = '2.3.0.0'
+def version = '2.4.0.0'
 
 def localReleaseDest = "${buildDir}/release/${version}"
 

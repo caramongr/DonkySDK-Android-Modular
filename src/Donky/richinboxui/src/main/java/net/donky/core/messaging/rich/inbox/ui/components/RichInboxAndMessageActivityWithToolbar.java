@@ -34,7 +34,9 @@ public class RichInboxAndMessageActivityWithToolbar extends DonkyActivity {
 
         if (toolbar != null) {
             setupUI(toolbar);
-            toolbar.setTitle(R.string.dk_inbox_fragment_title);
+            if (getSupportActionBar() != null) {
+                getSupportActionBar().setTitle(R.string.dk_inbox_fragment_title);
+            }
         }
 
     }

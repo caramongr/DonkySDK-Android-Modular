@@ -2,7 +2,7 @@
   <img src="https://avatars2.githubusercontent.com/u/11334935?v=3&s=200" alt="Donky Networks LTD" title="Donky Network SDK">
 </p>
 
-# DonkySDK-Android-Modular (V2.3.0.1)
+# DonkySDK-Android-Modular (V2.4.0.0)
 
 The Android Modular SDK is a kit for adding push notifications and rich content services to your application. For detailed documentation, tutorials and guides, visit our [online documentation](http://docs.mobiledonky.com/docs/set-up-guide).
 
@@ -82,8 +82,10 @@ To read more about how to get started please see [here](http://docs.mobiledonky.
 Download via Gradle
 
 ```shell
-    compile 'net.donky:donky-core:2.3.0.1'
+    compile 'net.donky:donky-core:2.4.0.0'
 ```
+
+### Standard Mode 
 
 Initialise this module in onCreate method of your application class.
 
@@ -103,6 +105,50 @@ public class MyApplication extends Application {
 }
 ```
 
+### Authenticated Mode
+
+You can delegate authentication responsibility to another trusted system that can issue a JWT containing the required information. In order to be able to register to Donky Network in a secured way you need to provide a callback that will respond to authentication challenges and provide a valid JWT token.
+
+```java
+class Authenticator implements DonkyAuthenticator {
+
+  @Override
+  public void onAuthenticationChallenge(DonkyAuthClient authClient,
+                                        ChallengeOptions options) {
+    
+    /**
+     * Obtain JWT token based on a given nonce and return the value to
+     * authClient instance. At this point the user authentication process will 
+     * be able to continue automatically.
+     * options.getNonce() for nonce to be included in token
+     * options.getForUserId() expected user id when re-authenticating
+     */
+     authClient.authenticateWithToken("TEST_TOKEN");
+   }
+
+}
+```
+
+Initialise this module in onCreate method of your application class with an instance of the DonkyAuthenticator class you created.
+
+```java
+public class MyApplication extends Application {
+
+    @Override
+    public void onCreate()
+    {
+        super.onCreate();
+      
+        DonkyCore.initialiseDonkySDK(this,">>ENTER API KEY HERE<<",
+          new Authenticator() /* extends DonkyAuthenticator */, 
+          new DonkyListener() /*set callback handlers*/);
+    }
+  
+}
+```
+
+For more details on [authentication](https://dash.readme.io/project/donky/docs/authentication-overview) please visit [documaentation page](http://docs.mobiledonky.com/docs/android-auth)
+
 # Donky-Push
 
 Use the Push module to enable your application to receive Push messages.
@@ -119,7 +165,7 @@ To read more about how to get started please see [here](http://docs.mobiledonky.
 Download via Gradle
 
 ```shell
-    compile 'net.donky:donky-module-push:2.3.0.1'
+    compile 'net.donky:donky-module-push:2.4.0.0'
 ```
 
 Initialise this module before initailising Donky Core in onCreate method of your application class.
@@ -158,7 +204,7 @@ To read more about how to get started please see [here](http://docs.mobiledonky.
 Download via Gradle
 
 ```shell
-    compile 'net.donky:donky-module-rich-logic:2.3.0.1'
+    compile 'net.donky:donky-module-rich-logic:2.4.0.0'
 ```
 
 Initialise this module before initailising Donky Core in onCreate method of your application class.
@@ -197,7 +243,7 @@ To read more about how to get started please see [here](http://docs.mobiledonky.
 Download via Gradle
 
 ```shell
-    compile 'net.donky:donky-module-rich-ui-inbox:2.3.0.1'
+    compile 'net.donky:donky-module-rich-ui-inbox:2.4.0.0'
 ```
 
 Initialise this module before initailising Donky Core in onCreate method of your application class.
@@ -242,7 +288,7 @@ To read more about how to get started please see [here](http://docs.mobiledonky.
 Download via Gradle
 
 ```shell
-    compile 'net.donky:donky-module-analytics:2.3.0.1'
+    compile 'net.donky:donky-module-analytics:2.4.0.0'
 ```
 
 Initialise this module before initailising Donky Core in onCreate method of your application class.
@@ -281,7 +327,7 @@ To read more about how to get started please see [here](http://docs.mobiledonky.
 Download via Gradle
 
 ```shell
-    compile 'net.donky:donky-module-automation:2.3.0.1'
+    compile 'net.donky:donky-module-automation:2.4.0.0'
 ```
 
 Initialise this module before initailising Donky Core in onCreate method of your application class.
@@ -320,7 +366,7 @@ To read more about how to get started please see [here](http://docs.mobiledonky.
 Download via Gradle
 
 ```shell
-    compile 'net.donky:donky-module-automation:2.3.0.1'
+    compile 'net.donky:donky-module-automation:2.4.0.0'
 ```
 
 Initialise this module before initailising Donky Core in onCreate method of your application class.
@@ -359,7 +405,7 @@ To read more about how to get started please see [here](http://docs.mobiledonky.
 Download via Gradle
 
 ```shell
-    compile 'net.donky:donky-module-location:2.3.0.1'
+    compile 'net.donky:donky-module-location:2.4.0.0'
 ```
 
 Initialise this module before initailising Donky Core in onCreate method of your application class.
@@ -410,7 +456,7 @@ Initialise this module before initailising Donky Core in onCreate method of your
 Add the following to gradle.build dependencies
 
 ```shell
-    compile 'net.donky:donky-module-signalr:2.3.0.1'
+    compile 'net.donky:donky-module-signalr:2.4.0.0'
 ```
 
 You will also need to include for TooTallNate/Java-WebSocket library:
@@ -460,7 +506,7 @@ To read more about how to get started please see [here](http://docs.mobiledonky.
 Download via Gradle
 
 ```shell
-    compile 'net.donky:donky-module-sequencing:2.3.0.1'
+    compile 'net.donky:donky-module-sequencing:2.4.0.0'
 ```
 
 Initialise this module before initailising Donky Core in onCreate method of your application class.

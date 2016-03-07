@@ -98,28 +98,34 @@ public abstract class GenericAuthenticationServiceRequest<T> extends GenericServ
 
                     } else if (statusCode == 401) {
 
-                        if (this instanceof Login) {
+                        if (!DonkyAccountController.getInstance().isAuthenticationRequired()) {
 
-                            try {
+                            if (this instanceof Login) {
 
-                                DonkyAccountController.getInstance().reRegisterWithSameUserDetailsSynchronously();
+                                try {
 
-                                return performSynchronous(apiKey);
+                                    DonkyAccountController.getInstance().reRegisterWithSameUserDetailsSynchronously();
+                                    return performSynchronous(apiKey);
 
-                            } catch (DonkyException exception) {
+                                } catch (DonkyException exception) {
 
-                                DonkyException donkyException = new DonkyException("Error performing network call. User don't exist. Re-registering failed.");
+                                    DonkyException donkyException = new DonkyException("Error performing network call. User don't exist. Re-registering failed.");
+                                    donkyException.initCause(error);
+                                    throw donkyException;
+
+                                }
+
+                            } else {
+
+                                DonkyException donkyException = new DonkyException("Error performing network call. Probably wrong API or AppSpace deleted.");
                                 donkyException.initCause(error);
                                 throw donkyException;
 
                             }
-
                         } else {
-
-                            DonkyException donkyException = new DonkyException("Error performing network call. Probably wrong API or AppSpace deleted.");
+                            DonkyException donkyException = new DonkyException("User not authorised on the network");
                             donkyException.initCause(error);
                             throw donkyException;
-
                         }
 
                     } else if (statusCode == 403) {
@@ -213,32 +219,42 @@ public abstract class GenericAuthenticationServiceRequest<T> extends GenericServ
 
                         } else if (statusCode == 401) {
 
-                            if (GenericAuthenticationServiceRequest.this instanceof Login) {
+                            if (!DonkyAccountController.getInstance().isAuthenticationRequired()) {
 
-                                DonkyAccountController.getInstance().reRegisterWithSameUserDetails(new DonkyListener() {
+                                if (GenericAuthenticationServiceRequest.this instanceof Login) {
 
-                                    @Override
-                                    public void success() {
+                                    DonkyAccountController.getInstance().reRegisterWithSameUserDetails(new DonkyListener() {
 
-                                        performAsynchronous(apiKey, listener);
+                                        @Override
+                                        public void success() {
 
-                                    }
+                                            performAsynchronous(apiKey, listener);
 
-                                    @Override
-                                    public void error(DonkyException donkyException, Map<String, String> validationErrors) {
-
-                                        new DLog("GenericAuthenticationServiceRequest").warning("Error performing network call. User don't exist. Re-registering failed.");
-
-                                        if (listener != null) {
-                                            listener.error(donkyException, validationErrors);
                                         }
+
+                                        @Override
+                                        public void error(DonkyException donkyException, Map<String, String> validationErrors) {
+
+                                            new DLog("GenericAuthenticationServiceRequest").warning("Error performing network call. User don't exist. Re-registering failed.");
+
+                                            if (listener != null) {
+                                                listener.error(donkyException, validationErrors);
+                                            }
+                                        }
+                                    });
+
+                                } else {
+                                    new DLog("GenericAuthenticationServiceRequest").warning("Error performing register network call. Probably wrong API or AppSpace deleted.");
+                                    if (listener != null) {
+                                        listener.error(new DonkyException("Error performing register network call. Probably wrong API or AppSpace deleted."), null);
                                     }
-                                });
-
+                                }
                             } else {
-
-                                new DLog("GenericAuthenticationServiceRequest").warning("Error performing register network call. Probably wrong API or AppSpace deleted.");
-
+                                DonkyException donkyException = new DonkyException("User not authorised on the network");
+                                donkyException.initCause(error);
+                                if (listener != null) {
+                                    listener.error(donkyException, null);
+                                }
                             }
 
                         } else if (statusCode == 403) {

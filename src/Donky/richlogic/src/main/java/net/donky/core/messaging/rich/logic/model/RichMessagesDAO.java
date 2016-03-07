@@ -7,9 +7,11 @@ import android.net.Uri;
 import android.text.TextUtils;
 
 import net.donky.core.DonkyException;
+import net.donky.core.DonkyListener;
 import net.donky.core.DonkyResultListener;
 import net.donky.core.helpers.DateAndTimeHelper;
 import net.donky.core.logging.DLog;
+import net.donky.core.messaging.logic.MessagingInternalController;
 import net.donky.core.messaging.logic.database.BaseDAO;
 import net.donky.core.messaging.logic.database.DonkyAsyncQueryHandler;
 import net.donky.core.messaging.logic.database.listeners.DonkyDeleteListener;
@@ -18,6 +20,7 @@ import net.donky.core.messaging.logic.database.listeners.DonkyQueryListener;
 import net.donky.core.messaging.logic.database.listeners.DonkyUpdateListener;
 import net.donky.core.messaging.rich.logic.database.RichMsgContentProvider;
 import net.donky.core.model.DonkyDataController;
+import net.donky.core.network.DonkyNetworkController;
 
 import org.json.JSONException;
 
@@ -143,9 +146,10 @@ public class RichMessagesDAO extends BaseDAO {
 
     /**
      * Get rich message with given external message id. Rich message external id is given from the network. This method is blocking.
-     * @deprecated please use {@link #getRichMessage(String)} method instead.
+     *
      * @param messageId Rich message external id.
      * @return Rich message with given external id.
+     * @deprecated please use {@link #getRichMessage(String)} method instead.
      */
     @Deprecated
     public RichMessage getRichMessageWithMessageId(final String messageId) {
@@ -196,19 +200,19 @@ public class RichMessagesDAO extends BaseDAO {
     /**
      * Mark rich message as read. This method is blocking.
      *
-     * @param internalId Rich message internal id.
+     * @param id Rich message internal/external id.
      * @return The number of rows affected.
      */
-    public int markAsRead(String internalId) {
+    public int markAsRead(String id) {
 
         int numberOfRowsUpdated = 0;
 
-        if (!TextUtils.isEmpty(internalId)) {
+        if (!TextUtils.isEmpty(id)) {
 
             try {
 
-                String selection = DatabaseSQLContract.RichMessageEntry.COLUMN_NAME_internalId + " = ?";
-                String[] selectionArgs = {internalId};
+                String selection = DatabaseSQLContract.RichMessageEntry.COLUMN_NAME_internalId + " = ? OR " + DatabaseSQLContract.RichMessageEntry.COLUMN_NAME_messageId + " = ?";
+                String[] selectionArgs = {id, id};
 
                 ContentValues cv = new ContentValues();
                 cv.put(DatabaseSQLContract.RichMessageEntry.COLUMN_NAME_messageRead, 1);
@@ -228,17 +232,17 @@ public class RichMessagesDAO extends BaseDAO {
     /**
      * Mark rich message as read. This method is non-blocking.
      *
-     * @param internalId Rich message internal id (internalId).
-     * @param listener   Callback with the number of rows affected.
+     * @param id       Rich message internal id (internalId).
+     * @param listener Callback with the number of rows affected.
      */
-    public void markAsRead(final String internalId, final DonkyResultListener<Integer> listener) {
+    public void markAsRead(final String id, final DonkyResultListener<Integer> listener) {
 
-        if (!TextUtils.isEmpty(internalId)) {
+        if (!TextUtils.isEmpty(id)) {
 
             try {
 
-                String selection = DatabaseSQLContract.RichMessageEntry.COLUMN_NAME_internalId + " = ?";
-                String[] selectionArgs = {internalId};
+                String selection = DatabaseSQLContract.RichMessageEntry.COLUMN_NAME_internalId + " = ? OR " + DatabaseSQLContract.RichMessageEntry.COLUMN_NAME_messageId + " = ?";
+                String[] selectionArgs = {id, id};
 
                 ContentValues cv = new ContentValues();
                 cv.put(DatabaseSQLContract.RichMessageEntry.COLUMN_NAME_messageRead, 1);
@@ -319,7 +323,7 @@ public class RichMessagesDAO extends BaseDAO {
      * @param sortOrder     How to order the rows, formatted as an SQL ORDER BY
      *                      clause (excluding the ORDER BY itself). Passing null will use the
      *                      default sort order, which may be unordered.
-     * @param listener Callback with list of found rich messages.
+     * @param listener      Callback with list of found rich messages.
      */
     private void getRichMessages(String selection, String[] selectionArgs, String sortOrder, final DonkyResultListener<List<RichMessage>> listener) {
 
@@ -488,9 +492,12 @@ public class RichMessagesDAO extends BaseDAO {
 
             for (RichMessage rm : richMessageList) {
                 richMessageIdList.add(rm.getInternalId());
+                MessagingInternalController.getInstance().queueMessageDeletedNotification(rm);
             }
 
-            return removeRichMessagesWithInternalIds(richMessageIdList);
+            DonkyNetworkController.getInstance().synchronise();
+
+            return removeRichMessagesWithInternalIds(richMessageIdList, false);
         }
 
         return 0;
@@ -508,9 +515,134 @@ public class RichMessagesDAO extends BaseDAO {
 
         for (RichMessage rm : richMessageList) {
             richMessageIdList.add(rm.getInternalId());
+            MessagingInternalController.getInstance().queueMessageDeletedNotification(rm);
         }
 
-        removeRichMessagesWithInternalIds(richMessageIdList, listener);
+        DonkyNetworkController.getInstance().synchronise();
+
+        removeRichMessagesWithInternalIds(richMessageIdList, false, listener);
+    }
+
+    /**
+     * Queue client notifications for deleted messages so it can be synchronised with other devices. Non-blocking method.
+     *
+     * @param richMessageIdList Internal ids of messages
+     * @param listener          Completion callback
+     */
+    private void reportMessageDeleted(List<String> richMessageIdList, final DonkyListener listener) {
+
+        if (richMessageIdList != null && !richMessageIdList.isEmpty()) {
+
+            try {
+
+                String[] selectionArgs = new String[richMessageIdList.size()];
+
+                StringBuilder inList = new StringBuilder();
+                for (int i = 0; i < richMessageIdList.size(); i++) {
+                    if (i > 0) {
+                        inList.append(",");
+                    }
+                    inList.append("?");
+                    selectionArgs[i] = richMessageIdList.get(i);
+                }
+
+                String selection = DatabaseSQLContract.RichMessageEntry.COLUMN_NAME_internalId + " IN (" + inList + ")";
+
+                DonkyAsyncQueryHandler queryHandler = new DonkyAsyncQueryHandler(context, new DonkyQueryListener() {
+                    @Override
+                    public void onQueryComplete(int token, Object cookie, Cursor cursor) {
+                        if (cursor != null) {
+
+                            try {
+
+                                if (token == REQUEST_CODE_QUERY_RICH_MESSAGES && cursor.moveToFirst()) {
+                                    do {
+                                        MessagingInternalController.getInstance().queueMessageDeletedNotification(getRichMessage(cursor));
+                                    } while (cursor.moveToNext());
+                                }
+
+                                if (listener != null) {
+                                    listener.success();
+                                }
+
+                            } catch (Exception e) {
+                                log.error("Error loading db content to rich message obj.", e);
+                                reportError(e, listener);
+                            } finally {
+                                if (!cursor.isClosed()) {
+                                    cursor.close();
+                                }
+                            }
+                            DonkyNetworkController.getInstance().synchronise();
+                        }
+                    }
+                });
+
+                queryHandler.startQuery(REQUEST_CODE_QUERY_RICH_MESSAGES, null, RichMsgContentProvider.getContentUri(context), null, selection, selectionArgs, null);
+
+            } catch (Exception exception) {
+                log.error("Error deleting rich messages from db", exception);
+                reportError(exception, listener);
+            }
+        }
+    }
+
+    /**
+     * Queue client notifications for deleted messages so it can be synchronised with other devices. Non-blocking method.
+     *
+     * @param richMessageIdList Internal ids of messages
+     */
+    private void reportMessageDeleted(List<String> richMessageIdList) {
+
+        if (richMessageIdList != null && !richMessageIdList.isEmpty()) {
+
+            try {
+
+                String[] selectionArgs = new String[richMessageIdList.size()];
+
+                StringBuilder inList = new StringBuilder();
+                for (int i = 0; i < richMessageIdList.size(); i++) {
+                    if (i > 0) {
+                        inList.append(",");
+                    }
+                    inList.append("?");
+                    selectionArgs[i] = richMessageIdList.get(i);
+                }
+
+                String selection = DatabaseSQLContract.RichMessageEntry.COLUMN_NAME_internalId + " IN (" + inList + ")";
+
+                try {
+
+                    Cursor cursor = context.getContentResolver().query(RichMsgContentProvider.getContentUri(context), null, selection, selectionArgs, null);
+
+                    if (cursor != null) {
+
+                        try {
+
+                            if (cursor.moveToFirst()) {
+                                do {
+                                    MessagingInternalController.getInstance().queueMessageDeletedNotification(getRichMessage(cursor));
+                                } while (cursor.moveToNext());
+                            }
+
+                        } catch (Exception e) {
+                            log.error("Error loading db content to rich message obj.", e);
+                        } finally {
+                            if (!cursor.isClosed()) {
+                                cursor.close();
+                            }
+                        }
+                        DonkyNetworkController.getInstance().synchronise();
+                    }
+
+                } catch (Exception exception) {
+                    log.error("Error loading rich message from db", exception);
+                }
+
+            } catch (Exception exception) {
+                log.error("Error deleting rich messages from db", exception);
+            }
+        }
     }
 
     /**
@@ -520,8 +652,23 @@ public class RichMessagesDAO extends BaseDAO {
      * @return Number of removed rich messages.
      */
     public int removeRichMessagesWithInternalIds(List<String> richMessageIdList) {
+        return removeRichMessagesWithInternalIds(richMessageIdList, true);
+    }
+
+    /**
+     * Remove Rich Messages from database. This method is blocking.
+     *
+     * @param richMessageIdList   Rich Messages to be removed.
+     * @param shouldReportDeleted
+     * @return Number of removed rich messages.
+     */
+    private int removeRichMessagesWithInternalIds(List<String> richMessageIdList, boolean shouldReportDeleted) {
 
         if (richMessageIdList != null && !richMessageIdList.isEmpty()) {
+
+            if (shouldReportDeleted) {
+                reportMessageDeleted(richMessageIdList);
+            }
 
             try {
 
@@ -555,7 +702,44 @@ public class RichMessagesDAO extends BaseDAO {
      * @param listener          Callback with number of rows affected.
      */
     public void removeRichMessagesWithInternalIds(final List<String> richMessageIdList, final DonkyResultListener<Integer> listener) {
+        removeRichMessagesWithInternalIds(richMessageIdList, true, listener);
+    }
 
+    /**
+     * Remove Rich Messages from database. This method is non-blocking.
+     *
+     * @param richMessageIdList   Rich Messages to be removed.
+     * @param shouldReportDeleted Should SDK syncronise this operation across devices
+     * @param listener            Callback with number of rows affected.
+     */
+    private void removeRichMessagesWithInternalIds(final List<String> richMessageIdList, boolean shouldReportDeleted, final DonkyResultListener<Integer> listener) {
+
+        if (shouldReportDeleted) {
+            reportMessageDeleted(richMessageIdList, new DonkyListener() {
+                @Override
+                public void success() {
+                    doRemoveRichMessagesWithInternalIds(richMessageIdList, listener);
+                }
+
+                @Override
+                public void error(DonkyException donkyException, Map<String, String> validationErrors) {
+                    doRemoveRichMessagesWithInternalIds(richMessageIdList, listener);
+                }
+            });
+
+        } else {
+            doRemoveRichMessagesWithInternalIds(richMessageIdList, listener);
+        }
+
+    }
+
+    /**
+     * Remove Rich Messages from database. This method is non-blocking.
+     *
+     * @param richMessageIdList Rich Messages to be removed.
+     * @param listener          Callback with number of rows affected.
+     */
+    private void doRemoveRichMessagesWithInternalIds(final List<String> richMessageIdList, final DonkyResultListener<Integer> listener) {
         if (richMessageIdList != null && !richMessageIdList.isEmpty()) {
 
             try {
@@ -597,6 +781,54 @@ public class RichMessagesDAO extends BaseDAO {
     }
 
     /**
+     * Remove Rich Messages from database. This method is non-blocking.
+     *
+     * @param richMessageIdList Rich Messages to be removed.
+     * @param listener          Callback with number of rows affected.
+     */
+    public void removeRichMessagesToSyncState(final List<String> richMessageIdList, final DonkyResultListener<Integer> listener) {
+
+        if (richMessageIdList != null && !richMessageIdList.isEmpty()) {
+
+            try {
+
+                String[] selectionArgs = new String[richMessageIdList.size()];
+
+                StringBuilder inList = new StringBuilder();
+                for (int i = 0; i < richMessageIdList.size(); i++) {
+                    if (i > 0) {
+                        inList.append(",");
+                    }
+                    inList.append("?");
+                    selectionArgs[i] = richMessageIdList.get(i);
+                }
+
+                String selection = DatabaseSQLContract.RichMessageEntry.COLUMN_NAME_messageId + " IN (" + inList + ")";
+
+                DonkyAsyncQueryHandler queryHandler = new DonkyAsyncQueryHandler(context, new DonkyDeleteListener() {
+                    @Override
+                    public void onDeleteComplete(int token, Object cookie, int result) {
+                        if (listener != null && token == REQUEST_CODE_DELETE_RICH_MESSAGES) {
+                            listener.success(result);
+                        }
+                    }
+                });
+
+                queryHandler.startDelete(REQUEST_CODE_DELETE_RICH_MESSAGES, null, RichMsgContentProvider.getContentUri(context), selection, selectionArgs);
+
+            } catch (Exception exception) {
+                log.error("Error deleting rich messages from db", exception);
+                if (listener != null) {
+                    reportError(exception, listener);
+                }
+            }
+
+        } else if (listener != null) {
+            listener.success(0);
+        }
+    }
+
+    /**
      * Remove Rich Message from database. This method is blocking.
      *
      * @param richMessage Rich Message to be removed.
@@ -604,7 +836,8 @@ public class RichMessagesDAO extends BaseDAO {
     public int removeRichMessage(final RichMessage richMessage) {
 
         if (richMessage != null) {
-            return removeRichMessage(richMessage.getInternalId());
+            MessagingInternalController.getInstance().queueMessageDeletedNotification(richMessage);
+            return removeRichMessage(richMessage.getInternalId(), false);
         } else {
             return 0;
         }
@@ -618,7 +851,8 @@ public class RichMessagesDAO extends BaseDAO {
      */
     public void removeRichMessage(final RichMessage richMessage, final DonkyResultListener<Integer> listener) {
         if (richMessage != null) {
-            removeRichMessage(richMessage.getInternalId(), listener);
+            MessagingInternalController.getInstance().queueMessageDeletedNotification(richMessage);
+            removeRichMessage(richMessage.getInternalId(), false, listener);
         } else if (listener != null) {
             listener.success(0);
         }
@@ -629,7 +863,12 @@ public class RichMessagesDAO extends BaseDAO {
      *
      * @param richMessageInternalId Internal ID of a Rich Message to be removed.
      */
-    public int removeRichMessage(final String richMessageInternalId) {
+    private int removeRichMessage(final String richMessageInternalId, final boolean shouldReportDeleted) {
+        if (shouldReportDeleted) {
+            List<String> map = new LinkedList<>();
+            map.add(richMessageInternalId);
+            reportMessageDeleted(map);
+        }
 
         if (!TextUtils.isEmpty(richMessageInternalId)) {
 
@@ -646,15 +885,53 @@ public class RichMessagesDAO extends BaseDAO {
         }
 
         return 0;
+
+    }
+
+    /**
+     * Remove Rich Message from database. This method is blocking.
+     *
+     * @param richMessageInternalId Internal ID of a Rich Message to be removed.
+     */
+    public int removeRichMessage(final String richMessageInternalId) {
+        return removeRichMessage(richMessageInternalId, true);
     }
 
     /**
      * Remove Rich Message from database. This method is non-blocking.
      *
      * @param richMessageInternalId Internal ID of a Rich Message to be removed.
+     * @param listener              Completion callback
      */
-    public void removeRichMessage(final String richMessageInternalId, final DonkyResultListener<Integer> listener) {
+    private void removeRichMessage(final String richMessageInternalId, final boolean shouldReportDeleted, final DonkyResultListener<Integer> listener) {
 
+        if (shouldReportDeleted) {
+            List<String> map = new LinkedList<>();
+            map.add(richMessageInternalId);
+            reportMessageDeleted(map, new DonkyListener() {
+                @Override
+                public void success() {
+                    doRemoveRichMessage(richMessageInternalId, listener);
+                }
+
+                @Override
+                public void error(DonkyException donkyException, Map<String, String> validationErrors) {
+                    doRemoveRichMessage(richMessageInternalId, listener);
+                }
+            });
+
+        } else {
+            doRemoveRichMessage(richMessageInternalId, listener);
+        }
+    }
+
+    /**
+     * Remove Rich Message from database. This method is non-blocking.
+     *
+     * @param richMessageInternalId Internal ID of a Rich Message to be removed.
+     * @param listener              Completion callback
+     */
+    private void doRemoveRichMessage(final String richMessageInternalId, final DonkyResultListener<Integer> listener) {
         if (!TextUtils.isEmpty(richMessageInternalId)) {
 
             try {
@@ -682,6 +959,15 @@ public class RichMessagesDAO extends BaseDAO {
         } else if (listener != null) {
             listener.success(0);
         }
+    }
+
+    /**
+     * Remove Rich Message from database. This method is non-blocking.
+     *
+     * @param richMessageInternalId Internal ID of a Rich Message to be removed.
+     */
+    public void removeRichMessage(final String richMessageInternalId, final DonkyResultListener<Integer> listener) {
+        removeRichMessage(richMessageInternalId, true, listener);
     }
 
     /**
@@ -721,7 +1007,7 @@ public class RichMessagesDAO extends BaseDAO {
                 selectionArgs = new String[]{arg, arg, String.valueOf(acceptableSentTimeMillisUTC)};
             }
 
-            queryHandler.startQuery(REQUEST_CODE_QUERY_RICH_MESSAGES, null, RichMsgContentProvider.getContentUri(context), null, selection, selectionArgs, DatabaseSQLContract.RichMessageEntry.COLUMN_NAME_sentTimestampLong+" DESC");
+            queryHandler.startQuery(REQUEST_CODE_QUERY_RICH_MESSAGES, null, RichMsgContentProvider.getContentUri(context), null, selection, selectionArgs, DatabaseSQLContract.RichMessageEntry.COLUMN_NAME_sentTimestampLong + " DESC");
 
         } catch (Exception exception) {
             log.error("Error querying rich messages from db", exception);
@@ -755,7 +1041,7 @@ public class RichMessagesDAO extends BaseDAO {
         }
 
         try {
-            return context.getContentResolver().query(RichMsgContentProvider.getContentUri(context), null, selection, selectionArgs, DatabaseSQLContract.RichMessageEntry.COLUMN_NAME_sentTimestampLong+" DESC");
+            return context.getContentResolver().query(RichMsgContentProvider.getContentUri(context), null, selection, selectionArgs, DatabaseSQLContract.RichMessageEntry.COLUMN_NAME_sentTimestampLong + " DESC");
         } catch (Exception exception) {
             log.error("Error loading rich message from db", exception);
         }
@@ -973,7 +1259,7 @@ public class RichMessagesDAO extends BaseDAO {
      * Update Rich Message or if not found add Rich Message to database. This method is non-blocking.
      *
      * @param richMessage Rich Message to be updated/saved.
-     * @param listener Callback with the number of rows affected.
+     * @param listener    Callback with the number of rows affected.
      */
     public void updateOrSaveRichMessage(final RichMessage richMessage, final DonkyResultListener<Integer> listener) {
 
@@ -1019,11 +1305,20 @@ public class RichMessagesDAO extends BaseDAO {
      */
     public int removeAllRichMessages() {
 
+        List<RichMessage> richMessages = getAllRichMessages();
+        if (!richMessages.isEmpty()) {
+            for (RichMessage rm : richMessages) {
+                MessagingInternalController.getInstance().queueMessageDeletedNotification(rm);
+            }
+        }
+
         try {
             return context.getContentResolver().delete(RichMsgContentProvider.getContentUri(context), null, null);
         } catch (Exception exception) {
             log.error("Error deleting rich message from db", exception);
         }
+
+        DonkyNetworkController.getInstance().synchronise();
 
         return 0;
     }
@@ -1034,6 +1329,13 @@ public class RichMessagesDAO extends BaseDAO {
      * @param listener Callback with number of deleted rows from database.
      */
     public void removeAllRichMessages(final DonkyResultListener<Integer> listener) {
+
+        List<RichMessage> richMessages = getAllRichMessages();
+        if (!richMessages.isEmpty()) {
+            for (RichMessage rm : richMessages) {
+                MessagingInternalController.getInstance().queueMessageDeletedNotification(rm);
+            }
+        }
 
         try {
 

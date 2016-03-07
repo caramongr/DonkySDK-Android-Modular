@@ -41,7 +41,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /**
  * This is main entry point class for Donky Core library integration.
  * To initialise Donky Core add initialiseDonkySDK method call to Application class onCreate call-back.
- *
+ * <p/>
  * Created by Marcin Swierczek
  * 17/02/2015
  * Copyright (C) Donky Networks Ltd. All rights reserved.
@@ -80,10 +80,13 @@ public class DonkyCore {
 
     private ExecutorService poolExecutor;
 
+    private AtomicBoolean isInitialisedCalled;
+
     /**
      * Private constructor. Prevents instantiation from other classes.
      */
     private DonkyCore() {
+        isInitialisedCalled = new AtomicBoolean(false);
         this.poolExecutor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
     }
 
@@ -109,25 +112,39 @@ public class DonkyCore {
      * This will also ensure that the registered module details are passed to the network if changed.
      * This method should be called in {@link android.app.Application} class {@link android.app.Application#onCreate()}
      *
-     * @Deprecated Initialising SDk with user details has been deprecated because this way of overriding any future user account updates is confusing. Please use {@link #initialiseDonkySDK(Application, String, DonkyListener)} instead.
-     *
      * @param application   The {@link android.app.Application} instance.
      * @param apiKey        The Client API key for the app space
      * @param userDetails   User details to use for the registration
      * @param deviceDetails Device details to use for the registration
      * @param appVersion    The app version as specified by the integrator
      * @param donkyListener The callback to invoke when the SDK is initialised.
+     * @Deprecated Initialising SDk with user details has been deprecated because this way of overriding any future user account updates is confusing. Please use {@link #initialiseDonkySDK(Application, String, DonkyListener)} instead.
      */
     @Deprecated
     public static void initialiseDonkySDK(final Application application, final String apiKey, final UserDetails userDetails, final DeviceDetails deviceDetails, final String appVersion, final DonkyListener donkyListener) {
-        SingletonHolder.INSTANCE.init(application, apiKey, userDetails, deviceDetails, appVersion, donkyListener, true);
+        SingletonHolder.INSTANCE.init(application, apiKey, userDetails, deviceDetails, appVersion, donkyListener, true, null, true, false);
     }
 
     /**
      * This operation will ensure the SDK is active, and that the device is registered on the network with the correct API key and able to send/receive data.
      * If no user has been registered yet the SDk will perform anonymous registration on the Network. You can update this registration details later on.
      * However if there was an successful account registration already performed, the SDK won't modify it in any way.
+     * <p/>
+     * This method should be called in {@link android.app.Application} class {@link android.app.Application#onCreate()}
      *
+     * @param application   The {@link android.app.Application} instance.
+     * @param apiKey        The Client API key for the app space
+     * @param donkyListener The callback to invoke when the SDK is initialised.
+     */
+    public static void initialiseDonkySDK(final Application application, final String apiKey, final boolean shouldRegisterUser, final DonkyListener donkyListener) {
+        SingletonHolder.INSTANCE.init(application, apiKey, null, null, null, donkyListener, false, null, shouldRegisterUser, false);
+    }
+
+    /**
+     * This operation will ensure the SDK is active, and that the device is registered on the network with the correct API key and able to send/receive data.
+     * If no user has been registered yet the SDk will perform anonymous registration on the Network. You can update this registration details later on.
+     * However if there was an successful account registration already performed, the SDK won't modify it in any way.
+     * <p/>
      * This method should be called in {@link android.app.Application} class {@link android.app.Application#onCreate()}
      *
      * @param application   The {@link android.app.Application} instance.
@@ -135,184 +152,249 @@ public class DonkyCore {
      * @param donkyListener The callback to invoke when the SDK is initialised.
      */
     public static void initialiseDonkySDK(final Application application, final String apiKey, final DonkyListener donkyListener) {
-        SingletonHolder.INSTANCE.init(application, apiKey, null, null, null, donkyListener, false);
+        SingletonHolder.INSTANCE.init(application, apiKey, null, null, null, donkyListener, false, null, true, false);
+    }
+
+    /**
+     * This operation will ensure the SDK is active.
+     * <p/>
+     * This method should be called in {@link android.app.Application} class {@link android.app.Application#onCreate()}
+     *
+     * @param application   The {@link android.app.Application} instance.
+     * @param apiKey        The Client API key for the app space
+     * @param donkyListener The callback to invoke when the SDK is initialised.
+     */
+    public static void initialiseDonkySDK(final Application application, final String apiKey, final DonkyAuthenticator donkyAuthenticator, final DonkyListener donkyListener) {
+        SingletonHolder.INSTANCE.init(application, apiKey, null, null, null, donkyListener, false, donkyAuthenticator, true, true);
+    }
+
+    /**
+     * This operation will ensure the SDK is active.
+     * <p/>
+     * This method should be called in {@link android.app.Application} class {@link android.app.Application#onCreate()}
+     *
+     * @param application   The {@link android.app.Application} instance.
+     * @param apiKey        The Client API key for the app space
+     * @param donkyListener The callback to invoke when the SDK is initialised.
+     */
+    public static void initialiseDonkySDK(final Application application, final String apiKey, final DonkyAuthenticator donkyAuthenticator, final boolean shouldRegisterUser, final DonkyListener donkyListener) {
+        SingletonHolder.INSTANCE.init(application, apiKey, null, null, null, donkyListener, false, donkyAuthenticator, shouldRegisterUser, true);
     }
 
     /**
      * Initialises all SDK components, and performs registration to Donky Network and GCM
      *
-     * @param application   The {@link android.app.Application} instance.
-     * @param apiKey        The Client API key for the app space
-     * @param userDetails   User details to use for the registration
-     * @param deviceDetails Device details to use for the registration
-     * @param appVersion    The app version as specified by the integrator
-     * @param donkyListener The callback to invoke when the SDK is initialised.
+     * @param application        The {@link Application} instance.
+     * @param apiKey             The Client API key for the app space
+     * @param userDetails        User details to use for the registration
+     * @param deviceDetails      Device details to use for the registration
+     * @param appVersion         The app version as specified by the integrator
+     * @param donkyListener      The callback to invoke when the SDK is initialised.
+     * @param donkyAuthenticator Callback for authentication challenges
+     * @param shouldRegisterUser Want register user if set to false
+     * @param isAuthenticated    Initialising in authenticated mode if true
      */
-    private void init(final Application application, final String apiKey, final UserDetails userDetails, final DeviceDetails deviceDetails, final String appVersion, final DonkyListener donkyListener, final boolean overrideCurrentUser) {
+    private void init(final Application application, final String apiKey, final UserDetails userDetails, final DeviceDetails deviceDetails, final String appVersion, final DonkyListener donkyListener, final boolean overrideCurrentUser, final DonkyAuthenticator donkyAuthenticator, final boolean shouldRegisterUser, final boolean isAuthenticated) {
 
-        final Handler mainThreadHandler = new Handler(Looper.getMainLooper());
+        if (!isInitialisedCalled.getAndSet(true)) {
 
-        if (!TextUtils.isEmpty(apiKey)) {
+            final Handler mainThreadHandler = new Handler(Looper.getMainLooper());
 
-            this.context = application.getApplicationContext();
+            if (!TextUtils.isEmpty(apiKey)) {
 
-            synchronized (sharedLock) {
+                this.context = application.getApplicationContext();
 
-                new Thread("Initialise Donky SDK") {
+                synchronized (sharedLock) {
 
-                    public void run() {
+                    new Thread("Initialise Donky SDK") {
 
-                        if (!initialised.get()) {
+                        public void run() {
 
-                            synchronized (sharedLock) {
+                            if (!initialised.get()) {
 
-                                try {
+                                synchronized (sharedLock) {
 
-                                    // Static app settings [no dependency]
-                                    AppSettings.getInstance().init(application);
+                                    try {
 
-                                    // Logging [depends on AppSettings]
-                                    DonkyLoggingController.getInstance().init(application);
+                                        // Static app settings [no dependency]
+                                        AppSettings.getInstance().init(application);
 
-                                    // Database controller [depends on Logging Controller]
-                                    DonkyDataController.getInstance().init(application);
+                                        // Logging [depends on AppSettings]
+                                        DonkyLoggingController.getInstance().init(application);
 
-                                    // User, Device and App details [depends on Logging Controller and Database Controller]
-                                    DonkyAccountController.getInstance().init(application);
+                                        // Database controller [depends on Logging Controller]
+                                        DonkyDataController.getInstance().init(application);
 
-                                    // Network communication [depends on App Settings, Logging Controller and Database Controller]
-                                    DonkyNetworkController.getInstance().init(application, apiKey);
+                                        // User, Device and App details [depends on Logging Controller and Database Controller]
+                                        DonkyAccountController.getInstance().init(application);
 
-                                    // GCM [depends on Network, Logging Controller and Database Controller]
-                                    DonkyGcmController.getInstance().init(application);
+                                        // Network communication [depends on App Settings, Logging Controller and Database Controller]
+                                        DonkyNetworkController.getInstance().init(application, apiKey);
 
-                                    //Subscribe Donky Logging Controller for TRANSMITDEBUGLOG notifications
-                                    List<Subscription<ServerNotification>> serverNotificationSubscriptions = new LinkedList<>();
+                                        // GCM [depends on Network, Logging Controller and Database Controller]
+                                        DonkyGcmController.getInstance().init(application);
 
-                                    LifeCycleObserver.getInstance().init(application);
+                                        //Subscribe Donky Logging Controller for TRANSMITDEBUGLOG notifications
+                                        List<Subscription<ServerNotification>> serverNotificationSubscriptions = new LinkedList<>();
 
-                                    DonkyAssetController.getInstance().init(context, RestClient.getInstance().getOkHttpClient());
+                                        LifeCycleObserver.getInstance().init(application);
 
-                                    serverNotificationSubscriptions.add(new Subscription<>(ServerNotification.NOTIFICATION_TYPE_TransmitDebugLog,
-                                            new NotificationBatchListener<ServerNotification>() {
+                                        DonkyAssetController.getInstance().init(context, RestClient.getInstance().getOkHttpClient());
 
-                                                @Override
-                                                public void onNotification(ServerNotification notification) {
-                                                }
-
-                                                @Override
-                                                public void onNotification(List<ServerNotification> notifications) {
-                                                    DonkyLoggingController.getInstance().submitLog(UploadLog.SubmissionReason.ManualRequest, null);
-                                                }
-                                            }));
-
-                                    if (AppSettings.getInstance().isNewDeviceNotificationEnabled()) {
-                                        serverNotificationSubscriptions.add(new Subscription<>(ServerNotification.NOTIFICATION_TYPE_NewDeviceAddedToUser,
+                                        serverNotificationSubscriptions.add(new Subscription<>(ServerNotification.NOTIFICATION_TYPE_TransmitDebugLog,
                                                 new NotificationBatchListener<ServerNotification>() {
 
                                                     @Override
-                                                    public void onNotification(ServerNotification notification) {}
+                                                    public void onNotification(ServerNotification notification) {
+                                                    }
 
                                                     @Override
                                                     public void onNotification(List<ServerNotification> notifications) {
-                                                        new NewDeviceHandler(application.getApplicationContext()).process(notifications);
+                                                        DonkyLoggingController.getInstance().submitLog(UploadLog.SubmissionReason.ManualRequest, null);
                                                     }
                                                 }));
+
+                                        if (AppSettings.getInstance().isNewDeviceNotificationEnabled()) {
+                                            serverNotificationSubscriptions.add(new Subscription<>(ServerNotification.NOTIFICATION_TYPE_NewDeviceAddedToUser,
+                                                    new NotificationBatchListener<ServerNotification>() {
+
+                                                        @Override
+                                                        public void onNotification(ServerNotification notification) {
+                                                        }
+
+                                                        @Override
+                                                        public void onNotification(List<ServerNotification> notifications) {
+                                                            new NewDeviceHandler(application.getApplicationContext()).process(notifications);
+                                                        }
+                                                    }));
+                                        }
+
+                                        serverNotificationSubscriptions.add(new Subscription<>(ServerNotification.NOTIFICATION_TYPE_UserUpdated,
+                                                new NotificationBatchListener<ServerNotification>() {
+
+                                                    @Override
+                                                    public void onNotification(ServerNotification notification) {
+                                                    }
+
+                                                    @Override
+                                                    public void onNotification(List<ServerNotification> notifications) {
+                                                        try {
+                                                            new UserUpdatedHandler().handleUserUpdatedNotifications(notifications);
+                                                        } catch (Exception exception) {
+                                                            log.error("Error handling user updated notification.", exception);
+                                                        }
+                                                    }
+                                                }));
+
+                                        subscribeToDonkyNotifications(
+                                                new ModuleDefinition(DonkyCore.class.getSimpleName(), AppSettings.getVersion()),
+                                                serverNotificationSubscriptions,
+                                                true);
+
+                                        log.info("Initialised Donky SDK.");
+
+                                        initialised.set(true);
+
+                                        sharedLock.notifyAll();
+
+                                        DonkyCore.publishLocalEvent(new CoreInitialisedSuccessfullyEvent());
+
+                                    } catch (final Exception e) {
+
+                                        log.error("Error initialising Donky SDK.");
+
+                                        final DonkyException donkyException = new DonkyException("Error initialising Donky SDK controllers.");
+                                        donkyException.initCause(e);
+
+                                        sharedLock.notifyAll();
+
+                                        postError(mainThreadHandler, donkyListener, donkyException);
+                                    }
+                                }
+                            }
+
+                            if (initialised.get()) {
+
+                                try {
+
+                                    for (ModuleDefinition moduleDefinition : moduleDefinitionsToRegister) {
+                                        registerModule(moduleDefinition);
+                                    }
+                                    moduleDefinitionsToRegister.clear();
+
+                                    if (!isAuthenticated) {
+
+                                        DonkyAccountController.getInstance().startNonAuthenticationMode(apiKey, appVersion);
+
+                                        log.info("Initialised in non-authenticated mode.");
+
+                                        if (shouldRegisterUser && (overrideCurrentUser || !DonkyAccountController.getInstance().isRegistered())) {
+                                            DonkyAccountController.getInstance().register(apiKey, userDetails, deviceDetails, appVersion, overrideCurrentUser);
+                                        } else if (DonkyAccountController.getInstance().isRegistered()) {
+                                            DonkyNetworkController.getInstance().synchronise();
+                                        }
+
+                                    } else {
+
+                                        DonkyAccountController.getInstance().startAuthenticationMode(apiKey, donkyAuthenticator, appVersion);
+
+                                        log.info("Initialised in authenticated mode.");
+
+                                        if (shouldRegisterUser && (overrideCurrentUser || !DonkyAccountController.getInstance().isRegistered())) {
+                                            DonkyAccountController.getInstance().registerAuthenticated(userDetails, deviceDetails, appVersion);
+                                        } else if (DonkyAccountController.getInstance().isRegistered()) {
+                                            DonkyNetworkController.getInstance().synchronise();
+                                        }
+
                                     }
 
-                                    serverNotificationSubscriptions.add(new Subscription<>(ServerNotification.NOTIFICATION_TYPE_UserUpdated,
-                                            new NotificationBatchListener<ServerNotification>() {
+                                    if (DonkyAccountController.getInstance().isRegistered()) {
 
-                                                @Override
-                                                public void onNotification(ServerNotification notification) {}
+                                        DonkyAccountController.getInstance().updateClient(null);
 
-                                                @Override
-                                                public void onNotification(List<ServerNotification> notifications) {
-                                                    try {
-                                                        new UserUpdatedHandler().handleUserUpdatedNotifications(notifications);
-                                                    } catch (Exception exception) {
-                                                        log.error("Error handling user updated notification.", exception);
-                                                    }
-                                                }
-                                            }));
+                                        // Register for Push messages in GCM
+                                        DonkyGcmController.getInstance().registerPush(new DonkyListener() {
 
-                                    subscribeToDonkyNotifications(
-                                            new ModuleDefinition(DonkyCore.class.getSimpleName(), AppSettings.getVersion()),
-                                            serverNotificationSubscriptions,
-                                            true);
+                                            @Override
+                                            public void success() {
+                                                postSuccess(mainThreadHandler, donkyListener);
+                                            }
 
-                                    log.info("Initialised Donky SDK.");
+                                            @Override
+                                            public void error(DonkyException donkyException, Map<String, String> validationErrors) {
+                                                postError(mainThreadHandler, donkyListener, donkyException);
+                                            }
+                                        });
 
-                                    initialised.set(true);
+                                    } else {
+                                        postSuccess(mainThreadHandler, donkyListener);
+                                    }
 
-                                    sharedLock.notifyAll();
+                                } catch (final DonkyException donkyException) {
 
-                                    DonkyCore.publishLocalEvent(new CoreInitialisedSuccessfullyEvent());
+                                    postError(mainThreadHandler, donkyListener, donkyException);
 
-                                } catch (final Exception e) {
-
-                                    log.error("Error initialising Donky SDK.");
+                                } catch (final Exception exception) {
 
                                     final DonkyException donkyException = new DonkyException("Error initialising Donky SDK controllers.");
-                                    donkyException.initCause(e);
-
-                                    sharedLock.notifyAll();
+                                    donkyException.initCause(exception);
 
                                     postError(mainThreadHandler, donkyListener, donkyException);
                                 }
                             }
                         }
+                    }.start();
+                }
+            } else {
 
-                        if (initialised.get()) {
+                log.error("Wrong argument when initialising Donky Core SDK. Check initialiseDonkySDK method call.");
 
-                            try {
-
-                                for (ModuleDefinition moduleDefinition : moduleDefinitionsToRegister) {
-                                    getInstance().registerModule(moduleDefinition);
-                                }
-                                moduleDefinitionsToRegister.clear();
-
-                                // register user or update registration
-                                DonkyAccountController.getInstance().register(apiKey, userDetails, deviceDetails, appVersion, overrideCurrentUser);
-
-                                DonkyAccountController.getInstance().updateClient(null);
-
-                                // Register for Push messages in GCM
-                                DonkyGcmController.getInstance().registerPush(new DonkyListener() {
-
-                                    @Override
-                                    public void success() {
-                                        postSuccess(mainThreadHandler, donkyListener);
-                                    }
-
-                                    @Override
-                                    public void error(DonkyException donkyException, Map<String, String> validationErrors) {
-                                        postError(mainThreadHandler, donkyListener, donkyException);
-                                    }
-                                });
-
-                            } catch (final DonkyException donkyException) {
-
-                                postError(mainThreadHandler, donkyListener, donkyException);
-
-                            } catch (final Exception exception) {
-
-                                final DonkyException donkyException = new DonkyException("Error initialising Donky SDK controllers.");
-                                donkyException.initCause(exception);
-
-                                postError(mainThreadHandler, donkyListener, donkyException);
-                            }
-                        }
-                    }
-                }.start();
-
+                final DonkyException donkyException = new DonkyException("Error initialising Donky SDK controllers.");
+                postError(mainThreadHandler, donkyListener, donkyException);
             }
         } else {
-
-            log.error("Wrong argument when initialising Donky Core SDK. Check initialiseDonkySDK method call.");
-
-            final DonkyException donkyException = new DonkyException("Error initialising Donky SDK controllers.");
-            postError(mainThreadHandler, donkyListener, donkyException);
+            log.warning("Cannot initialise more than once.");
+            postError(new Handler(Looper.getMainLooper()), donkyListener, new DonkyException("Cannot initialise more than once."));
         }
     }
 
@@ -354,7 +436,7 @@ public class DonkyCore {
     /**
      * Adds a subscription for specific types of Content notification. Should be called before Initialise to avoid a race condition resulting in missed notifications.
      *
-     * @param moduleDefinition                          The module details.
+     * @param moduleDefinition                The module details.
      * @param serverNotificationSubscriptions The subscriptions to register for this module.
      */
     public static void subscribeToContentNotifications(ModuleDefinition moduleDefinition, List<Subscription<ServerNotification>> serverNotificationSubscriptions) {
@@ -368,7 +450,7 @@ public class DonkyCore {
     /**
      * Adds a subscription for specific types of Content notification. Should be called before Initialise to avoid a race condition resulting in missed notifications.
      *
-     * @param moduleDefinition                          The module details.
+     * @param moduleDefinition               The module details.
      * @param serverNotificationSubscription The subscription to register for this module.
      */
     public static void subscribeToContentNotifications(ModuleDefinition moduleDefinition, Subscription<ServerNotification> serverNotificationSubscription) {
@@ -385,9 +467,9 @@ public class DonkyCore {
     /**
      * API for Donky module usage only. Adds a subscription for specific types of Donky notification. Should be called before Initialise to avoid a race condition resulting in missed notifications.
      *
-     * @param moduleDefinition                          The module details.
+     * @param moduleDefinition                The module details.
      * @param serverNotificationSubscriptions The subscriptions to register for this module.
-     * @param autoAcknowledge True if Core SDK should acknowledge the notification.
+     * @param autoAcknowledge                 True if Core SDK should acknowledge the notification.
      */
     public static void subscribeToDonkyNotifications(ModuleDefinition moduleDefinition, List<Subscription<ServerNotification>> serverNotificationSubscriptions, boolean autoAcknowledge) {
 
@@ -400,9 +482,9 @@ public class DonkyCore {
     /**
      * API for Donky module usage only. Adds a subscription for specific types of Donky notification. Should be called before Initialise to avoid a race condition resulting in missed notifications.
      *
-     * @param moduleDefinition                          The module details.
+     * @param moduleDefinition               The module details.
      * @param serverNotificationSubscription The subscription to register for this module.
-     * @param autoAcknowledge True if Core SDK should acknowledge the notification.
+     * @param autoAcknowledge                True if Core SDK should acknowledge the notification.
      */
     public static void subscribeToDonkyNotifications(ModuleDefinition moduleDefinition, Subscription<ServerNotification> serverNotificationSubscription, boolean autoAcknowledge) {
 
@@ -418,7 +500,7 @@ public class DonkyCore {
     /**
      * Subscribes to outbound notifications. Callbacks are made during the Synchronise flow.
      *
-     * @param moduleDefinition                            The module details.
+     * @param moduleDefinition                  The module details.
      * @param outboundNotificationSubscriptions The subscriptions to register for this module.
      */
     public static void subscribeToOutboundNotifications(ModuleDefinition moduleDefinition, List<Subscription<OutboundNotification>> outboundNotificationSubscriptions) {
@@ -432,7 +514,7 @@ public class DonkyCore {
     /**
      * Subscribes to outbound notifications. Callbacks are made during the Synchronise flow.
      *
-     * @param moduleDefinition                            The module details.
+     * @param moduleDefinition                 The module details.
      * @param outboundNotificationSubscription The subscription to register for this module.
      */
     public static void subscribeToOutboundNotifications(ModuleDefinition moduleDefinition, Subscription<OutboundNotification> outboundNotificationSubscription) {
@@ -463,7 +545,7 @@ public class DonkyCore {
     }
 
     /**
-     * The Core SDK will act as a Service Provider, allowing modules to register ‘services’ that other modules can consume.  This is largely to enable other Donky modules to interoperate.
+     * The Core SDK will act as a Service provider, allowing modules to register ‘services’ that other modules can consume.  This is largely to enable other Donky modules to interoperate.
      * Only a single instance of any given type can be tracked.  This will replace any previously registered instances of the given type.
      *
      * @param type     The type of the service being registered.
@@ -478,10 +560,10 @@ public class DonkyCore {
     }
 
     /**
-     * The Core SDK will act as a Service Provider, allowing modules to register ‘services’ that other modules can consume.  This is largely to enable other Donky modules to interoperate.
+     * The Core SDK will act as a Service provider, allowing modules to register ‘services’ that other modules can consume.  This is largely to enable other Donky modules to interoperate.
      * Only a single instance of any given type can be tracked.  This will replace any previously registered instances of the given type.
      *
-     * @param type The type of the service being registered.
+     * @param type     The type of the service being registered.
      * @param category The category of the service being registered. This can be used if some hierarchy of types is needed for Services.
      * @param instance Instance of the specified type.
      */
@@ -525,9 +607,9 @@ public class DonkyCore {
 
             Map<String, Object> servicesWithGivenCategory = new HashMap<>();
 
-            for (Map.Entry<String,ServiceWrapper> entry : services.entrySet()) {
+            for (Map.Entry<String, ServiceWrapper> entry : services.entrySet()) {
                 if (entry.getKey() != null && entry.getValue() != null && category.equals(entry.getValue().getCategory())) {
-                    servicesWithGivenCategory.put(entry.getKey(),entry.getValue().getServiceInstance());
+                    servicesWithGivenCategory.put(entry.getKey(), entry.getValue().getServiceInstance());
                 }
 
             }
@@ -638,11 +720,7 @@ public class DonkyCore {
                         }
 
                     } else if (versionList.get(i) != null) {
-                        if (versionList.get(i).intValue() > 0) {
-                            return true;
-                        } else {
-                            return false;
-                        }
+                        return versionList.get(i).intValue() > 0;
                     } else if (verToCompare.getVersionList().get(i) != null) {
                         return verToCompare.getVersionList().get(i).intValue() < 0;
                     } else {

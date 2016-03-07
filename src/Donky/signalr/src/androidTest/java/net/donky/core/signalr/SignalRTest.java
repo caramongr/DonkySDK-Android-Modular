@@ -2,17 +2,20 @@ package net.donky.core.signalr;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;
+import android.util.Log;
 
 import net.donky.core.DonkyCore;
 import net.donky.core.DonkyException;
-import net.donky.core.account.DeviceDetails;
-import net.donky.core.account.UserDetails;
-import net.donky.core.events.CoreInitialisedSuccessfullyEvent;
+import net.donky.core.ModuleDefinition;
+import net.donky.core.NotificationListener;
+import net.donky.core.Subscription;
+import net.donky.core.events.DonkyEventListener;
+import net.donky.core.events.LocalEvent;
 import net.donky.core.logging.DLog;
 import net.donky.core.network.ClientNotification;
+import net.donky.core.network.ServerNotification;
 import net.donky.core.network.restapi.secured.SynchroniseResponse;
 import net.donky.core.signalr.internal.helpers.JsonParsingHelper;
-import net.donky.core.signalr.mock.MockDonkyEventListener;
 import net.donky.core.signalr.mock.MockDonkyListener;
 import net.donky.core.signalr.mock.MockDonkyResultListener;
 
@@ -23,6 +26,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -54,49 +58,53 @@ public class SignalRTest extends ApplicationTestCase<Application> {
         super.setUp();
         createApplication();
 
-        UserDetails userDetails = new UserDetails();
-        userDetails.setUserCountryCode("GBR").
-                setUserId(initialUserId).
-                setUserFirstName("John").
-                setUserLastName("Smith").
-                setUserMobileNumber("07555555555").
-                setUserEmailAddress("j.s@me.com").
-                setUserDisplayName("John");
+        init();
+    }
 
-        DeviceDetails deviceDetails = new DeviceDetails("phone2 my favorite", "phone2", null);
+    public void init() throws InterruptedException {
 
-        MockDonkyEventListener mockDonkyEventListenerInitialised = new MockDonkyEventListener<>(CoreInitialisedSuccessfullyEvent.class);
-        DonkyCore.subscribeToLocalEvent(mockDonkyEventListenerInitialised);
+        if (!DonkyCore.isInitialised()) {
+            final MockDonkyListener listener = new MockDonkyListener();
 
-        MockDonkyListener listenerA = new MockDonkyListener();
+            //Subscribe
+            List<Subscription<ServerNotification>> serverNotificationSubscriptions = new LinkedList<>();
+            serverNotificationSubscriptions.add(new Subscription<>("changeColour",
+                    new NotificationListener<ServerNotification>() {
+                        @Override
+                        public void onNotification(ServerNotification notification) {
 
-        DonkySignalR.initialiseDonkySignalR(getApplication(), listenerA);
+                        }
+                    }));
 
-        synchronized (listenerA) {
-            listenerA.wait(TIME_OUT);
+            DonkyCore.subscribeToContentNotifications(
+                    new ModuleDefinition("Color Demo", "1.0.0.0"),
+                    serverNotificationSubscriptions);
+
+            DonkyCore.subscribeToLocalEvent(new DonkyEventListener<LocalEvent>(LocalEvent.class) {
+
+                @Override
+                public void onDonkyEvent(LocalEvent localEvent) {
+                    Log.i("TEST", "LOCAL EVENT !");
+                }
+
+            });
+
+            DonkyCore.initialiseDonkySDK(getApplication(), apiKey, listener);
+
+            synchronized (listener) {
+                listener.wait(TIME_OUT);
+            }
+
+            DonkyException donkyException = listener.getDonkyException();
+            assertNull(donkyException);
+
+            Map<String, String> validationErrors = listener.getValidationErrors();
+            assertNull(validationErrors);
         }
-
-        DonkyException donkyException = listenerA.getDonkyException();
-        assertNull(donkyException);
-
-        Map<String, String> validationErrors = listenerA.getValidationErrors();
-        assertNull(validationErrors);
-
-        MockDonkyListener listenerB = new MockDonkyListener();
-        DonkyCore.initialiseDonkySDK(getApplication(), apiKey, userDetails, deviceDetails, "1.0.0.0", listenerB);
-
-        synchronized (listenerB) {
-            listenerB.wait(TIME_OUT);
-        }
-
-        donkyException = listenerB.getDonkyException();
-        assertNull(donkyException);
-
-        validationErrors = listenerB.getValidationErrors();
-        assertNull(validationErrors);
     }
 
     @Test
+    @Deprecated
     public void testConnecting() throws InterruptedException {
 
         DonkySignalRController.getInstance().startSignalR();
@@ -115,6 +123,10 @@ public class SignalRTest extends ApplicationTestCase<Application> {
             listener.wait(TIME_OUT);
         }
 
+        /*
+            @Deprecated
+            Will fail in current implementation, signalR won't connect unless the activity is foregrounded
+         */
         assertNull(listener.getDonkyException());
         assertNotNull(listener.getResult());
 

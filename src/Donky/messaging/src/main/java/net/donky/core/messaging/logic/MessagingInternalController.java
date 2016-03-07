@@ -56,6 +56,15 @@ public class MessagingInternalController {
     }
 
     /**
+     * Queue 'Message Deleted' client notification.
+     */
+    public void queueMessageDeletedNotification(CommonMessage commonMessage) {
+
+        DonkyNetworkController.getInstance().queueClientNotification(ClientNotification.createMessageDeletedNotification(commonMessage));
+
+    }
+
+    /**
      * Queue 'Message Received' client notification.
      *
      * @param messageReceivedDetails Description of received message.

@@ -6,7 +6,12 @@ import net.donky.core.DonkyCore;
 import net.donky.core.DonkyException;
 import net.donky.core.DonkyListener;
 import net.donky.core.ModuleDefinition;
+import net.donky.core.NotificationBatchListener;
+import net.donky.core.Subscription;
+import net.donky.core.network.ServerNotification;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -86,6 +91,43 @@ public class DonkyMessaging {
             try {
 
                 DonkyCore.registerModule(new ModuleDefinition(DonkyMessaging.class.getSimpleName(), version));
+
+                List<Subscription<ServerNotification>> serverNotificationSubscriptions = new LinkedList<>();
+
+                serverNotificationSubscriptions.add(new Subscription<>(ServerNotification.NOTIFICATION_TYPE_SyncMsgDeleted,
+                        new NotificationBatchListener<ServerNotification>() {
+
+                            @Override
+                            public void onNotification(ServerNotification notification) {
+
+                            }
+
+                            @Override
+                            public void onNotification(List<ServerNotification> notifications) {
+                                new NotificationHandler().handleMessageDeletedNotification(notifications);
+                            }
+
+                        }));
+
+                serverNotificationSubscriptions.add(new Subscription<>(ServerNotification.NOTIFICATION_TYPE_SyncMsgRead,
+                        new NotificationBatchListener<ServerNotification>() {
+
+                            @Override
+                            public void onNotification(ServerNotification notification) {
+
+                            }
+
+                            @Override
+                            public void onNotification(List<ServerNotification> notifications) {
+                                new NotificationHandler().handleMessageReadNotification(notifications);
+                            }
+
+                        }));
+
+                DonkyCore.subscribeToDonkyNotifications(
+                        new ModuleDefinition(DonkyMessaging.class.getSimpleName(), version),
+                        serverNotificationSubscriptions,
+                        false);
 
                 initialised.set(true);
 

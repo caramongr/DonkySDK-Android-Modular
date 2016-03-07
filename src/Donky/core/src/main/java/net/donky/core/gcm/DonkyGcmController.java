@@ -4,27 +4,26 @@ import android.app.Application;
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.TextUtils;
 
 import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
+import com.google.android.gms.iid.InstanceID;
 
 import net.donky.core.DonkyCore;
 import net.donky.core.DonkyException;
 import net.donky.core.DonkyListener;
+import net.donky.core.account.DonkyAccountController;
 import net.donky.core.logging.DLog;
 import net.donky.core.model.DonkyDataController;
 import net.donky.core.network.DonkyNetworkController;
-import net.donky.core.network.RetryPolicy;
 import net.donky.core.network.restapi.secured.UpdatePushConfiguration;
 import net.donky.core.settings.AppSettings;
 
 import java.io.IOException;
-import java.util.Map;
 
 /**
  * Controller for all Google Cloud Messaging related functionality.
@@ -81,84 +80,61 @@ public class DonkyGcmController {
 
         if (DonkyCore.isInitialised() && !isRegisteredToGCM()) {
 
-            String senderId = AppSettings.getInstance().getGcmSenderId();
+            int connectionStatus = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(context);
 
-            if (TextUtils.isEmpty(senderId)) {
-
-                senderId = DonkyDataController.getInstance().getConfigurationDAO().getGcmSenderId();
-
-                if (TextUtils.isEmpty(senderId)) {
-
-                    if (listener != null) {
-                        listener.error(new DonkyException("GCM sender id not found."), null);
-                    }
-
-                    return;
-                }
-            }
-
-            int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(context);
-
-            if (resultCode == ConnectionResult.SUCCESS) {
+            if (connectionStatus == ConnectionResult.SUCCESS) {
 
                 log.info("Registering to GCM");
 
-                registerToGcmInBackground(senderId, new GcmRegistrationListener() {
-
-                    @Override
-                    public void success(String gcmRegistrationId) {
-
-                        DonkyDataController.getInstance().getConfigurationDAO().setGcmRegistrationId(gcmRegistrationId);
-
-                        DonkyNetworkController.getInstance().updatePushConfigurationOnNetwork(new UpdatePushConfiguration(gcmRegistrationId), listener);
-
-                    }
-
-                    @Override
-                    public void failed(DonkyException exception) {
-
-                        if (listener != null) {
-                            listener.error(exception, null);
-                        }
-
-                    }
-
-                    @Override
-                    public void googlePlayServicesNotAvailable(int googlePlayServicesUtilResultCode) {
-
-                        DonkyException donkyException = new DonkyException("Google Play Services not available, code " + googlePlayServicesUtilResultCode);
-
-                        if (listener != null) {
-                            listener.error(donkyException, null);
-                        }
-
-                    }
-                });
+                doRegisterGCM(listener);
 
             } else {
 
-                if (GooglePlayServicesUtil.isUserRecoverableError(resultCode)) {
-                    log.error("Google Play Services is probably not up to date. User recoverable Error Code is " + resultCode);
+                if (GoogleApiAvailability.getInstance().isUserResolvableError(connectionStatus)) {
+                    log.warning("Google Play Services is probably not up to date. User recoverable Error Code is " + connectionStatus);
                 } else {
-                    log.error("This device is not supported by Google Play Services.");
+                    log.warning("This device is not supported by Google Play Services.");
                 }
-
-                DonkyException donkyException = new DonkyException("Google Play Services not available. Connection Status Code " + resultCode);
 
                 if (listener != null) {
+                    DonkyException donkyException = new DonkyException("Google Play Services not available. Connection Status Code " + connectionStatus);
                     listener.error(donkyException, null);
                 }
-
             }
 
         } else {
-
             if (listener != null) {
                 listener.success();
             }
-
         }
+    }
 
+    /**
+     * Register to Google Cloud Services. This will allow app to receive push messages. Registration process will be moved to background if this method will be called from main thread.
+     */
+    public void registerPush() throws DonkyException {
+
+        if (DonkyCore.isInitialised() && !isRegisteredToGCM()) {
+
+            int connectionStatus = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(context);
+
+            if (connectionStatus == ConnectionResult.SUCCESS) {
+
+                log.info("Registering to GCM");
+
+                doRegisterGCM();
+
+            } else {
+
+                if (GoogleApiAvailability.getInstance().isUserResolvableError(connectionStatus)) {
+                    log.warning("Google Play Services is probably not up to date. User recoverable Error Code is " + connectionStatus);
+                } else {
+                    log.warning("This device is not supported by Google Play Services.");
+                }
+
+                throw new DonkyException("Google Play Services not available. Connection Status Code " + connectionStatus);
+            }
+        }
     }
 
     /**
@@ -170,184 +146,53 @@ public class DonkyGcmController {
 
         if (DonkyCore.isInitialised()) {
 
-            int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(context);
+            DonkyCore.getInstance().processInBackground(new Runnable() {
 
-            if (resultCode == ConnectionResult.SUCCESS) {
+                @Override
+                public void run() {
 
-                unregisterFromGcmInBackground(new DonkyListener() {
+                    DonkyException donkyException = null;
 
-                    @Override
-                    public void success() {
+                    boolean isRegistered = !TextUtils.isEmpty(DonkyDataController.getInstance().getConfigurationDAO().getGcmRegistrationId());
 
-                        DonkyDataController.getInstance().getConfigurationDAO().setGcmRegistrationId(null);
+                    String senderId = getSenderId();
 
-                        DonkyNetworkController.getInstance().deletePushConfigurationOnNetwork(listener);
+                    if (isRegistered) {
 
-                    }
+                        if (!TextUtils.isEmpty(senderId)) {
 
-                    @Override
-                    public void error(DonkyException donkyException, Map<String, String> validationErrors) {
-
-                        if (listener != null) {
-                            listener.error(donkyException, null);
-                        }
-
-                    }
-                });
-
-            } else {
-
-                if (GooglePlayServicesUtil.isUserRecoverableError(resultCode)) {
-                    log.error("Google Play Services is probably not up to date. User recoverable Error Code is " + resultCode);
-                } else {
-                    log.error("This device is not supported by Google Play Services.");
-                }
-
-                DonkyException donkyException = new DonkyException("Google Play Services not available. Connection Status Code " + resultCode);
-
-                if (listener != null) {
-                    listener.error(donkyException, null);
-                }
-
-            }
-
-        }
-    }
-
-    /**
-     * Registers the application with GCM servers asynchronously. Performs retries if unsuccessful.
-     * Stores the registration ID and app versionCode in the application's shared preferences.
-     *
-     * @param senderId Sender id identifier in Google Cloud Messaging
-     * @param listener Callback to invoke when method finishes.
-     */
-    private void registerToGcmInBackground(final String senderId, final GcmRegistrationListener listener) {
-
-        new Handler(Looper.getMainLooper()).post(new Runnable() {
-            @Override
-            public void run() {
-
-                new AsyncTask<Void, Void, String>() {
-
-                    IOException exception;
-
-                    @Override
-                    protected String doInBackground(Void... params) {
-
-                        RetryPolicy retryPolicy = new RetryPolicy();
-
-                        String registrationId = null;
-
-                        try {
-
-                            GoogleCloudMessaging gcm = GoogleCloudMessaging.getInstance(context);
-
-                            if (gcm != null) {
-
-                                while (registrationId == null && retryPolicy.retry()) {
-
-                                    registrationId = gcm.register(senderId);
-
-                                    if (TextUtils.isEmpty(registrationId)) {
-
-                                        try {
-                                            Thread.sleep(retryPolicy.getDelayBeforeNextRetry());
-                                        } catch (InterruptedException e) {
-                                            e.printStackTrace();
-                                        }
-
-                                    } else {
-
-                                        DonkyDataController.getInstance().getConfigurationDAO().setGcmRegistrationId(registrationId);
-                                    }
-                                }
+                            try {
+                                InstanceID.getInstance(context).deleteToken(senderId, GoogleCloudMessaging.INSTANCE_ID_SCOPE);
+                            } catch (IOException e) {
+                                donkyException = new DonkyException("Cannot delete GCM token from instanceID.");
+                                donkyException.initCause(e);
                             }
 
-                        } catch (IOException e) {
-
-                            exception = e;
-                            log.error("Error registering to GCM", e);
-
-                        }
-
-                        return registrationId;
-                    }
-
-                    @Override
-                    protected void onPostExecute(String registrationId) {
-
-                        if (!TextUtils.isEmpty(registrationId) && listener != null) {
-
-                            listener.success(registrationId);
-
-                        } else if (listener != null) {
-
-                            DonkyException donkyException = new DonkyException("Error registering for GCM.");
-                            donkyException.initCause(exception);
-
-                            listener.failed(donkyException);
-
+                        } else {
+                            donkyException = new DonkyException("GCM SenderId not found.");
                         }
                     }
-                }.execute(null, null, null);
-            }
-        });
 
-    }
-
-    /**
-     * Unregisters the application from GCM servers asynchronously.
-     *
-     * @param listener The callback to invoke when the command has executed.
-     */
-    private void unregisterFromGcmInBackground(final DonkyListener listener) {
-
-        new AsyncTask<Void, Void, Boolean>() {
-
-            IOException exception;
-
-            @Override
-            protected Boolean doInBackground(Void... params) {
-
-                GoogleCloudMessaging gcm = GoogleCloudMessaging.getInstance(context);
-
-                if (gcm != null) {
-
-                    try {
-
-                        gcm.unregister();
-
-                    } catch (IOException e) {
-
-                        exception = e;
-
-                        return false;
-
+                    if (DonkyAccountController.getInstance().isRegistered()) {
+                        try {
+                            DonkyNetworkController.getInstance().deletePushConfigurationOnNetwork();
+                        } catch (DonkyException e) {
+                            donkyException = new DonkyException("Error deleting GCM configuration on the network.");
+                            donkyException.initCause(e);
+                        }
                     }
 
+                    if (listener != null) {
+                        Handler handler = new Handler(Looper.getMainLooper());
+                        if (donkyException == null) {
+                            DonkyCore.getInstance().postSuccess(handler, listener);
+                        } else {
+                            DonkyCore.getInstance().postError(handler, listener, donkyException);
+                        }
+                    }
                 }
-
-                return true;
-            }
-
-            @Override
-            protected void onPostExecute(Boolean result) {
-
-                if (result && listener != null) {
-
-                    listener.success();
-
-                } else if (listener != null) {
-
-                    DonkyException donkyException = new DonkyException("Error registering for GCM.");
-                    donkyException.initCause(exception);
-
-                    listener.error(donkyException, null);
-
-                }
-            }
-        }.execute(null, null, null);
-
+            });
+        }
     }
 
     /**
@@ -357,8 +202,25 @@ public class DonkyGcmController {
      */
     public boolean isRegisteredToGCM() {
 
+        /**
+         * Check if instance id {@link InstanceID} was deleted so that tokens need to be recreated.
+         */
+        String currentInstanceId = InstanceID.getInstance(context).getId();
+        String oldInstanceId = DonkyDataController.getInstance().getConfigurationDAO().getInstanceId();
+        if (oldInstanceId == null || !oldInstanceId.equals(currentInstanceId)) {
+            DonkyDataController.getInstance().getConfigurationDAO().setInstanceId(currentInstanceId);
+            DonkyDataController.getInstance().getConfigurationDAO().setGcmRegistrationId(null);
+            return false;
+        }
+
+        /**
+         * Check if GCM registration token is missing in DB
+         */
         boolean isRegistered = !TextUtils.isEmpty(DonkyDataController.getInstance().getConfigurationDAO().getGcmRegistrationId());
 
+        /**
+         * Check if App version changed
+         */
         String appVersion = DonkyDataController.getInstance().getConfigurationDAO().getGcmRegistrationAppVersion();
 
         int currentVersion = getAppVersion();
@@ -405,4 +267,79 @@ public class DonkyGcmController {
             return -1;
         }
     }
+
+    private String getSenderId() {
+
+        String senderId = AppSettings.getInstance().getGcmSenderId();
+
+        if (TextUtils.isEmpty(senderId)) {
+
+            senderId = DonkyDataController.getInstance().getConfigurationDAO().getGcmSenderId();
+
+            if (TextUtils.isEmpty(senderId)) {
+                new DLog("DonkyGCMRegistrationService").warning("GCM sender id ");
+                return null;
+            }
+        }
+
+        return senderId;
+
+    }
+
+    private String getRegistrationToken() {
+
+        String senderId = getSenderId();
+
+        if (!TextUtils.isEmpty(senderId)) {
+            InstanceID instanceID = InstanceID.getInstance(context);
+
+            String token = null;
+
+            try {
+                token = instanceID.getToken(senderId,
+                        GoogleCloudMessaging.INSTANCE_ID_SCOPE, null);
+            } catch (IOException exception) {
+                new DLog("DonkyGCMRegistrationService").error("Error obtaining push GCM registration token.", exception);
+            }
+
+            return token;
+        }
+
+        return null;
+    }
+
+    private void doRegisterGCM() {
+
+        final String token = getRegistrationToken();
+
+        DonkyDataController.getInstance().getConfigurationDAO().setGcmRegistrationId(token);
+
+        if (DonkyAccountController.getInstance().isRegistered()) {
+            try {
+                if (!TextUtils.isEmpty(token)) {
+                    DonkyNetworkController.getInstance().updatePushConfigurationOnNetwork(new UpdatePushConfiguration(token));
+                } else {
+                    DonkyNetworkController.getInstance().deletePushConfigurationOnNetwork();
+                }
+            } catch (DonkyException exception) {
+                new DLog("DonkyGCMRegistrationService").error("Error updating push configuration on the network.", exception);
+            }
+        }
+    }
+
+    private void doRegisterGCM(DonkyListener listener) {
+
+        final String token = getRegistrationToken();
+
+        DonkyDataController.getInstance().getConfigurationDAO().setGcmRegistrationId(token);
+
+        if (DonkyAccountController.getInstance().isRegistered()) {
+            if (!TextUtils.isEmpty(token)) {
+                DonkyNetworkController.getInstance().updatePushConfigurationOnNetwork(new UpdatePushConfiguration(token), listener);
+            } else {
+                DonkyNetworkController.getInstance().deletePushConfigurationOnNetwork(listener);
+            }
+        }
+    }
+
 }

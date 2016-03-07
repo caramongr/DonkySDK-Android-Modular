@@ -176,7 +176,7 @@ public class RichMessageFragment extends DonkyFragment implements GenericBuilder
             MessagingInternalController.getInstance().sendMessageReadNotification(richMessage, new DonkyListener() {
                 @Override
                 public void success() {
-                    new DLog("RichMessageHandler").debug("Message read notification sent successfully.");
+                    new DLog("RichMessageHandler").debug("Message read notification sent successfully. Message id = "+richMessage.getMessageId());
                 }
 
                 @Override

@@ -36,15 +36,15 @@ public class Register extends GenericAuthenticationServiceRequest<RegisterRespon
     @SerializedName("user")
     private UpdateUser user;
 
-    private UserDetails userDetails;
+    protected UserDetails userDetails;
 
-    private DeviceDetails deviceDetails;
+    protected DeviceDetails deviceDetails;
 
-    private String appVersion;
+    protected String appVersion;
 
-    private String apiKey;
+    protected String apiKey;
 
-    private boolean overrideRegistration;
+    protected boolean overrideRegistration;
 
     public Register(final String apiKey, final UserDetails userDetails, final DeviceDetails deviceDetails, final String appVersion, boolean overrideRegistration) {
         device = new UpdateDevice(deviceDetails);

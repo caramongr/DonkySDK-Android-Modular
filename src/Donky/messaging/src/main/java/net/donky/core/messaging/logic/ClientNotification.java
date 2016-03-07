@@ -31,7 +31,8 @@ public class ClientNotification extends net.donky.core.network.ClientNotificatio
 
         MessageReceived,
         MessageRead,
-        MessageShared
+        MessageShared,
+        MessageDeleted
 
     }
 
@@ -85,6 +86,31 @@ public class ClientNotification extends net.donky.core.network.ClientNotificatio
         try {
 
             n.data = new JSONObject(gson.toJson(createMessageRead(n, richCommonMessage)));
+
+        } catch (JSONException e) {
+
+            e.printStackTrace();
+
+        };
+
+        return n;
+    }
+
+    /**
+     * Create 'Message Deleted' client notification.
+     *
+     * @param commonMessage Deleted message.
+     * @return 'Message Deleted' Client Notification
+     */
+    static net.donky.core.network.ClientNotification createMessageDeletedNotification(CommonMessage commonMessage) {
+
+        ClientNotification n = new ClientNotification(Type.MessageDeleted.toString(), IdHelper.generateId());
+
+        Gson gson = new Gson();
+
+        try {
+
+            n.data = new JSONObject(gson.toJson(createMessageDeleted(n, commonMessage)));
 
         } catch (JSONException e) {
 
@@ -191,6 +217,19 @@ public class ClientNotification extends net.donky.core.network.ClientNotificatio
     }
 
     /**
+     * Create serialized object for message deleted data.
+     */
+    private static MessageDeleted createMessageDeleted(ClientNotification n, CommonMessage commonMessage) {
+
+        MessageDeleted u = n.new MessageDeleted();
+
+        u.type = Type.MessageDeleted.toString();
+        u.messageId = commonMessage.getMessageId();
+
+        return u;
+    }
+
+    /**
      * Description of json content of 'Message Received' client notification.
      */
     private class MessageReceived {
@@ -258,6 +297,19 @@ public class ClientNotification extends net.donky.core.network.ClientNotificatio
 
         @SerializedName("timeToReadSeconds")
         private int timeToReadSeconds;
+
+    }
+
+    /**
+     * Description of json content of 'Message Deleted' client notification.
+     */
+    private class MessageDeleted {
+
+        @SerializedName("type")
+        private String type;
+
+        @SerializedName("messageId")
+        private String messageId;
 
     }
 

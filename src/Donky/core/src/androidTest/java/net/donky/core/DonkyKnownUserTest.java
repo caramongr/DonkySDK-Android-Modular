@@ -178,30 +178,13 @@ public class DonkyKnownUserTest extends ApplicationTestCase<Application> {
         DonkyCore.initialiseDonkySDK(getApplication(), apiKey, userDetails, deviceDetails, "1.0.0.0", listener);
 
         synchronized (listener) {
-            listener.wait(TIME_OUT);
+            listener.wait(TIME_OUT*3);
         }
 
         DonkyException donkyException = listener.getDonkyException();
-        assertNull(donkyException);
+        assertNotNull(donkyException);
 
-        Map<String, String> validationErrors = listener.getValidationErrors();
-        assertNull(validationErrors);
-
-        UserDetails userDetailsNew = DonkyAccountController.getInstance().getCurrentDeviceUser();
-
-        assertEquals("John_new_1", userDetailsNew.getUserFirstName());
-        assertEquals("Smith_new_1", userDetailsNew.getUserLastName());
-        assertEquals("j.s@me.com", userDetailsNew.getUserEmailAddress());
-        assertEquals("07555555556", userDetailsNew.getUserMobileNumber());
-        assertEquals("John_new_1", userDetailsNew.getUserDisplayName());
-
-        Set<String> tagsNew = userDetailsNew.getSelectedTags();
-        assertNotNull(tagsNew);
-        assertEquals(1, tagsNew.size());
-        assertEquals(true, tagsNew.contains("value3"));
-
-        Map<String, String> propertiesNew = userDetailsNew.getUserAdditionalProperties();
-        assertEquals(0, propertiesNew.size());
+        assertEquals(donkyException.getMessage(), "Cannot initialise more than once.");
 
     }
 
@@ -262,7 +245,7 @@ public class DonkyKnownUserTest extends ApplicationTestCase<Application> {
         DonkyGcmController.getInstance().unregisterPush(listener);
 
         synchronized (listener) {
-            listener.wait(TIME_OUT);
+            listener.wait(TIME_OUT*3);
         }
 
         DonkyException donkyException = listener.getDonkyException();
@@ -280,7 +263,7 @@ public class DonkyKnownUserTest extends ApplicationTestCase<Application> {
         DonkyGcmController.getInstance().registerPush(listener);
 
         synchronized (listener) {
-            listener.wait(TIME_OUT);
+            listener.wait(TIME_OUT*3);
         }
 
         donkyException = listener.getDonkyException();
