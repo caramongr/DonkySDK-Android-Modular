@@ -89,7 +89,7 @@ public class DonkySignalRController extends SignalRController implements PushHan
 
     /**
      * Initializes singleton.
-     * <p/>
+     *
      * SingletonHolder is loaded on the first execution of Singleton.getInstance()
      * or the first access to SingletonHolder.INSTANCE, not before.
      */
@@ -112,6 +112,15 @@ public class DonkySignalRController extends SignalRController implements PushHan
      * @param application Application instance.
      */
     void init(Application application) {
+    }
+
+    /**
+     * Checks if signalR is connected.
+     *
+     * @return True if signalR is connected.
+     */
+    public boolean isConnected() {
+        return hubConnectionFactory.isConnected();
     }
 
     @Override

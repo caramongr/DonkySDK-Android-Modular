@@ -11,7 +11,7 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * Helper class to generate timestamps for the UI
- * <p/>
+ *
  * Created by Marcin Swierczek
  * 09/06/2015.
  * Copyright (C) Donky Networks Ltd. All rights reserved.

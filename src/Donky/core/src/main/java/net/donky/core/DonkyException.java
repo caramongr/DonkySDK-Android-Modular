@@ -33,7 +33,7 @@ public class DonkyException extends Exception {
 
     /**
      * @param description Exception description.
-     * @param
+     * @param validationErrors Validation errors.
      */
     public DonkyException(String description, Map<String, String> validationErrors) {
         super(description);

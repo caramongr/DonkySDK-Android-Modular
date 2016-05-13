@@ -6,15 +6,18 @@ android {
     compileSdkVersion 23
     buildToolsVersion '23.0.2'
 
+
     defaultConfig {
         applicationId "net.donky"
         minSdkVersion 14
         targetSdkVersion 23
         versionCode 1
         versionName "1.0"
-
+        multiDexEnabled true
 //        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-
+    }
+    dexOptions {
+        javaMaxHeapSize "4g" //specify the heap size for the dex process
     }
     buildTypes {
         release {
@@ -25,14 +28,15 @@ android {
     lintOptions {
         disable 'InvalidPackage'
     }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_7
+        targetCompatibility JavaVersion.VERSION_1_7
+    }
 }
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.android.support:support-v13:23.1.1'
-    compile 'com.jakewharton:butterknife:6.1.0'
-    debugCompile 'com.squareup.leakcanary:leakcanary-android:1.3.1'
-    releaseCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.3.1'
     compile project(':core')
     compile project(':automation')
     compile project(':analytics')
@@ -41,4 +45,6 @@ dependencies {
     compile project(':richinboxui')
     compile project(':signalr')
     compile project(':location')
+
+    compile 'com.android.support:multidex:1.0.1'
 }

@@ -41,7 +41,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /**
  * This is main entry point class for Donky Core library integration.
  * To initialise Donky Core add initialiseDonkySDK method call to Application class onCreate call-back.
- * <p/>
+ *
  * Created by Marcin Swierczek
  * 17/02/2015
  * Copyright (C) Donky Networks Ltd. All rights reserved.
@@ -92,7 +92,7 @@ public class DonkyCore {
 
     /**
      * Initializes singleton.
-     * <p/>
+     *
      * SingletonHolder is loaded on the first execution of Singleton.getInstance()
      * or the first access to SingletonHolder.INSTANCE, not before.
      */
@@ -129,7 +129,7 @@ public class DonkyCore {
      * This operation will ensure the SDK is active, and that the device is registered on the network with the correct API key and able to send/receive data.
      * If no user has been registered yet the SDk will perform anonymous registration on the Network. You can update this registration details later on.
      * However if there was an successful account registration already performed, the SDK won't modify it in any way.
-     * <p/>
+     *
      * This method should be called in {@link android.app.Application} class {@link android.app.Application#onCreate()}
      *
      * @param application   The {@link android.app.Application} instance.
@@ -144,7 +144,7 @@ public class DonkyCore {
      * This operation will ensure the SDK is active, and that the device is registered on the network with the correct API key and able to send/receive data.
      * If no user has been registered yet the SDk will perform anonymous registration on the Network. You can update this registration details later on.
      * However if there was an successful account registration already performed, the SDK won't modify it in any way.
-     * <p/>
+     *
      * This method should be called in {@link android.app.Application} class {@link android.app.Application#onCreate()}
      *
      * @param application   The {@link android.app.Application} instance.
@@ -157,7 +157,7 @@ public class DonkyCore {
 
     /**
      * This operation will ensure the SDK is active.
-     * <p/>
+     *
      * This method should be called in {@link android.app.Application} class {@link android.app.Application#onCreate()}
      *
      * @param application   The {@link android.app.Application} instance.
@@ -170,7 +170,7 @@ public class DonkyCore {
 
     /**
      * This operation will ensure the SDK is active.
-     * <p/>
+     *
      * This method should be called in {@link android.app.Application} class {@link android.app.Application#onCreate()}
      *
      * @param application   The {@link android.app.Application} instance.

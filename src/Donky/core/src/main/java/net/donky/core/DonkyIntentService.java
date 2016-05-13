@@ -38,7 +38,11 @@ public class DonkyIntentService extends IntentService {
 
             }
 
-            DonkyBroadcastReceiver.completeWakefulIntent(intent);
+            try {
+                DonkyBroadcastReceiver.completeWakefulIntent(intent);
+            } catch (Exception e) {
+                //nothing to do
+            }
 
         }
 

@@ -4,7 +4,7 @@ import java.util.Set;
 
 /**
  * Subscription for inbound and outbound notifications.
- * <p/>
+ *
  * Created by Marcin Swierczek
  * 02/04/2015.
  * Copyright (C) Donky Networks Ltd. All rights reserved.

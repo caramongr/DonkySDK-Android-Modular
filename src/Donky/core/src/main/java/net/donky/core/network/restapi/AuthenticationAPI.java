@@ -17,7 +17,7 @@ import retrofit.http.POST;
 
 /**
  * REST api for account authentication on the network.
- * <p/>
+ *
  * Created by Marcin Swierczek
  * 27/02/2015
  * Copyright (C) Donky Networks Ltd. All rights reserved.

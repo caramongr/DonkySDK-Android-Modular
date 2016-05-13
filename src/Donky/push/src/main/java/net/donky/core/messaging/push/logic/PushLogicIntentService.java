@@ -146,14 +146,15 @@ public class PushLogicIntentService extends IntentService {
             SimplePushData simplePushData = (SimplePushData) oldIntent.getExtras().getSerializable("simplePushData");
             SimplePushData.ButtonSetAction buttonSetAction = (SimplePushData.ButtonSetAction) oldIntent.getExtras().getSerializable("buttonSetAction");
 
+            if (buttonSetAction != null && !TextUtils.isEmpty(buttonSetAction.getData())) {
+                intent.setData(Uri.parse(buttonSetAction.getData()));
+                if (buttonSetAction.getData().startsWith("http") || buttonSetAction.getData().startsWith("https")) {
+                    return;
+                }
+            }
+
             bundle.putSerializable("simplePushData", simplePushData);
             bundle.putSerializable("buttonSetAction", buttonSetAction);
-
-            if (buttonSetAction != null && !TextUtils.isEmpty(buttonSetAction.getData())) {
-
-                intent.setData(Uri.parse(buttonSetAction.getData()));
-
-            }
 
         } catch (Exception e) {
 

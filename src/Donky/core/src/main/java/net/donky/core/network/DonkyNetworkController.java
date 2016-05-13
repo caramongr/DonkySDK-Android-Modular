@@ -81,7 +81,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Controller for all Core library network activities.
- * <p/>
+ *
  * Created by Marcin Swierczek
  * 16/02/2015
  * Copyright (C) Donky Networks Ltd. All rights reserved.
@@ -126,7 +126,7 @@ public class DonkyNetworkController {
 
     /**
      * Initializes singleton.
-     * <p/>
+     *
      * SingletonHolder is loaded on the first execution of Singleton.getInstance()
      * or the first access to SingletonHolder.INSTANCE, not before.
      */

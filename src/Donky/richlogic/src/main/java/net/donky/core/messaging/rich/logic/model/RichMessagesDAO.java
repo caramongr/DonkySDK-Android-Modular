@@ -32,7 +32,7 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * Database Access Object for Rich Messages.
- * <p/>
+ *
  * Created by Marcin Swierczek
  * 21/02/2015.
  * Copyright (C) Donky Networks Ltd. All rights reserved.

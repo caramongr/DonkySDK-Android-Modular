@@ -16,7 +16,7 @@ import java.util.Set;
 
 /**
  * Class to handle received server notifications.
- * <p/>
+ *
  * Created by Marcin Swierczek
  * 10/03/2015
  * Copyright (C) Donky Networks Ltd. All rights reserved.

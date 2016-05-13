@@ -2,6 +2,7 @@
     package="net.donky.core.messaging.push">
 
     <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
 
     <application
         android:allowBackup="true">

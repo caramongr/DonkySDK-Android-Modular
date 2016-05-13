@@ -23,7 +23,7 @@ import java.util.List;
 
 /**
  * This class is for one time migration between core DB and rich module db.
- * <p/>
+ *
  * Created by Marcin Swierczek
  * 01/02/2016.
  * Copyright (C) Donky Networks Ltd. All rights reserved.

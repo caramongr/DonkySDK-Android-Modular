@@ -27,7 +27,7 @@ import java.io.IOException;
 
 /**
  * Controller for all Google Cloud Messaging related functionality.
- * <p/>
+ *
  * Created by Marcin Swierczek
  * 16/02/2015
  * Copyright (C) Donky Networks Ltd. All rights reserved.
@@ -45,7 +45,7 @@ public class DonkyGcmController {
 
     /**
      * Initializes singleton.
-     * <p/>
+     *
      * SingletonHolder is loaded on the first execution of Singleton.getInstance()
      * or the first access to SingletonHolder.INSTANCE, not before.
      */

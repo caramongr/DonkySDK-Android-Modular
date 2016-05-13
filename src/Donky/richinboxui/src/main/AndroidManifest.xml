@@ -3,8 +3,7 @@
     package="net.donky.core.messaging.rich.inbox.ui">
 
     <uses-permission android:name="android.permission.VIBRATE" />
-
-    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
 
     <application android:allowBackup="true">
 
