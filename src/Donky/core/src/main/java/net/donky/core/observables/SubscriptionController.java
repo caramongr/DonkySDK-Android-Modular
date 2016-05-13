@@ -14,7 +14,7 @@ import java.util.List;
 
 /**
  * Controller for subscriptions for notifications being send or received.
- * <p/>
+ *
  * Created by Marcin Swierczek
  * 02/04/2015.
  * Copyright (C) Donky Networks Ltd. All rights reserved.
@@ -46,7 +46,7 @@ public class SubscriptionController {
 
     /**
      * Initializes singleton.
-     * <p/>
+     *
      * SingletonHolder is loaded on the first execution of Singleton.getInstance()
      * or the first access to SingletonHolder.INSTANCE, not before.
      */

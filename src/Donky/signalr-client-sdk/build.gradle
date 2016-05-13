@@ -1,4 +1,6 @@
 apply plugin: 'java'
+sourceCompatibility = 1.7
+targetCompatibility = 1.7
 
 // ./gradlew clean build generateRelease
 apply plugin: 'maven'
@@ -13,7 +15,7 @@ dependencies {
 
 def groupId = 'net.donky'
 def artifactId = 'donky-signalr'
-def version = '2.4.0.0'
+def version = '2.7.0.1'
 
 def localReleaseDest = "${buildDir}/release/${version}"
 

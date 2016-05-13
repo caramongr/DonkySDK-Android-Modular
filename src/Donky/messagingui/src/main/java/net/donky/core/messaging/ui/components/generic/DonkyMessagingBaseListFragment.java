@@ -39,7 +39,7 @@ import java.util.Map;
 
 /**
  * Fragment providing setup for list fragments in Donky Messaging.
- * <p/>
+ *
  * Created by Marcin Swierczek
  * 27/06/15
  * Copyright (C) Donky Networks Ltd. All rights reserved.

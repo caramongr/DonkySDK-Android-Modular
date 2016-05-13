@@ -10,7 +10,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Observable for subscriptions for notifications being send or received. The generic type is the type of notification that this observable can store subscriptions for.
- * <p/>
+ *
  * Created by Marcin Swierczek
  * 02/04/2015.
  * Copyright (C) Donky Networks Ltd. All rights reserved.

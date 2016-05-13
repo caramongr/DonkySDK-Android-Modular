@@ -16,7 +16,7 @@ import net.donky.core.network.SynchronisationHandler;
 
 /**
  * Intent service processing received GCM messages.
- * <p/>
+ *
  * Created by Marcin Swierczek
  * 21/02/2015
  * Copyright (C) Donky Networks Ltd. All rights reserved.

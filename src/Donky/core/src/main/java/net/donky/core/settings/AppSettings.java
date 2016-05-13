@@ -20,7 +20,7 @@ public class AppSettings extends AppSettingsBase {
     // 2 - Minor version number, increment when adding new functionality.
     // 3 - Major bug fix number, increment every 100 bugs.
     // 4 - Minor bug fix number, increment every bug fix, roll back when reaching 99.
-    private static final String CLIENT_VERSION = "2.7.0.0";
+    private static final String CLIENT_VERSION = "2.7.0.1";
 
     private static final String DEFAULT_SERVICE_URL = "https://client-api.mobiledonky.com";
 
@@ -86,7 +86,7 @@ public class AppSettings extends AppSettingsBase {
 
     /**
      * Initializes singleton.
-     * <p/>
+     *
      * SingletonHolder is loaded on the first execution of Singleton.getInstance()
      * or the first access to SingletonHolder.INSTANCE, not before.
      */

@@ -46,8 +46,7 @@ public class AuthenticationChallengeDetails {
     }
 
     /**
-     * Sets ID token obtained from integrator through {@link net.donky.core.DonkyAuthenticator} and {@link DonkyAuthClient}
-     * @return
+     * Sets ID token obtained from integrator through {@link net.donky.core.DonkyAuthenticator} and {@link DonkyAuthClient}.
      */
     public void setToken(String token) {
         this.token = token;

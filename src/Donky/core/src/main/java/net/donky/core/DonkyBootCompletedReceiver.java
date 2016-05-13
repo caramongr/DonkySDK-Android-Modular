@@ -6,7 +6,7 @@ import android.content.Intent;
 
 /**
  * Broadcast receiver for boot completed broadcasts to resume work after device restart.
- * <p/>
+ *
  * Created by Marcin Swierczek
  * 26/03/2015
  * Copyright (C) Donky Networks Ltd. All rights reserved.

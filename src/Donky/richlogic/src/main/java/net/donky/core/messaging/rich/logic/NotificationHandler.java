@@ -57,7 +57,7 @@ public class NotificationHandler {
                 messageReceivedDetails.setMessageScope(MessageReceivedDetails.MessageScope.A2P.toString());
                 messageReceivedDetails.setContextItems(richMessage.getContextItems());
                 messageReceivedDetails.setSenderInternalUserId(richMessage.getSenderInternalUserId());
-                messageReceivedDetails.setSenderMessageId(richMessage.getMessageId());
+                messageReceivedDetails.setSenderMessageId(richMessage.getSenderMessageId());
                 messageReceivedDetails.setSentTimestamp(richMessage.getSentTimestamp());
 
                 Date expiredTime = DateAndTimeHelper.parseUtcDate(richMessage.getExpiryTimeStamp());

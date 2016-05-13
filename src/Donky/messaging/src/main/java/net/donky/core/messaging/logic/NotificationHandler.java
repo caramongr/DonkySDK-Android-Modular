@@ -15,7 +15,7 @@ import java.util.List;
 
 /**
  * Handler for received server notification.
- * <p/>
+ *
  * Created by Marcin Swierczek
  * 14/04/2015.
  * Copyright (C) Donky Networks Ltd. All rights reserved.

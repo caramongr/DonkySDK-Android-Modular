@@ -1,6 +1,6 @@
 package net.donky;
 
-import android.app.Application;
+import android.support.multidex.MultiDexApplication;
 import android.util.Log;
 
 import net.donky.core.DonkyCore;
@@ -29,7 +29,7 @@ import java.util.Map;
  * 07/04/2015.
  * Copyright (C) Donky Networks Ltd. All rights reserved.
  */
-public class Donky extends Application {
+public class Donky extends MultiDexApplication {
 
     private static final String TAG = "DonkyTestApp";
 

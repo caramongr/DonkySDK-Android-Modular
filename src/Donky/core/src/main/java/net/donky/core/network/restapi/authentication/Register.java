@@ -20,7 +20,7 @@ import retrofit.RetrofitError;
 
 /**
  * Network request to register the account.
- * <p/>
+ *
  * Created by Marcin Swierczek
  * 27/02/2015
  * Copyright (C) Donky Networks Ltd. All rights reserved.

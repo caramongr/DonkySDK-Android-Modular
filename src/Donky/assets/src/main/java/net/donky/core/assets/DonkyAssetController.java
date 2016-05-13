@@ -47,7 +47,7 @@ import java.util.Map;
 
 /**
  * Main Controller class for Assets Module
- * <p/>
+ *
  * Created by Marcin Swierczek
  * 11/11/2015.
  * Copyright (C) Donky Networks Ltd. All rights reserved.
@@ -81,7 +81,7 @@ public class DonkyAssetController {
 
     /**
      * Initializes singleton.
-     * <p/>
+     *
      * SingletonHolder is loaded on the first execution of Singleton.getInstance()
      * or the first access to SingletonHolder.INSTANCE, not before.
      */

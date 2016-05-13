@@ -50,7 +50,7 @@ import java.util.List;
 
 /**
  * Fragment containing Donky Rich Messaging Inbox.
- * <p/>
+ *
  * Created by Marcin Swierczek
  * 04/06/2015.
  * Copyright (C) Donky Networks Ltd. All rights reserved.

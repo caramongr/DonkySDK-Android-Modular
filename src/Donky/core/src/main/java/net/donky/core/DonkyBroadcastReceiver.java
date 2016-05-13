@@ -6,7 +6,7 @@ import android.support.v4.content.WakefulBroadcastReceiver;
 
 /**
  * Broadcast receiver for internal Donky Intent broadcasts.
- * <p/>
+ *
  * Created by Marcin Swierczek
  * 26/03/2015
  * Copyright (C) Donky Networks Ltd. All rights reserved.

@@ -1,5 +1,7 @@
 package net.donky.core.messaging.push.logic;
 
+import android.text.TextUtils;
+
 import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
 
@@ -110,6 +112,7 @@ public class ClientNotification extends net.donky.core.network.ClientNotificatio
                         if (buttonSetToUse.getButtonSetActions().length == 1) {
 
                             u.buttonDescription = buttonSetToUse.getButtonSetActions()[0].getLabel();
+                            u.userAction = "Button1";
 
                         } else if (buttonSetToUse.getButtonSetActions().length == 2) {
 
@@ -120,14 +123,12 @@ public class ClientNotification extends net.donky.core.network.ClientNotificatio
 
                             u.buttonDescription = sb.toString();
 
+                            u.userAction = TextUtils.equals(buttonSetAction.getLabel(), buttonSetToUse.getButtonSetActions()[0].getLabel()) ? "Button1" : "Button2";
+
                         }
                     }
                 }
             }
-        }
-
-        if (buttonSetAction != null) {
-            u.userAction = buttonSetAction.getActionType();
         }
 
         return u;

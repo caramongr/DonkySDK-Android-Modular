@@ -50,7 +50,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Controller for all account registration related functionality.
- * <p/>
+ *
  * Created by Marcin Swierczek
  * 16/02/2015
  * Copyright (C) Donky Networks Ltd. All rights reserved.
@@ -124,7 +124,7 @@ public class DonkyAccountController {
 
     /**
      * Initializes singleton.
-     * <p/>
+     *
      * SingletonHolder is loaded on the first execution of Singleton.getInstance()
      * or the first access to SingletonHolder.INSTANCE, not before.
      */
@@ -855,7 +855,7 @@ public class DonkyAccountController {
      * Handle internally a scenario in which user has been deleted on the Network. Re-registering with local data.
      */
     private void handleUserNotFound(DonkyException donkyException, Map<String, String> validationErrors, DonkyListener donkyListener) {
-        if (validationErrors.containsKey("AuthenticationDetail") && validationErrors.get("AuthenticationDetail").equals("UserNotFound")) {
+        if (validationErrors != null && validationErrors.containsKey("AuthenticationDetail") && validationErrors.get("AuthenticationDetail").equals("UserNotFound")) {
             reRegisterWithSameUserDetails(donkyListener);
         } else if (donkyListener != null) {
             donkyListener.error(donkyException, validationErrors);
@@ -943,7 +943,6 @@ public class DonkyAccountController {
      * @param deviceDetails Device details to use for the registration.
      * @param appVersion    Application version.
      * @param listener      donkyAuthenticator
-     * @throws DonkyException
      */
     public void registerAuthenticated(final UserDetails userDetails, final DeviceDetails deviceDetails, final String appVersion, final DonkyListener listener) {
         registerAuthenticated(userDetails, deviceDetails, appVersion, !TextUtils.isEmpty(DonkyDataController.getInstance().getUserDAO().getUserNetworkId()), listener);
@@ -1106,7 +1105,6 @@ public class DonkyAccountController {
      * If user is already registered the old registration details will be kept.
      *
      * @param listener donkyAuthenticator
-     * @throws DonkyException
      */
     public void registerAuthenticated(final DonkyListener listener) {
         registerAuthenticated(null, null, null, listener);
