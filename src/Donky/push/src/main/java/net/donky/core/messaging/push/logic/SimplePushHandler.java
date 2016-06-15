@@ -7,6 +7,7 @@ import com.google.gson.JsonObject;
 
 import net.donky.core.DonkyCore;
 import net.donky.core.helpers.DateAndTimeHelper;
+import net.donky.core.lifecycle.LifeCycleObserver;
 import net.donky.core.messaging.logic.MessagingInternalController;
 import net.donky.core.messaging.logic.model.MessageReceivedDetails;
 import net.donky.core.messaging.push.logic.events.SimplePushMessageEvent;
@@ -100,7 +101,9 @@ public class SimplePushHandler {
             }
         }
 
-        DonkyNetworkController.getInstance().synchronise();
+        if (LifeCycleObserver.getInstance().isApplicationForegrounded()) {
+            DonkyNetworkController.getInstance().synchronise();
+        }
 
         SimplePushMessageEvent event = new SimplePushMessageEvent(simplePushDataList);
 

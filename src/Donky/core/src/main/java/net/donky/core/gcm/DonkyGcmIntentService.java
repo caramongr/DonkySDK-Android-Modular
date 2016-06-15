@@ -14,6 +14,8 @@ import net.donky.core.network.DonkyNetworkController;
 import net.donky.core.network.ServerNotification;
 import net.donky.core.network.SynchronisationHandler;
 
+import org.json.JSONException;
+
 /**
  * Intent service processing received GCM messages.
  *
@@ -30,6 +32,8 @@ public class DonkyGcmIntentService extends GcmListenerService {
     private static final String DONKY_TYPE_MSG_REJECTED = "MSGREJECTED";
 
     private static final String DONKY_TYPE_RICH_MSG = "RICHMSG";
+
+    private static final String DIRECT_MESSAGE_TYPE = "DonkyMessage";
 
     private static DLog log;
 
@@ -61,8 +65,10 @@ public class DonkyGcmIntentService extends GcmListenerService {
         }
         log.debug("GCM received " + type);
 
-        if (!TextUtils.isEmpty(type)) {
-            handleDonkyMessage(data, type);
+        if (!handleDonkyDirectMessage(data, type)) {
+            if (!TextUtils.isEmpty(type)) {
+                handleDonkyMessage(data, type);
+            }
         }
     }
 
@@ -127,6 +133,34 @@ public class DonkyGcmIntentService extends GcmListenerService {
 
             }
         }
+    }
+
+    /**
+     * Extracts the Donky message content from GCM message and process.
+     *  @param data GCM bundle delivered by the OS.
+     * @param type Type of GCM message.
+     * @return True if Direct Message has been found and processed.
+     */
+    private static boolean handleDonkyDirectMessage(final Bundle data, String type) {
+
+        if (DIRECT_MESSAGE_TYPE.equals(type)) {
+
+            try {
+
+                ServerNotification sn = new ServerNotification(data);
+                SynchronisationHandler synchronisationHandler = new SynchronisationHandler(sn);
+                synchronisationHandler.processServerNotifications();
+                log.info("Direct GCM message processed successfully.");
+
+            } catch (JSONException e) {
+                log.warning("Direct GCM message processed with error.");
+                DonkyNetworkController.getInstance().setReRunNotificationExchange(true);
+            }
+
+            return true;
+        }
+
+        return false;
     }
 
     /**

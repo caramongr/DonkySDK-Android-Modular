@@ -82,6 +82,8 @@ public class DonkyCore {
 
     private AtomicBoolean isInitialisedCalled;
 
+    private static final String DIRECT_MESSAGE_MODULE_NAME = "DirectMessageDelivery";
+
     /**
      * Private constructor. Prevents instantiation from other classes.
      */
@@ -290,6 +292,8 @@ public class DonkyCore {
                                                 new ModuleDefinition(DonkyCore.class.getSimpleName(), AppSettings.getVersion()),
                                                 serverNotificationSubscriptions,
                                                 true);
+
+                                        registerModule(new ModuleDefinition(DIRECT_MESSAGE_MODULE_NAME, "1.0.0"));
 
                                         log.info("Initialised Donky SDK.");
 

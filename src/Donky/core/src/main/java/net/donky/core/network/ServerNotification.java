@@ -1,5 +1,7 @@
 package net.donky.core.network;
 
+import android.os.Bundle;
+
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.annotations.SerializedName;
@@ -8,6 +10,7 @@ import com.google.gson.internal.LinkedTreeMap;
 import net.donky.core.Notification;
 import net.donky.core.helpers.IdHelper;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
@@ -106,6 +109,11 @@ public class ServerNotification extends Notification {
      */
     public static final String NOTIFICATION_TYPE_UserUpdated = "UserUpdated";
 
+    public static final String DIRECT_MESSAGE_ID = "notificationId";
+    public static final String DIRECT_MESSAGE_CREATED_ON = "notificationCreatedOn";
+    public static final String DIRECT_MESSAGE_NOTIFICATION_TYPE = "notificationType";
+    public static final String DIRECT_MESSAGE_PAYLOAD = "payload";
+
     @SerializedName("type")
     private String type;
 
@@ -122,6 +130,26 @@ public class ServerNotification extends Notification {
 
     protected ServerNotification() {
         super(null, IdHelper.generateId());
+    }
+
+    /**
+     * Constructor initialised with GCM bundle data.
+     *
+     * @param bundle GCM bundle data with Donky direct message.
+     */
+    public ServerNotification(final Bundle bundle) throws JSONException {
+        super(null, IdHelper.generateId());
+
+        if (bundle != null) {
+            id = bundle.getString(DIRECT_MESSAGE_ID);
+            createdOn = bundle.getString(DIRECT_MESSAGE_CREATED_ON);
+            type = bundle.getString(DIRECT_MESSAGE_NOTIFICATION_TYPE);
+            String payload = bundle.getString(DIRECT_MESSAGE_PAYLOAD);
+            if (payload != null) {
+                JSONObject jObj = new JSONObject(payload);
+                data = new JsonParser().parse(jObj.toString()).getAsJsonObject();
+            }
+        }
     }
 
     /**
