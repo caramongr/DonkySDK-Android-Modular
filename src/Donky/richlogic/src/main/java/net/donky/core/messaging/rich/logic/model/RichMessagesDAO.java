@@ -836,7 +836,7 @@ public class RichMessagesDAO extends BaseDAO {
     public int removeRichMessage(final RichMessage richMessage) {
 
         if (richMessage != null) {
-            MessagingInternalController.getInstance().queueMessageDeletedNotification(richMessage);
+            MessagingInternalController.getInstance().sendMessageDeletedNotification(richMessage, null);
             return removeRichMessage(richMessage.getInternalId(), false);
         } else {
             return 0;
