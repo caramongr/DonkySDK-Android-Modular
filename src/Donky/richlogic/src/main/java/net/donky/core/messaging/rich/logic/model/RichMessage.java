@@ -1,5 +1,7 @@
 package net.donky.core.messaging.rich.logic.model;
 
+import android.text.TextUtils;
+
 import com.google.gson.annotations.SerializedName;
 
 import net.donky.core.messaging.logic.model.CommonMessage;
@@ -189,13 +191,15 @@ public class RichMessage extends CommonMessage {
 
         try {
 
-            return URLEncoder.encode(getBody(), "utf-8").replaceAll("\\+", " ");
+            if (!TextUtils.isEmpty(getBody())) {
+                return URLEncoder.encode(getBody(), "utf-8").replaceAll("\\+", " ");
+            }
 
         } catch (UnsupportedEncodingException e) {
 
-            return getBody();
-
         }
+
+        return getBody();
     }
 
     /**
