@@ -62,7 +62,7 @@ public class AssemblingManager {
 
     /**
      * Initializes singleton.
-     * <p/>
+     *
      * SingletonHolder is loaded on the first execution of Singleton.getInstance()
      * or the first access to SingletonHolder.INSTANCE, not before.
      */
@@ -79,6 +79,12 @@ public class AssemblingManager {
         return SingletonHolder.INSTANCE;
     }
 
+    /**
+     * Create and store assembly object with received message parts. Try to assemble parts when all are available.
+     *
+     * @param bundle GCM message bundle.
+     * @param isPart True if this is message part notification. False if main message notification with metadata.
+     */
     Bundle assembleMessage(Bundle bundle, boolean isPart) {
 
         synchronized (lock) {
@@ -95,7 +101,7 @@ public class AssemblingManager {
 
                 if (ma != null) {
                     ma.missingParts -= 1;
-                    log.debug(processId + "There is " + ma.missingParts+" missing parts.");
+                    log.debug(processId + "There is " + ma.missingParts + " missing parts.");
                 } else {
                     ma = new MessageAssembly();
                     if (isPart) {
@@ -106,7 +112,7 @@ public class AssemblingManager {
                         String expiredBodyParts = bundle.getString(DIRECT_MESSAGE_EXP_BODY_PART_COUNTS_KEY);
                         ma.missingParts = Integer.decode(bodyParts) + Integer.decode(expiredBodyParts);
                     }
-                    log.debug(processId + "There is " + ma.missingParts+" missing parts.");
+                    log.debug(processId + "There is " + ma.missingParts + " missing parts.");
                     assemblyMap.put(id, ma);
                 }
 
@@ -139,6 +145,14 @@ public class AssemblingManager {
         return null;
     }
 
+    /**
+     * If all parts can be assembled this method will remove the assembly and return the assembled message bundle.
+     *
+     * @param ma Message assembly to check.
+     * @param id Notification id.
+     * @return Assembled message bundle.
+     * @throws JSONException
+     */
     private Bundle concatMessages(MessageAssembly ma, String id) throws JSONException {
 
         if (ma.missingParts == 0 && ma.mainBundle != null) {
@@ -171,6 +185,12 @@ public class AssemblingManager {
         return null;
     }
 
+    /**
+     * Sorts message parts, adds byte arrays and decompress the resulting byte array encoded as base64 UTF-8 String.
+     *
+     * @param parts Parts bundles.
+     * @return Message body encoded as base64 UTF-8 String.
+     */
     private String assembleBody(List<Bundle> parts) {
 
         TreeMap<Integer, byte[]> sortedMap = new TreeMap<>();
@@ -190,6 +210,12 @@ public class AssemblingManager {
         return null;
     }
 
+    /**
+     * Concatenates collection of byte arrays.
+     *
+     * @param arrays Collection of byte arrays.
+     * @return
+     */
     public static byte[] concatAll(Collection<byte[]> arrays) {
 
         int totalLength = 0;
@@ -208,6 +234,9 @@ public class AssemblingManager {
         return result;
     }
 
+    /**
+     * Decompress byte array.
+     */
     public static String decompress(byte[] compressed) throws IOException {
 
         if (compressed != null && compressed.length > 0) {
@@ -234,14 +263,45 @@ public class AssemblingManager {
         }
     }
 
+    /**
+     * This method should be called by rich logic module to make sure that no redundant message assembly is being left in the memory.
+     *
+     * @param id Notification id.
+     */
+    public void removeAssembly(String id) {
+
+        log.debug("Removing assembly " + id);
+
+        synchronized (lock) {
+            assemblyMap.remove(id);
+            lock.notifyAll();
+        }
+
+    }
+
+    /**
+     * Describes set of message parts to assemble.
+     */
     class MessageAssembly {
 
+        /**
+         * Counts missing parts of the message.
+         */
         int missingParts;
 
+        /**
+         * Main message bundle. Stores all the message metadata.
+         */
         Bundle mainBundle;
 
+        /**
+         * Parts of expired message body.
+         */
         List<Bundle> expiredBodyParts;
 
+        /**
+         * Parts of message body.
+         */
         List<Bundle> bodyParts;
 
         MessageAssembly() {

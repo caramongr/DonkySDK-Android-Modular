@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
 import net.donky.core.DonkyCore;
+import net.donky.core.gcm.AssemblingManager;
 import net.donky.core.helpers.DateAndTimeHelper;
 import net.donky.core.helpers.IdHelper;
 import net.donky.core.lifecycle.LifeCycleObserver;
@@ -90,6 +91,8 @@ public class NotificationHandler {
 
                 richMessage.setReceivedExpired(receivedExpired);
                 richMessages.add(richMessage);
+
+                AssemblingManager.getInstance().removeAssembly(serverNotification.getId());
 
             }
         }
