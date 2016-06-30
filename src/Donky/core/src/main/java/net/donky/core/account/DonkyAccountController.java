@@ -1897,11 +1897,16 @@ public class DonkyAccountController {
 
     private void registerPushIfEmpty() {
 
-        String gcmRegistrationId = DonkyDataController.getInstance().getConfigurationDAO().getGcmRegistrationId();
+        DonkyCore.getInstance().processInBackground(new Runnable() {
+            @Override
+            public void run() {
+                String gcmRegistrationId = DonkyDataController.getInstance().getConfigurationDAO().getGcmRegistrationId();
 
-        if (TextUtils.isEmpty(gcmRegistrationId)) {
-            DonkyGcmController.getInstance().registerPush(null);
-        }
+                if (TextUtils.isEmpty(gcmRegistrationId)) {
+                    DonkyGcmController.getInstance().registerPush(null);
+                }
+            }
+        });
     }
 
     /**
