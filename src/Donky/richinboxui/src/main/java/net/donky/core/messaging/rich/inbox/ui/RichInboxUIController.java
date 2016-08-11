@@ -90,8 +90,8 @@ public class RichInboxUIController {
     }
 
     /**
-     * Notify UI components about incoming {@link RichMessage}s
-     * @param richMessages Incoming rich mesages.
+     * Notify UI components about incoming RichMessage
+     * @param richMessages Incoming rich messages.
      */
     public void notifyListeners(List<RichMessage> richMessages) {
 
@@ -278,7 +278,14 @@ public class RichInboxUIController {
         //stackBuilder.addNextIntent(new Intent(context,RichInboxAndMessageActivity.class));
         stackBuilder.addNextIntent(intent);
 
-        int requestCode = 8712;
+        int requestCode;
+
+        if (richMessageToDisplay != null && !TextUtils.isEmpty(richMessageToDisplay.getMessageId())) {
+            requestCode = richMessageToDisplay.getMessageId().hashCode();
+        } else {
+            requestCode = 8712;
+        }
+
         return stackBuilder.getPendingIntent(requestCode, PendingIntent.FLAG_ONE_SHOT);
 
     }

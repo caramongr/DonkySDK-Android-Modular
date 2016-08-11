@@ -836,7 +836,7 @@ public class RichMessagesDAO extends BaseDAO {
     public int removeRichMessage(final RichMessage richMessage) {
 
         if (richMessage != null) {
-            MessagingInternalController.getInstance().queueMessageDeletedNotification(richMessage);
+            MessagingInternalController.getInstance().sendMessageDeletedNotification(richMessage, null);
             return removeRichMessage(richMessage.getInternalId(), false);
         } else {
             return 0;
@@ -974,7 +974,6 @@ public class RichMessagesDAO extends BaseDAO {
      * Gets rich message cursor containing all rich messages that didn't exceeded maximum availability days. This method is non-blocking.
      *
      * @param filter String to filter the rich message sender display name and description
-     * @return Cursor with filtered rich messages.
      */
     public void getRichMessagesCursorForUI(final String filter, final DonkyResultListener<Cursor> listener) {
 

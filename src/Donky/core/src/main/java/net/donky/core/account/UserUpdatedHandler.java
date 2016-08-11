@@ -28,7 +28,7 @@ public class UserUpdatedHandler {
 
     /**
      * Looks for most recent server notification and saves user details locally.
-     * @param notifications List of server notifications of type {@link ServerNotification#NOTIFICATION_TYPE_UserUpdated)
+     * @param notifications List of server notifications of type {@link ServerNotification#NOTIFICATION_TYPE_UserUpdated}
      */
     public void handleUserUpdatedNotifications(List<ServerNotification> notifications) {
 

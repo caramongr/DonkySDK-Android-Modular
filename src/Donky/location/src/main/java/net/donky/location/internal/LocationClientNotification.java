@@ -28,7 +28,9 @@ public class LocationClientNotification extends ClientNotification {
 	/**
 	 * Create a notification to request location of a user with a given network profile id
 	 *
-	 * @param networkProfileId Network profile id of user to ask for a location
+     * @param externalUserId Requester user id.
+	 * @param networkProfileId Network profile id of user to ask for a location.
+     * @param deviceId Device id for requested location.
 	 * @return 'Location Crossed' Client Notification
 	 */
 	public static ClientNotification createRequestLocationNotification(String externalUserId, String networkProfileId, String deviceId) {

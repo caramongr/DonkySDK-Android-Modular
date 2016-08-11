@@ -15,7 +15,7 @@ dependencies {
 
 def groupId = 'net.donky'
 def artifactId = 'donky-signalr'
-def version = '2.7.0.1'
+def version = '2.7.0.2'
 
 def localReleaseDest = "${buildDir}/release/${version}"
 

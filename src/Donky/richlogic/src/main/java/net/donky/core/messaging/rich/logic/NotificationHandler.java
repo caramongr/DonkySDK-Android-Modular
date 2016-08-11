@@ -4,8 +4,10 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
 import net.donky.core.DonkyCore;
+import net.donky.core.gcm.AssemblingManager;
 import net.donky.core.helpers.DateAndTimeHelper;
 import net.donky.core.helpers.IdHelper;
+import net.donky.core.lifecycle.LifeCycleObserver;
 import net.donky.core.messaging.rich.logic.model.RichMessage;
 import net.donky.core.messaging.logic.model.MessageReceivedDetails;
 import net.donky.core.messaging.logic.MessagingInternalController;
@@ -90,10 +92,14 @@ public class NotificationHandler {
                 richMessage.setReceivedExpired(receivedExpired);
                 richMessages.add(richMessage);
 
+                AssemblingManager.getInstance().removeAssembly(serverNotification.getId());
+
             }
         }
 
-        DonkyNetworkController.getInstance().synchronise();
+        if (LifeCycleObserver.getInstance().isApplicationForegrounded()) {
+            DonkyNetworkController.getInstance().synchronise();
+        }
 
         DonkyCore.publishLocalEvent(new RichMessageEvent(richMessages));
 

@@ -14,6 +14,8 @@ import net.donky.core.network.DonkyNetworkController;
 import net.donky.core.network.ServerNotification;
 import net.donky.core.network.SynchronisationHandler;
 
+import org.json.JSONException;
+
 /**
  * Intent service processing received GCM messages.
  *
@@ -31,11 +33,14 @@ public class DonkyGcmIntentService extends GcmListenerService {
 
     private static final String DONKY_TYPE_RICH_MSG = "RICHMSG";
 
+    private static final String DIRECT_MESSAGE_TYPE = "DonkyMessage";
+
     private static DLog log;
 
     /**
-     * Inform DonkyGcmIntentService about incoming GCM message. Call this method in {@link GcmListenerService#onMessageReceived} method if you implemented {@link GcmListenerService} in your app.
+     * Inform DonkyGcmIntentService about incoming GCM message. Call this method in GcmListenerService#onMessageReceived method if you implemented GcmListenerService in your app.
      * If you didn't implement such class DonkyGcmIntentService will receive GCM message automatically.
+     *
      * @param from describes message sender.
      * @param data message data as String key/value pairs.
      */
@@ -61,14 +66,22 @@ public class DonkyGcmIntentService extends GcmListenerService {
         }
         log.debug("GCM received " + type);
 
-        if (!TextUtils.isEmpty(type)) {
-            handleDonkyMessage(data, type);
+        try {
+            if (!TextUtils.isEmpty(type)) {
+                if (!handleDonkyDirectMessage(data, type)) {
+                    handleDonkyMessage(data, type);
+                }
+            }
+        } catch (JSONException e) {
+            log.warning("Direct GCM message processed with error.");
+            DonkyNetworkController.getInstance().setReRunNotificationExchange(true);
         }
     }
 
     /**
      * Performs appropriate Donky Core Actions according to GCM message type.
-     *  @param data GCM bundle delivered by the OS.
+     *
+     * @param data GCM bundle delivered by the OS.
      * @param type Type of GCM message.
      */
     private static void handleDonkyMessage(final Bundle data, String type) {
@@ -123,14 +136,53 @@ public class DonkyGcmIntentService extends GcmListenerService {
 
             } catch (Exception e) {
 
-                Log.e("DonkyGcmIntentService","Error processing NOTIFICATIONS_PENDING message.");
+                Log.e("DonkyGcmIntentService", "Error processing NOTIFICATIONS_PENDING message.");
 
             }
         }
     }
 
     /**
+     * Extracts the Donky message content from GCM message and process.
+     *
+     * @param data GCM bundle delivered by the OS.
+     * @param type Type of GCM message.
+     * @return True if Direct Message has been found and processed.
+     */
+    private static boolean handleDonkyDirectMessage(final Bundle data, String type) throws JSONException {
+
+        boolean isPart = AssemblingManager.DIRECT_MESSAGE_PART_TYPE.equals(type);
+
+        if (isPart || DIRECT_MESSAGE_TYPE.equals(type)) {
+
+            ServerNotification sn;
+
+            if (isPart || AssemblingManager.DIRECT_MESSAGE_NOTIFICATION_TYPE_RM.equals(data.getString(AssemblingManager.DIRECT_MESSAGE_NOTIFICATION_TYPE_KEY))) {
+
+                Bundle assembledBundle = AssemblingManager.getInstance().assembleMessage(data, isPart);
+
+                if (assembledBundle == null) {
+                    return true;
+                } else {
+                    sn = new ServerNotification(assembledBundle);
+                }
+            } else {
+                sn = new ServerNotification(data);
+            }
+
+            SynchronisationHandler synchronisationHandler = new SynchronisationHandler(sn);
+            synchronisationHandler.processServerNotifications();
+            log.info("Direct GCM message processed successfully.");
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * Check if GCM message is notifying about pending rich message.
+     *
      * @param extras GCM intent extras Bundle.
      * @return
      */

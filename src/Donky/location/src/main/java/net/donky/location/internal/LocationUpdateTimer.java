@@ -108,8 +108,8 @@ public class LocationUpdateTimer {
     }
 
     /**
-     * Sets the delay in milliseconds between
-     * @param delayInMilliseconds
+     * Sets the delay in milliseconds
+     * @param delayInMilliseconds Delay in milliseconds
      */
     public void setDelayInMilliseconds(long delayInMilliseconds) {
         this.delayInMilliseconds = delayInMilliseconds;

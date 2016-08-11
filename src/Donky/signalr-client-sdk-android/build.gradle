@@ -4,13 +4,13 @@ apply plugin: 'com.android.library'
 apply plugin: 'maven'
 
 android {
-    compileSdkVersion 23
-    buildToolsVersion "23.0.2"
+    compileSdkVersion 24
+    buildToolsVersion "23.0.3"
     useLibrary 'org.apache.http.legacy'
 
     defaultConfig {
         minSdkVersion 14
-        targetSdkVersion 23
+        targetSdkVersion 24
         versionCode 1
         versionName "1.0"
     }
@@ -31,7 +31,7 @@ dependencies {
 
 def groupId = 'net.donky'
 def artifactId = 'donky-android-signalr'
-def version = '2.7.0.1'
+def version = '2.7.0.2'
 
 def localReleaseDest = "${buildDir}/release/${version}"
 
