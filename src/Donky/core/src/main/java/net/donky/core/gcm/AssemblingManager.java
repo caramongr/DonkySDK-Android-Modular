@@ -4,9 +4,6 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Base64;
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-
 import net.donky.core.helpers.IdHelper;
 import net.donky.core.logging.DLog;
 
@@ -164,17 +161,17 @@ public class AssemblingManager {
             if (!TextUtils.isEmpty(payload)) {
 
                 JSONObject jObj = new JSONObject(payload);
-                JsonObject data = new JsonParser().parse(jObj.toString()).getAsJsonObject();
                 String body = assembleBody(ma.bodyParts);
                 String expBody = assembleBody(ma.expiredBodyParts);
                 if (!TextUtils.isEmpty(body)) {
-                    data.addProperty(BODY_KEY, body);
+                    jObj.put(BODY_KEY, body);
                 }
                 if (!TextUtils.isEmpty(expBody)) {
-                    data.addProperty(EXP_BODY_KEY, expBody);
+                    jObj.put(EXP_BODY_KEY, expBody);
                 }
-                log.debug("Payload after assembling " + data.toString());
-                ma.mainBundle.putString(AssemblingManager.DIRECT_MESSAGE_PAYLOAD, data.toString());
+
+                log.debug("Payload after assembling " + jObj.toString());
+                ma.mainBundle.putString(AssemblingManager.DIRECT_MESSAGE_PAYLOAD, jObj.toString());
                 Bundle newBundle = new Bundle(ma.mainBundle);
                 assemblyMap.remove(id);
 

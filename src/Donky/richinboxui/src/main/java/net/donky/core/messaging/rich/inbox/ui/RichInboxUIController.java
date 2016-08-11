@@ -90,8 +90,8 @@ public class RichInboxUIController {
     }
 
     /**
-     * Notify UI components about incoming {@link RichMessage}s
-     * @param richMessages Incoming rich mesages.
+     * Notify UI components about incoming RichMessage
+     * @param richMessages Incoming rich messages.
      */
     public void notifyListeners(List<RichMessage> richMessages) {
 

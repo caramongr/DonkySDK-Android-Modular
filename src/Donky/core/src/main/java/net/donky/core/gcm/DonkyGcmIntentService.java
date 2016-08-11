@@ -38,7 +38,7 @@ public class DonkyGcmIntentService extends GcmListenerService {
     private static DLog log;
 
     /**
-     * Inform DonkyGcmIntentService about incoming GCM message. Call this method in {@link GcmListenerService#onMessageReceived} method if you implemented {@link GcmListenerService} in your app.
+     * Inform DonkyGcmIntentService about incoming GCM message. Call this method in GcmListenerService#onMessageReceived method if you implemented GcmListenerService in your app.
      * If you didn't implement such class DonkyGcmIntentService will receive GCM message automatically.
      *
      * @param from describes message sender.

@@ -7,7 +7,7 @@ import net.donky.core.network.location.UserLocationRequest;
 import java.util.List;
 
 /**
- * Event notifying about some users on the Donky Network requesting the location of these device. You can respond to that using {@link net.donky.location.DonkyLocationController#sendLocationUpdate(DonkyListener)}
+ * Event notifying about some users on the Donky Network requesting the location of these device. You can respond to that using net.donky.location.DonkyLocationController#sendLocationUpdate(DonkyListener)
  *
  * Created by Marcin Swierczek
  * 27/11/2015.

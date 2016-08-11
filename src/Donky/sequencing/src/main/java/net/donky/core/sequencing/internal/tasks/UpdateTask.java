@@ -5,7 +5,6 @@ import android.os.Looper;
 
 import net.donky.core.DonkyException;
 import net.donky.core.DonkyListener;
-import net.donky.core.account.DonkyAccountController;
 import net.donky.core.sequencing.DonkySequenceListener;
 import net.donky.core.sequencing.internal.DonkySequenceController;
 
@@ -79,7 +78,7 @@ public abstract class UpdateTask {
     }
 
     /**
-     * Perform appropriate call in {@link DonkyAccountController}
+     * Perform appropriate call in DonkyAccountController
      */
     abstract public void performTask();
 }

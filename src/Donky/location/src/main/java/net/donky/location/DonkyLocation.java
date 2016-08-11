@@ -71,6 +71,7 @@ public class DonkyLocation {
     /**
      * Initialise Donky Automation Module.
      *
+     * @param application Application instance
      * @param donkyListener The callback to invoke when the Module is initialised.
      */
     public static void initialiseDonkyLocation(final Application application, final DonkyListener donkyListener) {

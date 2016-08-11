@@ -74,8 +74,6 @@ public class RichInboxAndMessageFragment extends GenericSplitFragment<RichInboxF
 
     /**
      * Set Activity that will display Rich Message.
-     *
-     * @return Activity child class that will display Rich Message. By default this is RichMessageForInboxActivity which will work with NActionBarThemes.
      */
     public void setRichMessageActivityClass(Class<?> getRichMessageActivityClass) {
         synchronized (sharedLock) {

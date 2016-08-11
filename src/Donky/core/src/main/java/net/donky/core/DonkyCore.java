@@ -120,7 +120,8 @@ public class DonkyCore {
      * @param deviceDetails Device details to use for the registration
      * @param appVersion    The app version as specified by the integrator
      * @param donkyListener The callback to invoke when the SDK is initialised.
-     * @Deprecated Initialising SDk with user details has been deprecated because this way of overriding any future user account updates is confusing. Please use {@link #initialiseDonkySDK(Application, String, DonkyListener)} instead.
+     *
+     *  @deprecated Initialising SDk with user details has been deprecated because this way of overriding any future user account updates is confusing. Please use {@link #initialiseDonkySDK(Application, String, DonkyListener)} instead.
      */
     @Deprecated
     public static void initialiseDonkySDK(final Application application, final String apiKey, final UserDetails userDetails, final DeviceDetails deviceDetails, final String appVersion, final DonkyListener donkyListener) {
