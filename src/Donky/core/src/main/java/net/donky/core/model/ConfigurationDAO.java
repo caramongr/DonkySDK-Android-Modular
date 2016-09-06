@@ -29,6 +29,7 @@ public class ConfigurationDAO extends SharedPreferencesBaseDAO {
     private static final String KEY_GCM_SENDER_ID = "senderId";
     private static final String KEY_DONKY_API_KEY = "apiKey";
     private static final String KEY_APP_VERSION = "appVersion";
+    private static final String KEY_SDK_VERSION = "sdkVersion";
     private static final String KEY_GCM_REGISTRATION_APP_VERSION_CODE = "appVersionCode";
     private static final String KEY_GCM_ALLOW_PUSH_NOTIFICATIONS = "allowPush";
     private static final String KEY_USER_SUSPENDED = "userSuspended";
@@ -42,24 +43,24 @@ public class ConfigurationDAO extends SharedPreferencesBaseDAO {
     private static final String KEY_CONFIGURATION_ITEMS = "configurationItemsKeySet";
 
     public static final String KEY_CONFIGURATION_DefaultGCMSenderId = "DefaultGCMSenderId";
-    public static final String KEY_CONFIGURATION_MinimumClientVersion = "MinimumClientVersion";
-    public static final String KEY_CONFIGURATION_AssetDownloadNamedFileUrlFormat= "AssetDownloadNamedFileUrlFormat";
+//    public static final String KEY_CONFIGURATION_MinimumClientVersion = "MinimumClientVersion";
+//    public static final String KEY_CONFIGURATION_AssetDownloadNamedFileUrlFormat= "AssetDownloadNamedFileUrlFormat";
     public static final String KEY_CONFIGURATION_AssetDownloadUrlFormat = "AssetDownloadUrlFormat";
     public static final String KEY_CONFIGURATION_AlwaysSubmitErrors = "AlwaysSubmitErrors";
-    public static final String KEY_CONFIGURATION_ContactDiscoveryMaxItems = "ContactDiscoveryMaxItems";
+//    public static final String KEY_CONFIGURATION_ContactDiscoveryMaxItems = "ContactDiscoveryMaxItems";
     public static final String KEY_CONFIGURATION_DeviceCommsConnectionRetrySchedule = "DeviceCommsConnectionRetrySchedule";
-    public static final String KEY_CONFIGURATION_DeviceCommsFeatureOn = "DeviceCommsFeatureOn";
-    public static final String KEY_CONFIGURATION_DeviceCommsPingInterval = "DeviceCommsPingInterval";
-    public static final String KEY_CONFIGURATION_ForwardingOverlayMessageMaxLength = "ForwardingOverlayMessageMaxLength";
-    public static final String KEY_CONFIGURATION_MaxAttachments = "MaxAttachments";
-    public static final String KEY_CONFIGURATION_MaximumGroupParticipants = "MaximumGroupParticipants";
+//    public static final String KEY_CONFIGURATION_DeviceCommsFeatureOn = "DeviceCommsFeatureOn";
+//    public static final String KEY_CONFIGURATION_DeviceCommsPingInterval = "DeviceCommsPingInterval";
+//    public static final String KEY_CONFIGURATION_ForwardingOverlayMessageMaxLength = "ForwardingOverlayMessageMaxLength";
+//    public static final String KEY_CONFIGURATION_MaxAttachments = "MaxAttachments";
+//    public static final String KEY_CONFIGURATION_MaximumGroupParticipants = "MaximumGroupParticipants";
     public static final String KEY_CONFIGURATION_MaxMinutesWithoutNotificationExchange = "MaxMinutesWithoutNotificationExchange";
     public static final String KEY_CONFIGURATION_RichMessageAvailabilityDays = "RichMessageAvailabilityDays";
-    public static final String KEY_CONFIGURATION_ServerUnavailablePollPeriod = "ServerUnavailablePollPeriod";
-    public static final String KEY_CONFIGURATION_ServerUnavailableWarningPeriodSeconds = "ServerUnavailableWarningPeriodSeconds";
-    public static final String KEY_CONFIGURATION_UploadImageJpegQuality = "UploadImageJpegQuality";
-    public static final String KEY_CONFIGURATION_UploadImageMaxResX = "UploadImageMaxResX";
-    public static final String KEY_CONFIGURATION_UploadImageMaxResY = "UploadImageMaxResY";
+//    public static final String KEY_CONFIGURATION_ServerUnavailablePollPeriod = "ServerUnavailablePollPeriod";
+//    public static final String KEY_CONFIGURATION_ServerUnavailableWarningPeriodSeconds = "ServerUnavailableWarningPeriodSeconds";
+//    public static final String KEY_CONFIGURATION_UploadImageJpegQuality = "UploadImageJpegQuality";
+//    public static final String KEY_CONFIGURATION_UploadImageMaxResX = "UploadImageMaxResX";
+//    public static final String KEY_CONFIGURATION_UploadImageMaxResY = "UploadImageMaxResY";
     public static final String KEY_CONFIGURATION_CustomContentMaxSizeBytes = "CustomContentMaxSizeBytes";
     public static final String KEY_CONFIGURATION_LocationUpdateIntervalSeconds = "LocationUpdateIntervalSeconds";
 
@@ -145,6 +146,20 @@ public class ConfigurationDAO extends SharedPreferencesBaseDAO {
      */
     public String getAppVersion() {
         return getString(KEY_APP_VERSION, null);
+    }
+
+    /**
+     * @param sdkVersion SDK version.
+     */
+    public void setSdkVersion(String sdkVersion) {
+        setString(KEY_SDK_VERSION, sdkVersion);
+    }
+
+    /**
+     * @return SDK version.
+     */
+    public String getSdkVersion() {
+        return getString(KEY_SDK_VERSION, null);
     }
 
     /**

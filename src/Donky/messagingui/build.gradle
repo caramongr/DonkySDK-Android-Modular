@@ -35,7 +35,7 @@ dependencies {
 
 def groupId = 'net.donky'
 def artifactId = 'donky-module-messaging-ui'
-def version = '2.7.0.2'
+def version = '2.7.0.3'
 
 def localReleaseDest = "${buildDir}/release/${version}"
 
