@@ -33,6 +33,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -322,10 +323,22 @@ public class DonkyCore {
 
                                 try {
 
-                                    for (ModuleDefinition moduleDefinition : moduleDefinitionsToRegister) {
-                                        registerModule(moduleDefinition);
+                                    boolean isClientChanged = false;
+                                    boolean isFirstRun = DonkyDataController.getInstance().getDeviceDAO().getDeviceId() == null;
+
+                                    if (!isFirstRun) {
+                                        isClientChanged = isClientChanged();
                                     }
-                                    moduleDefinitionsToRegister.clear();
+
+                                    if (isFirstRun || isClientChanged) {
+
+                                        for (ModuleDefinition moduleDefinition : moduleDefinitionsToRegister) {
+                                            registerModule(moduleDefinition);
+                                        }
+                                        moduleDefinitionsToRegister.clear();
+
+                                        DonkyDataController.getInstance().getConfigurationDAO().setSdkVersion(AppSettings.getVersion());
+                                    }
 
                                     if (!isAuthenticated) {
 
@@ -355,7 +368,9 @@ public class DonkyCore {
 
                                     if (DonkyAccountController.getInstance().isRegistered()) {
 
-                                        DonkyAccountController.getInstance().updateClient(null);
+                                        if (!isFirstRun && isClientChanged) {
+                                            DonkyAccountController.getInstance().updateClient(null);
+                                        }
 
                                         // Register for Push messages in GCM
                                         DonkyGcmController.getInstance().registerPush(new DonkyListener() {
@@ -401,6 +416,31 @@ public class DonkyCore {
             log.warning("Cannot initialise more than once.");
             postError(new Handler(Looper.getMainLooper()), donkyListener, new DonkyException("Cannot initialise more than once."));
         }
+    }
+
+    private boolean isClientChanged() {
+
+        try {
+
+            Map<String, String> newModules = new TreeMap<>();
+            for (ModuleDefinition md : moduleDefinitionsToRegister) {
+                newModules.put(md.getName(), md.getVersion());
+            }
+
+            //TreeMap is are sorted by the keys so we can compare value lists:
+            List<String> oldVersions = new ArrayList<>(DonkyDataController.getInstance().getConfigurationDAO().getModules().values());
+            List<String> newVersions = new ArrayList<>(newModules.values());
+
+            if (!newVersions.equals(oldVersions)) {
+                return true;
+            }
+
+        } catch (Exception e) {
+            log.error("Error checking modules/app versions.");
+            return true;
+        }
+
+        return false;
     }
 
     /**
