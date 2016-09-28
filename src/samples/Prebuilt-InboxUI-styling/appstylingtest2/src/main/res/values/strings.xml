@@ -10,8 +10,6 @@
     <string name="DebugLogsEnabled">true</string>
     <string name="SensitiveLogsEnabled">true</string>
 
-    <string name="ServiceURL">https://client-api.mobiledonky.com</string>
-
     <integer name="MinimalTimeBetweenSubmittingLogsSeconds">30</integer>
 
     <string name="NewDeviceNotificationEnabled">true</string>

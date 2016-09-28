@@ -1,4 +1,3 @@
 <resources>
     <string name="app_name">RichPushSample</string>
-    <string name="ServiceURL">https://dev-client-api.mobiledonky.com</string>
 </resources>
